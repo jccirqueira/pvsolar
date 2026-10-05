@@ -2,11 +2,13 @@
 # Copy this file to scada.yaml and customize
 
 # MQTT Connection
+# Credenciais do padrao do ecossistema (broker anonimo local as ignora,
+# o stack raiz autenticado as exige - ver docker/mosquitto.conf)
 mqtt:
   broker: "localhost"
   port: 1883
-  username: null
-  password: null
+  username: "pvsolar"
+  password: "pvsolar_dev"
   client_id: "pvsolar-scada"
   topics:
     - "pvsolar/+/telemetry"

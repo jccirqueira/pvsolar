@@ -1195,10 +1195,10 @@ pause</code></div>
                             <tr><td><code>docker-compose.yml</code></td><td>Stack completa (16 servicos): healthchecks, volumes, dependencias, binds de config</td></tr>
                             <tr><td><code>docker/initdb/01-databases.sql</code></td><td>Cria os 4 bancos (auth/scheduler + pares *_test) e o pvsolar_analytics na primeira subida</td></tr>
                             <tr><td><code>docker/Caddyfile</code></td><td>Roteamento por caminho: <code>/auth/*</code>, <code>/gateway/*</code>, ... e o Web em <code>/</code></td></tr>
-                            <tr><td><code>docker/mosquitto.conf</code></td><td>Broker MQTT na 1883 (anonimo - trocar por senha/TLS antes de expor)</td></tr>
+                            <tr><td><code>docker/mosquitto.conf</code></td><td>Broker MQTT na 1883 com autenticação (<code>allow_anonymous false</code> + <code>docker/mosquitto-passwd</code>; senha padrão <code>pvsolar_dev</code>)</td></tr>
                             <tr><td><code>docker/config/*.yaml</code></td><td>7 variantes de config com URLs da rede interna (<code>broker: mosquitto</code>, <code>http://gateway:8000</code>, ...)</td></tr>
                             <tr><td><code>.env.example</code></td><td>Variaveis: DOMAIN, senha do Postgres, TZ, URLs do Web</td></tr>
-                            <tr><td><code>docker/validate_compose.py</code></td><td>Valida YAML, builds, volumes, portas e initdb (<code>python docker\validate_compose.py</code>)</td></tr>
+                            <tr><td><code>docker/validate_*.py</code></td><td>4 validadores (locais e na CI): compose (YAML, builds, volumes, portas, initdb), guia (HTML), 13 manuals (HTML) e links relativos dos Markdown — ex.: <code>python docker\validate_compose.py</code></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -1305,6 +1305,13 @@ sudo ufw enable</code></div>
 docker compose ps
 <span class="comment"># HTTPS emitido automaticamente na primeira subida (DOMAIN com dominio)</span></code></div>
                         </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <div class="alert-content">
+                        <div class="alert-title">Senha do MQTT</div>
+                        <div class="alert-text">O Mosquitto sobe autenticado (<code>allow_anonymous false</code>) com usuário <code>pvsolar</code> e senha padrão <code>pvsolar_dev</code>, já configurada nos clientes (<code>docker/config/*.yaml</code>); conexões anônimas são recusadas e a porta 1883 fica apenas em <code>127.0.0.1</code>. Para trocar a senha: <code>mosquitto_passwd -b docker/mosquitto-passwd pvsolar NOVA_SENHA</code> e atualize <code>password</code> em <code>gateway.yaml</code>, <code>analytics.yaml</code> e <code>scada.yaml</code>.</div>
                     </div>
                 </div>
 

@@ -17,8 +17,8 @@ gateway:
   instance_id: null                # Auto-generated if null
 
 # MQTT Configuration (obrigatorio: o gateway conecta ao broker no startup)
-# Para local, suba um Mosquitto em localhost:1883 (ex.: docker compose do
-# proprio projeto ou `docker run -p 1883:1883 eclipse-mosquitto`).
+# Broker do stack raiz exige autenticacao (allow_anonymous false) -
+# credenciais em docker/mosquitto-passwd (ver docker/mosquitto.conf).
 mqtt:
   broker: "mosquitto"
   port: 1883
@@ -31,8 +31,8 @@ mqtt:
     tls_version: "1.3"
     verify_certificate: false
   client_id: "pvsolar-gateway-001"
-  username: null
-  password: null
+  username: "pvsolar"
+  password: "pvsolar_dev"
   topics:
     publish: "pvsolar/{site_id}/telemetry"
     command: "pvsolar/{site_id}/command"

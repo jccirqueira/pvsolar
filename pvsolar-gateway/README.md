@@ -3,7 +3,6 @@
 **Enterprise-Grade Solar Inverter Monitoring Gateway**
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![License: Commercial](https://img.shields.io/badge/License-Commercial-red.svg)](LICENSE-COMMERCIAL)
 
 pvSolar Gateway é um gateway profissional de monitoramento de inversores solares com integração MQTT e cloud. Projetado para ambientes industriais, oferece suporte completo a inversores via SunSpec Modbus (IEEE 1547-2018) e protocolos específicos de fabricantes.
 
@@ -139,16 +138,16 @@ pvsolar-gateway/
 │       ├── css/
 │       └── js/
 ├── config/
-│   ├── gateway.example.yaml    # Configuração de exemplo
-│   └── certificates/           # Certificados TLS
+│   ├── gateway.yaml            # Configuração local (dev)
+│   └── gateway.example.yaml    # Configuração de exemplo
 ├── examples/
-│   ├── docker-compose.yml
-│   └── kubernetes/
+│   └── pvbrowser_example.py    # Integração com o protocolo pvBrowser
 ├── tests/
-├── docs/
 ├── docker/
 ├── requirements.txt
-├── setup.py
+├── Resumo.txt
+├── Manual.html
+├── INSTALL.md
 └── LICENSE
 ```
 
@@ -323,53 +322,43 @@ O gateway expõe métricas via Prometheus:
 ## 🧪 Testes
 
 ```bash
-# Unit tests
-pytest tests/unit/
-
-# Integration tests
-pytest tests/integration/
-
-# Load tests
-pytest tests/load/
+# Suíte completa (358 testes) com cobertura
+python -m pytest tests/ -q --cov=src --cov-report=term
 ```
+
+O piso de cobertura é o do `.coveragerc` (ratchet — nunca regredir).
 
 ## 📦 Deploy
 
-### Bare Metal / VM
+O gateway é implantado como parte do stack do ecossistema (compose da raiz —
+16 serviços com Caddy/HTTPS):
+
 ```bash
-sudo ./install.sh
-sudo systemctl enable pvsolar
-sudo systemctl start pvsolar
+# na raiz do repositório
+docker compose up -d --build
 ```
 
-### Docker Compose
-```bash
-docker-compose -f examples/docker-compose.yml up -d
-```
-
-### Kubernetes
-```bash
-kubectl apply -f examples/kubernetes/
-```
+Para VM/VPS, siga o
+[Guia Completo de Instalação](../Guia%20Completo%20de%20Instalacao%20do%20Ecossistema%20pvSolar.html)
+(seções Docker e VPS) e o [INSTALL.md](INSTALL.md) deste projeto.
 
 ## 📚 Documentação
 
-- [Guia de Instalação](docs/installation.md)
-- [Configuração Avançada](docs/configuration.md)
-- [Drivers de Inversores](docs/drivers.md)
-- [Integração MQTT](docs/mqtt.md)
-- [Cloud Integration](docs/cloud.md)
-- [API Reference](docs/api.md)
-- [Troubleshooting](docs/troubleshooting.md)
+- [Resumo.txt](Resumo.txt) — visão técnica: arquitetura, módulos, problemas resolvidos e testes
+- [Manual.html](Manual.html) — manual profissional: API, configuração e troubleshooting
+- [INSTALL.md](INSTALL.md) — instalação e implantação do serviço
+- [Guia do ecossistema](../Guia%20Completo%20de%20Instalacao%20do%20Ecossistema%20pvSolar.html) — stack completa (13 projetos)
+- [README raiz](../README.md) — visão geral do ecossistema pvSolar
 
 ## 🤝 Contribuição
 
-Contribuições são bem-vindas! Por favor, leia nosso [CONTRIBUTING.md](CONTRIBUTING.md) antes de submeter um Pull Request.
+Contribuições são bem-vindas: rode a suíte completa
+(`python -m pytest tests/ -q`) e o lint (`ruff check .`), depois abra um
+Pull Request contra `main` — a CI exige todos os checks verdes.
 
 ## 📄 Licença
 
-- **Core (Open Source):** GPLv3 - [LICENSE](LICENSE)
-- **Premium Features:** Licença Comercial - [LICENSE-COMMERCIAL](LICENSE-COMMERCIAL)
+**GPLv3** — [LICENSE](LICENSE)
 
 ## 📞 Suporte
 

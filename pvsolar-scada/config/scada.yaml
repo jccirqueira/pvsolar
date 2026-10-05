@@ -6,11 +6,13 @@
 # URLs internas do compose), montada pelo docker-compose.yml da raiz.
 
 # MQTT Connection
+# Credenciais tambem aceitas pelo broker anonimo local (mosquitto as
+# ignora sem password_file) e exigidas pelo stack raiz autenticado.
 mqtt:
   broker: "localhost"
   port: 1883
-  username: null
-  password: null
+  username: "pvsolar"
+  password: "pvsolar_dev"
   client_id: "pvsolar-scada"
   topics:
     - "pvsolar/+/telemetry"

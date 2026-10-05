@@ -34,8 +34,9 @@ ar da CI com probes HTTP e healthchecks) e Dependabot semanal.
 | pvsolar-scada | 5000 (TCP) | HMI/SCADA — protocolo TCP do pvBrowser |
 | pvsolar-web | 3001 | Frontend Next.js 14 + Tailwind |
 
-Infraestrutura do stack Docker: **PostgreSQL 17** (5432), **Mosquitto** (1883),
-**Caddy** (80/443 — porta única de entrada com roteamento por caminho).
+Infraestrutura do stack Docker: **PostgreSQL 17** (5432), **Mosquitto** (1883 —
+autenticado por senha; anônimo é recusado), **Caddy** (80/443 — porta única de
+entrada com roteamento por caminho).
 
 ---
 
@@ -83,9 +84,10 @@ Validadores estruturais (raiz do repositório):
 
 ```bash
 pip install pyyaml
-python docker/validate_compose.py    # compose, builds, portas, initdb
-python docker/validate_guide.py      # HTML do guia (tags, âncoras, comandos)
-python docker/validate_manuals.py    # 13 manuals (tags, âncoras, entrypoints)
+python docker/validate_compose.py      # compose, builds, portas, initdb
+python docker/validate_guide.py        # HTML do guia (tags, âncoras, comandos)
+python docker/validate_manuals.py      # 13 manuals (tags, âncoras, entrypoints)
+python docker/validate_md_links.py     # links relativos dos .md (sem mortos)
 ```
 
 ---
@@ -118,7 +120,8 @@ PvBrowser/
 │   ├── Caddyfile             # roteamento /auth/*, /gateway/*, ...
 │   ├── config/               # variantes de config p/ rede interna
 │   ├── mosquitto.conf
-│   └── validate_*.py         # validadores (compose, guia, manuals)
+│   ├── mosquitto-passwd         # hash PBKDF2 das credenciais MQTT
+│   └── validate_*.py         # validadores (compose, guia, manuals, links)
 ├── .github/
 │   ├── workflows/ci.yml      # CI: lint + validadores + testes + build/smoke
 │   └── dependabot.yml        # atualizações semanais (pip, npm, actions)
@@ -145,7 +148,7 @@ profissional com API, configuração e troubleshooting).
 
 `.github/workflows/ci.yml` roda em cada push/PR:
 
-1. **Validadores** — compose + guia + 13 manuals;
+1. **Validadores** — compose + guia + 13 manuals + links dos .md;
 2. **pytest** — matriz com os 12 projetos Python (Windows runner, ambiente
    validado);
 3. **jest** — pvsolar-web (Node 20);

@@ -5,6 +5,8 @@
 # Em Docker use a variante docker/config/analytics.yaml (broker "mosquitto"),
 # montada pelo docker-compose.yml da raiz.
 
+# Credenciais tambem aceitas pelo broker anonimo local (mosquitto as
+# ignora sem password_file) e exigidas pelo stack raiz autenticado.
 mqtt:
   broker: "localhost"
   port: 1883
@@ -14,8 +16,8 @@ mqtt:
   client_cert: ""
   client_key: ""
   client_id: "pvsolar-analytics-001"
-  username: null
-  password: null
+  username: "pvsolar"
+  password: "pvsolar_dev"
   subscribe_topics:
     - "pvsolar/+/telemetry/+"
     - "pvsolar/+/status"

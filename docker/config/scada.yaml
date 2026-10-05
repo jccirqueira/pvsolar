@@ -8,12 +8,13 @@
 # Em Docker use a variante docker/config/scada.yaml (broker "mosquitto" e
 # URLs internas do compose), montada pelo docker-compose.yml da raiz.
 
-# MQTT Connection
+# MQTT Connection (broker do stack raiz exige autenticacao - ver
+# docker/mosquitto.conf e docker/mosquitto-passwd)
 mqtt:
   broker: "mosquitto"
   port: 1883
-  username: null
-  password: null
+  username: "pvsolar"
+  password: "pvsolar_dev"
   client_id: "pvsolar-scada"
   topics:
     - "pvsolar/+/telemetry"

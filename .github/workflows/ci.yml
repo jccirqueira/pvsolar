@@ -24,6 +24,8 @@ jobs:
         run: python docker/validate_guide.py
       - name: Validar 13 manuals (HTML)
         run: python docker/validate_manuals.py
+      - name: Validar links relativos dos Markdown
+        run: python docker/validate_md_links.py
 
   lint:
     name: Lint (ruff + eslint)
@@ -162,6 +164,20 @@ jobs:
           echo "gateway :8000 /api/health OK"
           curl -sf --retry 5 --retry-delay 3 --retry-all-errors http://localhost:3001 >/dev/null
           echo "web :3001 OK"
+      - name: "Smoke E2E: auth MQTT (credenciais autorizam, anonimo e recusado)"
+        shell: bash
+        run: |
+          echo "== publicar COM credenciais deve autorizar =="
+          docker compose exec -T mosquitto mosquitto_pub -h 127.0.0.1 \
+            -u pvsolar -P pvsolar_dev -t pvsolar/ci -m ok
+          echo "auth com credenciais OK"
+          echo "== publicar SEM credenciais deve ser recusado =="
+          if docker compose exec -T mosquitto mosquitto_pub -h 127.0.0.1 \
+            -t pvsolar/ci -m anon >/dev/null 2>&1; then
+            echo "::error::mosquitto aceitou conexao anonima (allow_anonymous deveria ser false)"
+            exit 1
+          fi
+          echo "anonimo recusado OK"
       - name: "Smoke E2E: logs (diagnostico em caso de falha)"
         if: failure()
         shell: bash
