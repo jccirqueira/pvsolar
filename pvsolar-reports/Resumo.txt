@@ -183,11 +183,11 @@ pvsolar-reports/
 6. TESTES
 ================================================================================
 
-Total: 57 testes — 57 passando (100%)
+Total: 59 testes — 59 passando (100%)
 
 test_config.py:         19 testes (configs + enums + load + PVSOLAR_CONFIG)
 test_collector.py:      11 testes (Telemetry, Alarm, Performance, Collector)
-test_api.py:             9 testes (health, status, daily/weekly/monthly/maintenance)
+test_api.py:            11 testes (health, status, daily/weekly/monthly/maintenance, regressão E2E)
 test_pdf_generator.py:   7 testes (criação, daily, weekly, monthly, maintenance)
 test_excel_generator.py: 7 testes (criação, daily, weekly, monthly, maintenance)
 test_email.py:           4 testes (criação, mensagem, disabled, no recipients)

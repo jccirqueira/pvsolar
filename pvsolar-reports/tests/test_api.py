@@ -5,6 +5,7 @@ from types import SimpleNamespace
 import pytest
 from fastapi.testclient import TestClient
 from src.api.app import create_app
+from src.app import PVSolarReports
 
 
 class StubReports:
@@ -115,3 +116,29 @@ def test_other_generators(client: TestClient, path: str, expect_file: str) -> No
 
 def test_unknown_route_returns_404(client: TestClient) -> None:
     assert client.get("/api/nao-existe").status_code == 404
+
+
+def test_health_com_servico_real_regressao_e2e() -> None:
+    """Regressao do smoke E2E da CI: /health com a classe real.
+
+    Com ``is_running`` como ``@property`` a rota respondia 500
+    (``TypeError: 'bool' object is not callable``) e o healthcheck do
+    Docker marcava o container como unhealthy, derrubando o ``compose up``.
+    """
+    app = create_app(reports=PVSolarReports())
+    resp = TestClient(app).get("/health")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["service"] == "pvsolar-reports"
+    assert body["status"] == "ok"
+    # sem context manager o lifespan nao roda -> servico nunca iniciado
+    assert body["running"] is False
+
+
+def test_status_com_servico_real_regressao_e2e() -> None:
+    app = create_app(reports=PVSolarReports())
+    resp = TestClient(app).get("/api/status")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["running"] is False
+    assert isinstance(body["formats"], list)

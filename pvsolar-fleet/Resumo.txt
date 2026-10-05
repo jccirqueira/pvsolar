@@ -142,13 +142,13 @@ pvsolar-fleet/
 6. TESTES
 ================================================================================
 
-Total: 83 testes — 83 passando (100%)
+Total: 85 testes — 85 passando (100%)
 
 test_config.py:         16 testes (configs + enums + load + PVSOLAR_CONFIG)
 test_site_manager.py:   18 testes (SiteInfo, SiteMetrics, SiteManager)
 test_alerts.py:         18 testes (FleetAlert, AlertAggregator)
 test_comparison.py:     13 testes (SiteRanking, ComparisonResult, Engine)
-test_api.py:            18 testes (health, sites CRUD, frota, alertas, ranking)
+test_api.py:            20 testes (health, sites CRUD, frota, alertas, ranking, regressão E2E)
 
 ================================================================================
 7. CONFIGURAÇÃO

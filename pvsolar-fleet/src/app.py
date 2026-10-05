@@ -153,6 +153,5 @@ class PVSolarFleet:
     def get_region_summary(self, region: str) -> dict[str, Any]:
         return self.fleet_aggregator.get_region_aggregation(region)
 
-    @property
     def is_running(self) -> bool:
         return self._running

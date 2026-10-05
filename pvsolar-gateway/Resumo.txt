@@ -4,7 +4,7 @@
 Versão do Documento: 1.0
 Data: 2026-09-16
 Autor: Opencode (IA Assistente)
-Status: PROJETO FUNCIONAL - 68/68 TESTES PASSANDO
+Status: PROJETO FUNCIONAL - 96/96 TESTES PASSANDO
 
 ================================================================================
 1. CONTEXTO E OBJETIVO DO PROJETO
@@ -121,14 +121,16 @@ pvsolar-gateway/
 │
 └── tests/                        — Suite de testes
     ├── conftest.py               — Config pytest (adds src/ ao path)
-    ├── test_config.py            — 18 testes de configuração
+    ├── test_config.py            — 22 testes de configuração
     ├── test_drivers.py           — 12 testes de drivers
     ├── test_edge.py              — 8 testes de edge store
     ├── test_huawei.py            — 9 testes do driver Huawei
     ├── test_sma.py               — 7 testes do driver SMA
-    └── test_pvbinder.py          — 10 testes do pvbrowser bridge
+    ├── test_pvbinder.py          — 10 testes do pvbrowser bridge
+    ├── test_web.py               — 13 testes da API web (REST + WebSocket)
+    └── test_metrics.py           — 15 testes do coletor Prometheus
 
-Total: 68 testes, todos passando.
+Total: 96 testes, todos passando.
 
 ================================================================================
 4. MÓDULOS DETALHADOS
@@ -419,15 +421,17 @@ Pacotes que precisam de __init__.py:
 ================================================================================
 
 Comando: python -m pytest tests/ -v
-Resultado: 68/68 PASSED (0.69s)
+Resultado: 96/96 PASSED (4.12s)
 
 Distribuição por arquivo:
-- test_config.py:    18 testes (validação de config, TLS, MQTT, inverters, load)
+- test_config.py:    22 testes (validação de config, TLS, MQTT, inverters, load)
 - test_drivers.py:   12 testes (InverterData, BaseDriver, create_driver factory)
 - test_edge.py:       8 testes (init, store, pending, sync, alert, stats)
 - test_huawei.py:     9 testes (decode, registers, state, structure)
 - test_sma.py:        7 testes (decode, status, ASCII, structure)
 - test_pvbinder.py:  10 testes (converter, bridge, normalize, pack)
+- test_web.py:       13 testes (dashboard HTML, REST, WebSocket, OpenAPI)
+- test_metrics.py:   15 testes (coletor Prometheus: init, update, helpers)
 
 Fixtures:
 - conftest.py: adiciona src/ ao sys.path

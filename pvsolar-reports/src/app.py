@@ -190,6 +190,5 @@ class PVSolarReports:
         logger.info("app.maintenance_done", files=results["files"])
         return results
 
-    @property
     def is_running(self) -> bool:
         return self._running
