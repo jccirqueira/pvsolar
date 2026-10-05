@@ -3,7 +3,17 @@
 # - pip: 12 projetos Python (requisitos em pvsolar-*/requirements.txt)
 # - npm: pvsolar-web
 # - github-actions: pins das actions nesta propria CI
-# Agrupado em 1 PR/semana por ecossistema para nao poluir o feed.
+#
+# Politica:
+# - Atualizacoes minor/patch sao agrupadas em 1 PR/semana por
+#   ecossistema (validados juntos pela CI inteira).
+# - MAJOR versions sao ignoradas: migracoes de framework (next 14->16,
+#   typescript 5->7, pydantic 2->3, tailwind 3->4...) sao decisoes
+#   deliberadas, nao bumps automaticos. Um major agrupado quebrou o
+#   npm uma vez (ERESOLVE ts-jest x typescript 7) e travaria qualquer
+#   outro update do grupo junto.
+# - github-actions mantem majors: sao compatibilizados pela propria CI
+#   (checkout v4->v5 resolve o deprecation de Node 20) e de baixo risco.
 # ============================================================
 version: 2
 updates:
@@ -24,9 +34,14 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+    open-pull-requests-limit: 5
     groups:
       python-deps:
         patterns: ["*"]
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     labels:
       - "dependencies"
       - "python"
@@ -39,6 +54,10 @@ updates:
     groups:
       web-deps:
         patterns: ["*"]
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     labels:
       - "dependencies"
       - "javascript"
