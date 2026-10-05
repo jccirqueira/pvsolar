@@ -13,7 +13,7 @@ datasources:
       organization: pvsolar
       defaultBucket: pvsolar
     secureJsonData:
-      token: ${INFLUXDB_TOKEN:-pvsolar-super-secret-token}
+      token: ${INFLUXDB_TOKEN}
     isDefault: true
     editable: true
 
