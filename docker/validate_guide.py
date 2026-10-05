@@ -39,7 +39,8 @@ for needle in (
     "python -m src.core.app -c config/analytics.yaml",
     "python -m src.app -c config/scada.yaml",
     "<td>137 passed</td>",
-    "<td>23 passed</td>",
+    "<td>50 passed</td>",
+    "<td>60 passed</td>",
 ):
     if needle not in html:
         errors.append(f"conteudo ausente: {needle!r}")

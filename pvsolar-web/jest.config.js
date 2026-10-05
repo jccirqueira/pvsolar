@@ -18,4 +18,13 @@ module.exports = {
     }],
   },
   testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/'],
+  // Piso de cobertura (gate da CI): atual ~97/67/97/97 - nunca regredir.
+  coverageThreshold: {
+    global: {
+      statements: 90,
+      branches: 60,
+      functions: 90,
+      lines: 90,
+    },
+  },
 };

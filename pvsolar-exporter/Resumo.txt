@@ -26,9 +26,10 @@ tests/
   test_config.py           - 11 tests (enums, configs, load, PVSOLAR_CONFIG)
   test_exporter.py         - 17 tests (metrics, record, batch)
   test_collectors.py       - 15 tests (all collectors, factory)
-  test_scrape.py           - 4 tests (ScrapeManager)
+  test_scrape.py           - 8 tests (ScrapeManager + erros/close)
   test_api.py              - 8 tests (API endpoints)
-  Total:                   55 tests, all passing
+  test_app.py              - 1 test (main() sobe uvicorn com config)
+  Total:                   60 tests, all passing
 
 METRICS EXPORTED
 ----------------

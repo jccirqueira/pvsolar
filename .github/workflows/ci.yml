@@ -57,7 +57,7 @@ jobs:
         run: pip install -r requirements.txt
       - name: Testes
         working-directory: ${{ matrix.projeto }}
-        run: python -m pytest tests/ -q
+        run: python -m pytest tests/ -q --cov=src --cov-report=term-missing
 
   testes-web:
     name: jest pvsolar-web
@@ -76,7 +76,7 @@ jobs:
       - name: Dependencias
         run: npm ci
       - name: Testes
-        run: npm test
+        run: npm test -- --coverage
 
   docker-build:
     name: Docker build (13 imagens)

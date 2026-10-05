@@ -1,0 +1,11 @@
+# Piso de cobertura (gate da CI via pytest-cov). Piso atual -2pp:
+# NUNCA regredir; meta do ecossistema: >=80 em todos os projetos.
+[run]
+source = src
+
+[report]
+fail_under = 68
+show_missing = True
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:

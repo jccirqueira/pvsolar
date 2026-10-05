@@ -66,8 +66,9 @@ __tests__/
     theme.test.tsx         - 7 tests (light/dark theme)
   lib/
     config.test.ts         - 2 tests (config)
-    data.test.ts           - 4 tests (data fetching)
-  Total:                   23 tests, all passing (npm run test)
+    data.test.ts           - 15 tests (mocks, getters, fallbacks)
+    api.test.ts            - 16 tests (HTTP client, erros, conexao)
+  Total:                   50 tests, all passing (npm run test)
 
 INSTALLATION
 ------------
