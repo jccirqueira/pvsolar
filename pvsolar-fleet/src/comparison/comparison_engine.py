@@ -4,11 +4,10 @@ Comparison Engine Module.
 Compares and ranks sites across the fleet.
 """
 
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 import structlog
-
 from src.core.config import ComparisonMetric
 from src.sites.site_manager import SiteManager, SiteMetrics
 
@@ -24,9 +23,9 @@ class SiteRanking:
         self.metric = metric
         self.value = value
         self.rank = rank
-        self.timestamp: datetime = datetime.now(timezone.utc)
+        self.timestamp: datetime = datetime.now(UTC)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "site_id": self.site_id,
             "site_name": self.site_name,
@@ -42,14 +41,14 @@ class ComparisonResult:
 
     def __init__(self, metric: ComparisonMetric):
         self.metric = metric
-        self.timestamp: datetime = datetime.now(timezone.utc)
-        self.rankings: List[SiteRanking] = []
+        self.timestamp: datetime = datetime.now(UTC)
+        self.rankings: list[SiteRanking] = []
         self.avg_value: float = 0.0
-        self.best_site: Optional[str] = None
-        self.worst_site: Optional[str] = None
+        self.best_site: str | None = None
+        self.worst_site: str | None = None
         self.fleet_total: float = 0.0
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "metric": self.metric.value,
             "timestamp": self.timestamp.isoformat(),
@@ -74,7 +73,7 @@ class ComparisonEngine:
 
     def __init__(self, site_manager: SiteManager):
         self.site_manager = site_manager
-        self._history: List[ComparisonResult] = []
+        self._history: list[ComparisonResult] = []
 
     def _get_metric_value(self, metrics: SiteMetrics, metric: ComparisonMetric) -> float:
         metric_map = {
@@ -117,13 +116,13 @@ class ComparisonEngine:
         )
         return result
 
-    def compare_all_metrics(self) -> Dict[str, ComparisonResult]:
+    def compare_all_metrics(self) -> dict[str, ComparisonResult]:
         results = {}
         for metric in ComparisonMetric:
             results[metric.value] = self.compare_sites(metric)
         return results
 
-    def get_peer_group(self, site_id: str, metric: ComparisonMetric, group_size: int = 5) -> List[SiteRanking]:
+    def get_peer_group(self, site_id: str, metric: ComparisonMetric, group_size: int = 5) -> list[SiteRanking]:
         result = self.compare_sites(metric)
         site_rank = None
         for ranking in result.rankings:
@@ -138,7 +137,7 @@ class ComparisonEngine:
         end = min(len(result.rankings), start + group_size)
         return result.rankings[start:end]
 
-    def get_vs_average(self, site_id: str, metric: ComparisonMetric) -> Dict[str, Any]:
+    def get_vs_average(self, site_id: str, metric: ComparisonMetric) -> dict[str, Any]:
         result = self.compare_sites(metric)
         site_value = None
         for ranking in result.rankings:
@@ -161,7 +160,7 @@ class ComparisonEngine:
             "vs_avg_percent": round(pct, 2),
         }
 
-    def get_vs_best(self, site_id: str, metric: ComparisonMetric) -> Dict[str, Any]:
+    def get_vs_best(self, site_id: str, metric: ComparisonMetric) -> dict[str, Any]:
         result = self.compare_sites(metric)
         site_value = None
         best_value = None
@@ -184,18 +183,18 @@ class ComparisonEngine:
             "gap_percent": round((diff / best_value * 100) if best_value > 0 else 0.0, 2),
         }
 
-    def get_worst_performers(self, metric: ComparisonMetric, count: int = 3) -> List[SiteRanking]:
+    def get_worst_performers(self, metric: ComparisonMetric, count: int = 3) -> list[SiteRanking]:
         result = self.compare_sites(metric)
         return result.rankings[-count:] if len(result.rankings) >= count else result.rankings
 
-    def get_best_performers(self, metric: ComparisonMetric, count: int = 3) -> List[SiteRanking]:
+    def get_best_performers(self, metric: ComparisonMetric, count: int = 3) -> list[SiteRanking]:
         result = self.compare_sites(metric)
         return result.rankings[:count]
 
-    def get_comparison_history(self, limit: int = 10) -> List[ComparisonResult]:
+    def get_comparison_history(self, limit: int = 10) -> list[ComparisonResult]:
         return self._history[-limit:]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "history_count": len(self._history),
             "latest": self._history[-1].to_dict() if self._history else None,

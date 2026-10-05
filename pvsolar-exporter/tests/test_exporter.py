@@ -1,7 +1,10 @@
 import pytest
 from src.core.config import ExporterConfig, MetricType
 from src.core.exporter import (
-    PrometheusExporter, MetricDefinition, MetricValue, CollectorResult,
+    CollectorResult,
+    MetricDefinition,
+    MetricValue,
+    PrometheusExporter,
 )
 
 

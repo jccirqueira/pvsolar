@@ -1,13 +1,11 @@
 import gzip
 import hashlib
-import json
 import shutil
 import tarfile
 import time
 import zipfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 import structlog
 
@@ -48,7 +46,7 @@ class BackupEngine:
         self.records: dict[str, BackupRecord] = {}
 
     def generate_backup_id(self) -> str:
-        ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        ts = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         return f"backup_{ts}"
 
     def _collect_files(self) -> list[tuple[str, str]]:
@@ -75,11 +73,10 @@ class BackupEngine:
             return archive_path
         elif compression == CompressionType.GZIP:
             archive_path = output_path + ".gz"
-            with open(archive_path, 'wb') as out_f:
-                with gzip.GzipFile(fileobj=out_f, mode='wb') as gz_f:
-                    for src, _ in files:
-                        with open(src, 'rb') as in_f:
-                            gz_f.write(in_f.read())
+            with open(archive_path, 'wb') as out_f, gzip.GzipFile(fileobj=out_f, mode='wb') as gz_f:
+                for src, _ in files:
+                    with open(src, 'rb') as in_f:
+                        gz_f.write(in_f.read())
             return archive_path
         elif compression in (CompressionType.TAR, CompressionType.TAR_GZ):
             ext = ".tar.gz" if compression == CompressionType.TAR_GZ else ".tar"
@@ -106,7 +103,7 @@ class BackupEngine:
         if backup_id is None:
             backup_id = self.generate_backup_id()
 
-        ts = datetime.now(timezone.utc).isoformat()
+        ts = datetime.now(UTC).isoformat()
         record = BackupRecord(backup_id=backup_id, timestamp=ts, status=BackupStatus.RUNNING)
         self.records[backup_id] = record
 

@@ -3,7 +3,6 @@
 from pathlib import Path
 
 import pytest
-
 from src.core.config import (
     AlertConfig,
     AlertRuleConfig,
@@ -21,7 +20,6 @@ from src.core.config import (
     TimeWindow,
     load_config,
 )
-
 
 # ---------------------------------------------------------------------------
 # NotificationChannel

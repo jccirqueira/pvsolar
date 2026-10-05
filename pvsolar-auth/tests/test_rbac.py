@@ -1,7 +1,6 @@
 """Testes do rbac_engine do pvSolar Auth."""
 
 import pytest
-
 from src.core.config import Permission, UserRole
 from src.rbac.rbac_engine import Policy, RBACEngine, Role
 

@@ -72,19 +72,16 @@ class RulesEngine:
         op = condition.operator
         target = condition.value
 
-        if op == "eq":
-            return value == target
-        elif op == "ne":
-            return value != target
-        elif op == "gt":
-            return value > target
-        elif op == "gte":
-            return value >= target
-        elif op == "lt":
-            return value < target
-        elif op == "lte":
-            return value <= target
-        return False
+        comparators = {
+            "eq": lambda a, b: a == b,
+            "ne": lambda a, b: a != b,
+            "gt": lambda a, b: a > b,
+            "gte": lambda a, b: a >= b,
+            "lt": lambda a, b: a < b,
+            "lte": lambda a, b: a <= b,
+        }
+        comparator = comparators.get(op)
+        return comparator(value, target) if comparator else False
 
     def evaluate_rule(
         self, rule: AlertRuleConfig, data: dict
@@ -96,11 +93,7 @@ class RulesEngine:
         if not rule.conditions:
             return True
 
-        for condition in rule.conditions:
-            if not self.evaluate_condition(condition, data):
-                return False
-
-        return True
+        return all(self.evaluate_condition(condition, data) for condition in rule.conditions)
 
     def evaluate_all(self, data: dict) -> list[RuleMatch]:
         """Avalia todas as regras ativas."""

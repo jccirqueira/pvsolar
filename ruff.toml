@@ -1,0 +1,33 @@
+# ============================================================
+# pvSolar - config unica do Ruff (monorepo)
+# Ruff descobre este arquivo subindo a arvore dos arquivos alvo
+# (os pyprojects dos projetos nao tem mais [tool.ruff]).
+# ============================================================
+target-version = "py311"
+line-length = 100
+extend-exclude = [
+    "**/venv/**",
+    "**/__pycache__/**",
+    "**/ml_models/**",
+]
+
+[lint]
+# Conjunto estrito unificado do ecossistema:
+# E (pycodestyle) + F (pyflakes) + W (avisos) + I (isort)
+# + UP (modernizar idiomas) + B (bugbear) + SIM (simplificacoes)
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = [
+    "E501",   # tamanho de linha: dominio do formatter (line-length acima)
+    "E741",   # nomes ambiguos de variavel (l, I, O) - comuns em matematica
+    "B008",   # calls em default: idiomático do FastAPI (Query/Depends/Header)
+]
+
+[lint.per-file-ignores]
+# __init__.py usam imports para re-exportar simbolos
+"**/__init__.py" = ["F401"]
+# testes podem importar fixtures/deps "nao usadas" diretamente
+"**/tests/**" = ["F401", "F811"]
+
+[format]
+quote-style = "double"
+indent-style = "space"

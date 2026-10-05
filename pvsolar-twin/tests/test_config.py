@@ -3,7 +3,6 @@
 from pathlib import Path
 
 import pytest
-
 from src.core.config import (
     DegradationConfig,
     DegradationModel,
@@ -18,7 +17,6 @@ from src.core.config import (
     TwinConfig,
     load_config,
 )
-
 
 # ---------------------------------------------------------------------------
 # Enums

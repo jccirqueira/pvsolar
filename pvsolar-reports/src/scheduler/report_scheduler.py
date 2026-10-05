@@ -4,13 +4,12 @@ Report Scheduler.
 Schedules automatic report generation using APScheduler.
 """
 
-from datetime import datetime, timezone
-from typing import Any, Callable, Dict, List, Optional
+from collections.abc import Callable
+from typing import Any
 
 import structlog
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
-
 from src.core.config import SchedulerConfig
 
 logger = structlog.get_logger(__name__)
@@ -30,7 +29,7 @@ class ReportScheduler:
     def __init__(self, config: SchedulerConfig):
         self.config = config
         self._scheduler = AsyncIOScheduler()
-        self._jobs: Dict[str, Dict[str, Any]] = {}
+        self._jobs: dict[str, dict[str, Any]] = {}
         self._running = False
 
     async def start(self) -> None:
@@ -97,7 +96,7 @@ class ReportScheduler:
             return True
         return False
 
-    def get_jobs(self) -> List[Dict[str, Any]]:
+    def get_jobs(self) -> list[dict[str, Any]]:
         jobs = []
         for job_id, info in self._jobs.items():
             jobs.append({

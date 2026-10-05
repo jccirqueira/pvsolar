@@ -1,11 +1,21 @@
 import pytest
-from src.core.config import CollectorConfig, ServiceType
 from src.collectors.collectors import (
-    BaseCollector, GatewayCollector, AnalyticsCollector, ScadaCollector,
-    ReportsCollector, FleetCollector, AlertCollector, GridCollector,
-    TwinCollector, AuthCollector, BackupCollector, SchedulerCollector,
-    create_collector, COLLECTOR_MAP,
+    COLLECTOR_MAP,
+    AlertCollector,
+    AnalyticsCollector,
+    AuthCollector,
+    BackupCollector,
+    BaseCollector,
+    FleetCollector,
+    GatewayCollector,
+    GridCollector,
+    ReportsCollector,
+    ScadaCollector,
+    SchedulerCollector,
+    TwinCollector,
+    create_collector,
 )
+from src.core.config import CollectorConfig, ServiceType
 
 
 class TestBaseCollector:
@@ -17,7 +27,7 @@ class TestBaseCollector:
         for st in ServiceType:
             if st == ServiceType.WEB:
                 continue
-            config = CollectorConfig(url=f"http://localhost:8000")
+            config = CollectorConfig(url="http://localhost:8000")
             c = create_collector(st, config)
             assert c.service_type == st
 

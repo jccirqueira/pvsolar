@@ -8,9 +8,8 @@ Implements:
 - Rolling statistics anomaly detection
 """
 
-from datetime import datetime, timezone
-from enum import Enum
-from typing import Any
+from datetime import UTC, datetime
+from enum import StrEnum
 
 import numpy as np
 import structlog
@@ -20,7 +19,7 @@ from sklearn.preprocessing import StandardScaler
 logger = structlog.get_logger(__name__)
 
 
-class AnomalySeverity(str, Enum):
+class AnomalySeverity(StrEnum):
     """Anomaly severity levels."""
     INFO = "info"
     WARNING = "warning"
@@ -28,7 +27,7 @@ class AnomalySeverity(str, Enum):
     CRITICAL = "critical"
 
 
-class AnomalyType(str, Enum):
+class AnomalyType(StrEnum):
     """Types of anomalies detected."""
     ISOLATION_FOREST = "isolation_forest"
     ZSCORE = "zscore"
@@ -58,7 +57,7 @@ class AnomalyResult:
         self.severity = severity
         self.anomaly_type = anomaly_type
         self.description = description
-        self.timestamp = timestamp or datetime.now(timezone.utc)
+        self.timestamp = timestamp or datetime.now(UTC)
 
     def to_dict(self) -> dict:
         return {
@@ -167,7 +166,7 @@ class IsolationForestDetector:
         scores = self.score(data)
         results = []
 
-        for i, (pred, score) in enumerate(zip(predictions, scores)):
+        for i, (pred, score) in enumerate(zip(predictions, scores, strict=False)):
             if pred == -1:  # Anomaly
                 severity = self._score_to_severity(score)
                 # Find which features contributed most

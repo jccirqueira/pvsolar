@@ -5,14 +5,15 @@ Centralized configuration using Pydantic for type-safe settings.
 """
 
 import os
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
-class SiteStatus(str, Enum):
+class SiteStatus(StrEnum):
     """Site status."""
     ONLINE = "online"
     OFFLINE = "offline"
@@ -20,21 +21,21 @@ class SiteStatus(str, Enum):
     DEGRADED = "degraded"
 
 
-class AlertSeverity(str, Enum):
+class AlertSeverity(StrEnum):
     """Alert severity levels."""
     CRITICAL = "critical"
     WARNING = "warning"
     INFO = "info"
 
 
-class AlertStatus(str, Enum):
+class AlertStatus(StrEnum):
     """Alert status."""
     ACTIVE = "active"
     ACKNOWLEDGED = "acknowledged"
     RESOLVED = "resolved"
 
 
-class ComparisonMetric(str, Enum):
+class ComparisonMetric(StrEnum):
     """Metrics for comparison."""
     ENERGY = "energy"
     PR = "pr"
@@ -56,7 +57,7 @@ class SiteConfig(BaseSettings):
     latitude: float = Field(ge=-90, le=90, description="Latitude")
     longitude: float = Field(ge=-180, le=180, description="Longitude")
     region: str = Field(default="default", description="Site region")
-    api_key: Optional[str] = Field(default=None, description="API key")
+    api_key: str | None = Field(default=None, description="API key")
 
     model_config = {"env_prefix": "SITE_"}
 
@@ -64,7 +65,7 @@ class SiteConfig(BaseSettings):
 class GatewayServiceConfig(BaseSettings):
     """Gateway service connection settings."""
     url: str = Field(default="http://localhost:8000", description="Gateway service URL")
-    api_key: Optional[str] = Field(default=None, description="API key")
+    api_key: str | None = Field(default=None, description="API key")
     timeout: int = Field(default=30, ge=5, le=120, description="Request timeout")
 
     model_config = {"env_prefix": "GATEWAY_"}
@@ -73,7 +74,7 @@ class GatewayServiceConfig(BaseSettings):
 class AnalyticsServiceConfig(BaseSettings):
     """Analytics service connection settings."""
     url: str = Field(default="http://localhost:8001", description="Analytics service URL")
-    api_key: Optional[str] = Field(default=None, description="API key")
+    api_key: str | None = Field(default=None, description="API key")
     timeout: int = Field(default=30, ge=5, le=120, description="Request timeout")
 
     model_config = {"env_prefix": "ANALYTICS_"}
@@ -116,19 +117,19 @@ class FleetConfig(BaseSettings):
     alerts: AlertAggregatorConfig = Field(default_factory=AlertAggregatorConfig)
     comparison: ComparisonConfig = Field(default_factory=ComparisonConfig)
     api: APIConfig = Field(default_factory=APIConfig)
-    sites: List[SiteConfig] = Field(default_factory=list, description="Managed sites")
+    sites: list[SiteConfig] = Field(default_factory=list, description="Managed sites")
     company_name: str = Field(default="pvSolar Fleet", description="Company name")
     debug: bool = Field(default=False, description="Debug mode")
 
     model_config = {"env_prefix": "PVFLEET_"}
 
 
-def load_config(config_path: Optional[str] = None) -> FleetConfig:
+def load_config(config_path: str | None = None) -> FleetConfig:
     """Load configuration from file and environment."""
     import yaml
 
-    config_data: Dict[str, Any] = {}
-    
+    config_data: dict[str, Any] = {}
+
     if config_path:
         path = Path(config_path)
         if path.exists():

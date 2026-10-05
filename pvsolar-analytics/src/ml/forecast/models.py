@@ -5,12 +5,11 @@ Handles persistence of trained forecast models and feature extractors.
 """
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 import joblib
-import numpy as np
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -73,7 +72,7 @@ class ForecastModelStore:
         # Save metadata
         metadata = {
             "name": name,
-            "saved_at": datetime.now(timezone.utc).isoformat(),
+            "saved_at": datetime.now(UTC).isoformat(),
             "model_version": predictor.model_version,
             "fitted": predictor._fitted,
             "sequence_length": predictor.sequence_length,
@@ -94,8 +93,8 @@ class ForecastModelStore:
         Returns:
             EnergyForecastPredictor instance or None if not found
         """
+        from src.ml.forecast.model import LSTMEnergyModel
         from src.ml.forecast.predictor import EnergyForecastPredictor
-        from src.ml.forecast.model import LSTMEnergyModel, SimpleForecaster
 
         model_path = self.model_dir / f"{name}"
 
@@ -179,7 +178,7 @@ class ForecastModelStore:
             raw_history = self._load_json(history_path)
 
             # Convert timestamp strings back to datetime
-            for inv_id, samples in raw_history.items():
+            for _inv_id, samples in raw_history.items():
                 for sample in samples:
                     if isinstance(sample.get("timestamp"), str):
                         sample["timestamp"] = datetime.fromisoformat(
@@ -213,5 +212,5 @@ class ForecastModelStore:
 
     def _load_json(self, path: Path) -> Any:
         """Load data from JSON."""
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return json.load(f)

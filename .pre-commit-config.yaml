@@ -1,0 +1,25 @@
+# ============================================================
+# pvSolar - hooks de pre-commit (https://pre-commit.com)
+# Instalacao:  pip install pre-commit && pre-commit install
+# Uso manual:  pre-commit run --all-files
+# A CI roda as mesmas checagens (job "Lint"), entao o hook e
+# apenas atalho de feedback rapido para o dev.
+# ============================================================
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.7
+    hooks:
+      - id: ruff
+        args: [--fix]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '\.html$'
+      - id: end-of-file-fixer
+        exclude: '\.html$'
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+        args: ['--maxkb=1024']

@@ -1,9 +1,10 @@
 import os
 import tempfile
-import pytest
 from pathlib import Path
-from src.core.config import BackupConfig, CompressionType, BackupStatus
+
+import pytest
 from src.backup.engine import BackupEngine, BackupRecord
+from src.core.config import BackupConfig, BackupStatus, CompressionType
 
 
 @pytest.fixture

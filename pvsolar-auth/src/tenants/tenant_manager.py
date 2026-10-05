@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import structlog
 
@@ -20,8 +20,8 @@ class Tenant:
     name: str = ""
     slug: str = ""
     status: TenantStatus = TenantStatus.ACTIVE
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     max_users: int = 100
     max_api_keys: int = 10
     features: list[str] = field(default_factory=list)
@@ -90,7 +90,7 @@ class TenantManager:
         for key, value in kwargs.items():
             if hasattr(tenant, key) and key not in ("id", "created_at"):
                 setattr(tenant, key, value)
-        tenant.updated_at = datetime.now(timezone.utc)
+        tenant.updated_at = datetime.now(UTC)
         logger.info("tenant.updated", tenant_id=tenant_id)
         return True
 

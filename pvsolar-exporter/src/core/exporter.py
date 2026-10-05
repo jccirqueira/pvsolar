@@ -4,17 +4,17 @@ import time
 from typing import Any
 
 from prometheus_client import (
+    CONTENT_TYPE_LATEST,
     CollectorRegistry,
     Counter,
     Gauge,
     Histogram,
     Summary,
     generate_latest,
-    CONTENT_TYPE_LATEST,
 )
 from pydantic import BaseModel, Field
 
-from src.core.config import ExporterConfig, CollectorConfig, MetricType, ServiceType
+from src.core.config import ExporterConfig, MetricType
 
 
 class MetricDefinition(BaseModel):
@@ -101,16 +101,11 @@ class PrometheusExporter:
 
         has_label_names = bool(definition.labels) or bool(self.config.global_labels)
 
-        if has_label_names:
-            target = m.labels(**labels)
-        else:
-            target = m
+        target = m.labels(**labels) if has_label_names else m
 
         if definition.metric_type == MetricType.COUNTER:
             target.inc(value)
-        elif definition.metric_type == MetricType.HISTOGRAM:
-            target.observe(value)
-        elif definition.metric_type == MetricType.SUMMARY:
+        elif definition.metric_type == MetricType.HISTOGRAM or definition.metric_type == MetricType.SUMMARY:
             target.observe(value)
         else:
             target.set(value)

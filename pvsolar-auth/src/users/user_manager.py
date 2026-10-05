@@ -6,11 +6,11 @@ import hashlib
 import secrets
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import structlog
 
-from src.core.config import UserStatus, UserRole
+from src.core.config import UserRole, UserStatus
 
 logger = structlog.get_logger()
 
@@ -26,8 +26,8 @@ class User:
     role: UserRole = UserRole.VIEWER
     status: UserStatus = UserStatus.ACTIVE
     tenant_id: str = ""
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     last_login: datetime | None = None
     login_attempts: int = 0
     locked_until: datetime | None = None
@@ -58,7 +58,7 @@ class APIKey:
     name: str = ""
     user_id: str = ""
     tenant_id: str = ""
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     expires_at: datetime | None = None
     is_active: bool = True
     permissions: list[str] = field(default_factory=list)
@@ -161,7 +161,7 @@ class UserManager:
             if hasattr(user, key) and key not in ("id", "created_at"):
                 setattr(user, key, value)
 
-        user.updated_at = datetime.now(timezone.utc)
+        user.updated_at = datetime.now(UTC)
         logger.info("user.updated", user_id=user_id)
         return True
 
@@ -184,7 +184,7 @@ class UserManager:
             return None
 
         if user.status == UserStatus.LOCKED:
-            if user.locked_until and user.locked_until > datetime.now(timezone.utc):
+            if user.locked_until and user.locked_until > datetime.now(UTC):
                 logger.warning("user.locked", user_id=user.id)
                 return None
             user.status = UserStatus.ACTIVE
@@ -196,14 +196,14 @@ class UserManager:
                 user.status = UserStatus.LOCKED
                 # Bloqueio com janela real: sem ela o bloqueio expirava no
                 # mesmo instante em que era aplicado (auto-liberação).
-                user.locked_until = datetime.now(timezone.utc) + timedelta(
+                user.locked_until = datetime.now(UTC) + timedelta(
                     minutes=self.login_lockout_minutes
                 )
             logger.warning("user.auth_failed", user_id=user.id, attempts=user.login_attempts)
             return None
 
         user.login_attempts = 0
-        user.last_login = datetime.now(timezone.utc)
+        user.last_login = datetime.now(UTC)
         user.status = UserStatus.ACTIVE
         logger.info("user.authenticated", user_id=user.id)
         return user
@@ -214,7 +214,7 @@ class UserManager:
         if user is None:
             return False
         user.hashed_password = hash_password(new_password)
-        user.updated_at = datetime.now(timezone.utc)
+        user.updated_at = datetime.now(UTC)
         logger.info("user.password_changed", user_id=user_id)
         return True
 

@@ -1,9 +1,8 @@
 """Testes do auth_engine do pvSolar Auth."""
 
 import pytest
-
-from src.core.config import JWTConfig, UserRole
 from src.auth.auth_engine import AuthEngine, TokenPair, TokenPayload
+from src.core.config import JWTConfig, UserRole
 
 
 class TestAuthEngine:

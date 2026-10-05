@@ -3,7 +3,6 @@ Configuration module with Pydantic validation.
 """
 
 from pathlib import Path
-from typing import Optional
 
 import yaml
 from pydantic import BaseModel, Field, field_validator
@@ -14,7 +13,7 @@ class GatewaySettings(BaseModel):
     name: str = Field(..., description="Gateway unique identifier")
     location: str = Field(default="", description="Physical location")
     timezone: str = Field(default="UTC", description="Timezone")
-    instance_id: Optional[str] = Field(default=None, description="Unique instance ID")
+    instance_id: str | None = Field(default=None, description="Unique instance ID")
 
 
 class TLSConfig(BaseModel):
@@ -34,16 +33,16 @@ class MQTTConfig(BaseModel):
     use_tls: bool = Field(default=True, description="Use TLS encryption")
     tls: TLSConfig = Field(default_factory=TLSConfig)
     client_id: str = Field(..., description="MQTT client ID")
-    username: Optional[str] = Field(default=None, description="MQTT username")
-    password: Optional[str] = Field(default=None, description="MQTT password")
-    
+    username: str | None = Field(default=None, description="MQTT username")
+    password: str | None = Field(default=None, description="MQTT password")
+
     topics: dict = Field(default_factory=lambda: {
         "publish": "pvsolar/{site_id}/telemetry",
         "command": "pvsolar/{site_id}/command",
         "status": "pvsolar/{site_id}/status",
         "alert": "pvsolar/{site_id}/alert"
     })
-    
+
     qos: int = Field(default=1, ge=0, le=2)
     retain: bool = Field(default=True)
     heartbeat_interval: int = Field(default=30, description="Heartbeat interval in seconds")
@@ -80,7 +79,7 @@ class InverterConfig(BaseModel):
     connection: ModbusConnection
     polling_interval: float = Field(default=5.0, description="Polling interval in seconds")
     registers: list[RegisterConfig] = Field(default_factory=list)
-    
+
     @field_validator('driver')
     @classmethod
     def validate_driver(cls, v):
@@ -216,19 +215,19 @@ class GatewayConfig(BaseModel):
 def load_config(config_path: str) -> GatewayConfig:
     """Load and validate configuration from YAML file."""
     path = Path(config_path)
-    
+
     if not path.exists():
         raise FileNotFoundError(f"Configuration file not found: {config_path}")
-    
-    with open(path, 'r') as f:
+
+    with open(path) as f:
         raw_config = yaml.safe_load(f)
-    
+
     if raw_config is None:
         raise ValueError("Configuration file is empty")
-    
+
     # Validate and create config
     config = GatewayConfig(**raw_config)
-    
+
     return config
 
 

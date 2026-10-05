@@ -2,39 +2,38 @@
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 import yaml
 from pydantic import BaseModel, Field
 
-
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
 
-class PanelType(str, Enum):
+class PanelType(StrEnum):
     MONOCRYSTALLINE = "monocrystalline"
     POLYCRYSTALLINE = "polycrystalline"
     THIN_FILM = "thin_film"
     BIFACIAL = "bifacial"
 
 
-class DegradationModel(str, Enum):
+class DegradationModel(StrEnum):
     LINEAR = "linear"
     EXPONENTIAL = "exponential"
     LOGARITHMIC = "logarithmic"
     STEP = "step"
 
 
-class ScenarioType(str, Enum):
+class ScenarioType(StrEnum):
     WHAT_IF = "what_if"
     SENSITIVITY = "sensitivity"
     MONTE_CARLO = "monte_carlo"
     OPTIMIZATION = "optimization"
 
 
-class OptimizationTarget(str, Enum):
+class OptimizationTarget(StrEnum):
     ENERGY = "energy"
     COST = "cost"
     ROI = "roi"
@@ -160,7 +159,7 @@ def load_config(config_path: str | Path | None = None) -> TwinConfig:
     if not path.exists():
         return TwinConfig()
 
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         data = yaml.safe_load(f) or {}
 
     return TwinConfig(**data)

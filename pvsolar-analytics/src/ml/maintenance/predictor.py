@@ -4,9 +4,7 @@ Predictive maintenance predictor using XGBoost.
 Predicts failure probability for 7, 30, and 90 day horizons.
 """
 
-from datetime import datetime, timezone
-from enum import Enum
-from typing import Any
+from enum import StrEnum
 
 import numpy as np
 import structlog
@@ -17,7 +15,7 @@ from sklearn.preprocessing import StandardScaler
 logger = structlog.get_logger(__name__)
 
 
-class RiskLevel(str, Enum):
+class RiskLevel(StrEnum):
     """Risk levels for maintenance predictions."""
     LOW = "low"
     MEDIUM = "medium"
@@ -307,7 +305,7 @@ class MaintenancePredictor:
         importances = self._models["30d"].feature_importances_
         return {
             name: float(imp)
-            for name, imp in zip(self._feature_names, importances)
+            for name, imp in zip(self._feature_names, importances, strict=False)
         }
 
     def get_stats(self) -> dict:

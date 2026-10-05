@@ -2,8 +2,8 @@
 Database module - TimescaleDB connection and session management.
 """
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 import structlog
 from sqlalchemy import text
@@ -104,7 +104,7 @@ async def execute_query(query: str, params: dict | None = None) -> list[dict]:
     async with get_session() as session:
         result = await session.execute(text(query), params or {})
         columns = result.keys()
-        return [dict(zip(columns, row)) for row in result.fetchall()]
+        return [dict(zip(columns, row, strict=False)) for row in result.fetchall()]
 
 
 async def check_database_health() -> dict:

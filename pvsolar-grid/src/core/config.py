@@ -2,40 +2,38 @@
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
-from typing import Optional
 
 import yaml
 from pydantic import BaseModel, Field
-
 
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
 
-class GridStandard(str, Enum):
+class GridStandard(StrEnum):
     PRODIST = "prodist"
     ANEEL = "aneel"
     INMETRO = "inmetro"
     ONS = "ons"
 
 
-class VoltageLevel(str, Enum):
+class VoltageLevel(StrEnum):
     LOW = "low"           # < 1kV
     MEDIUM = "medium"     # 1kV - 69kV
     HIGH = "high"         # 69kV - 230kV
     EXTRA_HIGH = "extra_high"  # > 230kV
 
 
-class ComplianceStatus(str, Enum):
+class ComplianceStatus(StrEnum):
     COMPLIANT = "compliant"
     NON_COMPLIANT = "non_compliant"
     WARNING = "warning"
     UNKNOWN = "unknown"
 
 
-class FaultType(str, Enum):
+class FaultType(StrEnum):
     LVRT = "lvrt"         # Low Voltage Ride Through
     HVRT = "hvrt"         # High Voltage Ride Through
     FRT = "frt"           # Fault Ride Through
@@ -44,7 +42,7 @@ class FaultType(str, Enum):
     DISCONNECT = "disconnect"
 
 
-class QualityMetric(str, Enum):
+class QualityMetric(StrEnum):
     THD_V = "thd_v"       # Total Harmonic Distortion - Tensão
     THD_I = "thd_i"       # Total Harmonic Distortion - Corrente
     PCC_VOLTAGE = "pcc_voltage"  # Tensão no PCC
@@ -55,7 +53,7 @@ class QualityMetric(str, Enum):
     UNBALANCE = "unbalance"  # Desequilíbrio
 
 
-class ReportType(str, Enum):
+class ReportType(StrEnum):
     DAILY = "daily"
     WEEKLY = "weekly"
     MONTHLY = "monthly"
@@ -198,7 +196,7 @@ def load_config(config_path: str | Path | None = None) -> GridConfig:
     if not path.exists():
         return GridConfig()
 
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         data = yaml.safe_load(f) or {}
 
     return GridConfig(**data)

@@ -4,12 +4,11 @@ Fleet Aggregator Module.
 Aggregates data from all sites into fleet-wide metrics.
 """
 
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 import aiohttp
 import structlog
-
 from src.core.config import FleetConfig
 from src.sites.site_manager import SiteManager, SiteMetrics
 
@@ -20,7 +19,7 @@ class FleetMetrics:
     """Represents aggregated fleet metrics."""
 
     def __init__(self):
-        self.timestamp: datetime = datetime.now(timezone.utc)
+        self.timestamp: datetime = datetime.now(UTC)
         self.total_sites: int = 0
         self.online_sites: int = 0
         self.total_capacity_kw: float = 0.0
@@ -30,9 +29,9 @@ class FleetMetrics:
         self.avg_efficiency: float = 0.0
         self.avg_availability: float = 0.0
         self.total_alarms: int = 0
-        self.site_metrics: List[Dict[str, Any]] = []
+        self.site_metrics: list[dict[str, Any]] = []
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "timestamp": self.timestamp.isoformat(),
             "total_sites": self.total_sites,
@@ -62,8 +61,8 @@ class FleetAggregator:
     def __init__(self, config: FleetConfig, site_manager: SiteManager):
         self.config = config
         self.site_manager = site_manager
-        self._session: Optional[aiohttp.ClientSession] = None
-        self._fleet_metrics: List[FleetMetrics] = []
+        self._session: aiohttp.ClientSession | None = None
+        self._fleet_metrics: list[FleetMetrics] = []
 
     async def start(self) -> None:
         self._session = aiohttp.ClientSession()
@@ -74,7 +73,7 @@ class FleetAggregator:
             await self._session.close()
         logger.info("aggregator.stopped")
 
-    async def _fetch_site_metrics(self, site_id: str) -> Optional[SiteMetrics]:
+    async def _fetch_site_metrics(self, site_id: str) -> SiteMetrics | None:
         site = self.site_manager.get_site(site_id)
         if not site:
             return None
@@ -129,7 +128,7 @@ class FleetAggregator:
         except Exception as e:
             logger.error("aggregator.performance_error", site_id=site_id, error=str(e))
 
-    async def collect_all_sites(self) -> List[SiteMetrics]:
+    async def collect_all_sites(self) -> list[SiteMetrics]:
         all_metrics = []
         for site in self.site_manager.get_all_sites():
             metrics = await self._fetch_site_metrics(site.id)
@@ -173,13 +172,13 @@ class FleetAggregator:
 
         return fleet
 
-    def get_latest_fleet_metrics(self) -> Optional[FleetMetrics]:
+    def get_latest_fleet_metrics(self) -> FleetMetrics | None:
         return self._fleet_metrics[-1] if self._fleet_metrics else None
 
-    def get_fleet_history(self, limit: int = 100) -> List[FleetMetrics]:
+    def get_fleet_history(self, limit: int = 100) -> list[FleetMetrics]:
         return self._fleet_metrics[-limit:]
 
-    def get_region_aggregation(self, region: str) -> Dict[str, Any]:
+    def get_region_aggregation(self, region: str) -> dict[str, Any]:
         sites = self.site_manager.get_sites_by_region(region)
         metrics = []
         for site in sites:
@@ -199,6 +198,6 @@ class FleetAggregator:
             "avg_efficiency": sum(m.efficiency for m in metrics) / len(metrics),
         }
 
-    def get_all_regions_aggregation(self) -> List[Dict[str, Any]]:
+    def get_all_regions_aggregation(self) -> list[dict[str, Any]]:
         regions = self.site_manager.get_regions()
         return [self.get_region_aggregation(r) for r in regions]

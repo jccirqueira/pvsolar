@@ -4,7 +4,7 @@ Tests for pvSolar Reports Excel Generator.
 
 import os
 import tempfile
-import pytest
+
 from src.generators.excel_generator import ExcelReportGenerator
 
 

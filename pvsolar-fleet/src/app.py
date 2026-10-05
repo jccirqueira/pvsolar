@@ -4,12 +4,11 @@ pvSolar Fleet Application.
 Main application that initializes and runs the fleet management system.
 """
 
-import asyncio
-from typing import Any, Dict, List, Optional
+import contextlib
+from typing import Any
 
 import structlog
-
-from src.alerts.alert_aggregator import AlertAggregator, FleetAlert
+from src.alerts.alert_aggregator import AlertAggregator
 from src.comparison.comparison_engine import ComparisonEngine
 from src.core.config import AlertSeverity, ComparisonMetric, FleetConfig, SiteConfig, load_config
 from src.sites.fleet_aggregator import FleetAggregator
@@ -29,7 +28,7 @@ class PVSolarFleet:
     - Comparison engine
     """
 
-    def __init__(self, config: Optional[FleetConfig] = None, config_path: Optional[str] = None):
+    def __init__(self, config: FleetConfig | None = None, config_path: str | None = None):
         if config:
             self.config = config
         else:
@@ -57,7 +56,7 @@ class PVSolarFleet:
         self._running = False
         logger.info("fleet.stopped")
 
-    def add_site(self, config: SiteConfig) -> Dict[str, Any]:
+    def add_site(self, config: SiteConfig) -> dict[str, Any]:
         site = self.site_manager.add_site(config)
         logger.info("fleet.site_added", site_id=site.id, name=site.name)
         return site.to_dict()
@@ -68,25 +67,25 @@ class PVSolarFleet:
             logger.info("fleet.site_removed", site_id=site_id)
         return result
 
-    def get_site(self, site_id: str) -> Optional[Dict[str, Any]]:
+    def get_site(self, site_id: str) -> dict[str, Any] | None:
         site = self.site_manager.get_site(site_id)
         return site.to_dict() if site else None
 
-    def get_all_sites(self) -> List[Dict[str, Any]]:
+    def get_all_sites(self) -> list[dict[str, Any]]:
         return [s.to_dict() for s in self.site_manager.get_all_sites()]
 
-    def get_fleet_summary(self) -> Dict[str, Any]:
+    def get_fleet_summary(self) -> dict[str, Any]:
         return self.site_manager.get_fleet_summary()
 
-    async def refresh_fleet(self) -> Dict[str, Any]:
+    async def refresh_fleet(self) -> dict[str, Any]:
         fleet_metrics = await self.fleet_aggregator.aggregate_fleet()
         return fleet_metrics.to_dict()
 
-    def get_fleet_metrics(self) -> Optional[Dict[str, Any]]:
+    def get_fleet_metrics(self) -> dict[str, Any] | None:
         metrics = self.fleet_aggregator.get_latest_fleet_metrics()
         return metrics.to_dict() if metrics else None
 
-    def compare_sites(self, metric: str = "pr") -> Dict[str, Any]:
+    def compare_sites(self, metric: str = "pr") -> dict[str, Any]:
         try:
             m = ComparisonMetric(metric)
         except ValueError:
@@ -94,21 +93,21 @@ class PVSolarFleet:
         result = self.comparison_engine.compare_sites(m)
         return result.to_dict()
 
-    def get_site_ranking(self, site_id: str, metric: str = "pr") -> Dict[str, Any]:
+    def get_site_ranking(self, site_id: str, metric: str = "pr") -> dict[str, Any]:
         try:
             m = ComparisonMetric(metric)
         except ValueError:
             m = ComparisonMetric.PR
         return self.comparison_engine.get_vs_average(site_id, m)
 
-    def get_best_performers(self, metric: str = "pr", count: int = 3) -> List[Dict[str, Any]]:
+    def get_best_performers(self, metric: str = "pr", count: int = 3) -> list[dict[str, Any]]:
         try:
             m = ComparisonMetric(metric)
         except ValueError:
             m = ComparisonMetric.PR
         return [r.to_dict() for r in self.comparison_engine.get_best_performers(m, count)]
 
-    def get_worst_performers(self, metric: str = "pr", count: int = 3) -> List[Dict[str, Any]]:
+    def get_worst_performers(self, metric: str = "pr", count: int = 3) -> list[dict[str, Any]]:
         try:
             m = ComparisonMetric(metric)
         except ValueError:
@@ -121,7 +120,7 @@ class PVSolarFleet:
         severity: str,
         message: str,
         source: str = "",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         site = self.site_manager.get_site(site_id)
         site_name = site.name if site else "Unknown"
         try:
@@ -137,23 +136,21 @@ class PVSolarFleet:
     def resolve_alert(self, alert_id: str) -> bool:
         return self.alert_aggregator.resolve_alert(alert_id)
 
-    def get_alerts(self, site_id: Optional[str] = None, severity: Optional[str] = None) -> List[Dict[str, Any]]:
+    def get_alerts(self, site_id: str | None = None, severity: str | None = None) -> list[dict[str, Any]]:
         s = None
         if severity:
-            try:
+            with contextlib.suppress(ValueError):
                 s = AlertSeverity(severity)
-            except ValueError:
-                pass
         alerts = self.alert_aggregator.get_alerts(site_id=site_id, severity=s)
         return [a.to_dict() for a in alerts]
 
-    def get_alert_statistics(self) -> Dict[str, Any]:
+    def get_alert_statistics(self) -> dict[str, Any]:
         return self.alert_aggregator.get_statistics()
 
-    def get_regions(self) -> List[str]:
+    def get_regions(self) -> list[str]:
         return self.site_manager.get_regions()
 
-    def get_region_summary(self, region: str) -> Dict[str, Any]:
+    def get_region_summary(self, region: str) -> dict[str, Any]:
         return self.fleet_aggregator.get_region_aggregation(region)
 
     @property

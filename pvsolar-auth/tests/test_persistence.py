@@ -16,11 +16,10 @@ from __future__ import annotations
 
 import asyncio
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 
 import pytest
 from fastapi.testclient import TestClient
-
 from src.api.app import create_app
 from src.core.config import (
     AuthConfig,
@@ -127,8 +126,8 @@ class TestUserPersistence:
         um.change_password(user.id, "NovaSenha123")
         user = um.get_user(user.id)
         user.login_attempts = 3
-        user.last_login = datetime.now(timezone.utc)
-        user.locked_until = datetime.now(timezone.utc) + timedelta(minutes=10)
+        user.last_login = datetime.now(UTC)
+        user.locked_until = datetime.now(UTC) + timedelta(minutes=10)
         await service.save_user(user)
 
         # novo "processo"
@@ -223,7 +222,7 @@ class TestUserPersistence:
         assert got.status == UserStatus.LOCKED
         assert got.login_attempts == 5
         assert got.locked_until is not None
-        assert got.locked_until > datetime.now(timezone.utc)
+        assert got.locked_until > datetime.now(UTC)
         # senha correta continua bloqueada após o reinício
         assert um2.authenticate("rita", "senha_correta") is None
         await service.dispose()

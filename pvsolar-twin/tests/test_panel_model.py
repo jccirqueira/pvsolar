@@ -1,7 +1,6 @@
 """Testes do panel_model do pvSolar Digital Twin."""
 
 import pytest
-
 from src.core.config import PanelConfig, PanelType
 from src.models.panel_model import IVCurve, PanelModel, PanelState
 

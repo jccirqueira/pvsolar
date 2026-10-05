@@ -3,7 +3,6 @@
 from pathlib import Path
 
 import pytest
-
 from src.core import config as config_module
 from src.core.config import (
     AuthConfig,
@@ -20,7 +19,6 @@ from src.core.config import (
     UserStatus,
     load_config,
 )
-
 
 # ---------------------------------------------------------------------------
 # Enums

@@ -2,19 +2,17 @@
 
 from __future__ import annotations
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 
+from src.compliance.compliance_engine import ComplianceEngine
 from src.core.config import (
-    ComplianceStatus,
     FaultType,
     GridConfig,
     GridStandard,
-    QualityMetric,
     load_config,
 )
-from src.compliance.compliance_engine import ComplianceEngine
-from src.quality.quality_analyzer import QualityAnalyzer
 from src.fault_recorder.fault_recorder import FaultRecorder
+from src.quality.quality_analyzer import QualityAnalyzer
 from src.reports.report_generator import ReportGenerator
 
 

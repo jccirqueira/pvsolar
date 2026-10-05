@@ -5,14 +5,15 @@ Centralized configuration using Pydantic for type-safe settings.
 """
 
 import os
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
-from typing import Any, Dict, List, Optional
-from pydantic import Field, field_validator
+from typing import Any
+
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
-class ReportType(str, Enum):
+class ReportType(StrEnum):
     """Report types."""
     DAILY = "daily"
     WEEKLY = "weekly"
@@ -22,7 +23,7 @@ class ReportType(str, Enum):
     CUSTOM = "custom"
 
 
-class OutputFormat(str, Enum):
+class OutputFormat(StrEnum):
     """Output formats."""
     PDF = "pdf"
     EXCEL = "excel"
@@ -30,7 +31,7 @@ class OutputFormat(str, Enum):
     ALL = "all"
 
 
-class ReportLanguage(str, Enum):
+class ReportLanguage(StrEnum):
     """Report languages."""
     PT_BR = "pt_BR"
     EN_US = "en_US"
@@ -39,7 +40,7 @@ class ReportLanguage(str, Enum):
 class GatewayConfig(BaseSettings):
     """Gateway API connection settings."""
     url: str = Field(default="http://localhost:8000", description="Gateway API URL")
-    api_key: Optional[str] = Field(default=None, description="API key")
+    api_key: str | None = Field(default=None, description="API key")
     timeout: int = Field(default=30, ge=5, le=120, description="Request timeout in seconds")
 
     model_config = {"env_prefix": "GATEWAY_"}
@@ -48,7 +49,7 @@ class GatewayConfig(BaseSettings):
 class AnalyticsConfig(BaseSettings):
     """Analytics API connection settings."""
     url: str = Field(default="http://localhost:8001", description="Analytics API URL")
-    api_key: Optional[str] = Field(default=None, description="API key")
+    api_key: str | None = Field(default=None, description="API key")
     timeout: int = Field(default=30, ge=5, le=120, description="Request timeout in seconds")
 
     model_config = {"env_prefix": "ANALYTICS_"}
@@ -59,11 +60,11 @@ class EmailConfig(BaseSettings):
     enabled: bool = Field(default=False, description="Enable email notifications")
     smtp_host: str = Field(default="smtp.gmail.com", description="SMTP host")
     smtp_port: int = Field(default=587, description="SMTP port")
-    smtp_user: Optional[str] = Field(default=None, description="SMTP username")
-    smtp_password: Optional[str] = Field(default=None, description="SMTP password")
+    smtp_user: str | None = Field(default=None, description="SMTP username")
+    smtp_password: str | None = Field(default=None, description="SMTP password")
     use_tls: bool = Field(default=True, description="Use TLS")
     from_address: str = Field(default="reports@pvsolar.com", description="From address")
-    recipients: List[str] = Field(default_factory=list, description="Recipient addresses")
+    recipients: list[str] = Field(default_factory=list, description="Recipient addresses")
 
     model_config = {"env_prefix": "EMAIL_"}
 
@@ -92,7 +93,7 @@ class TemplateConfig(BaseSettings):
     """Template settings."""
     language: ReportLanguage = Field(default=ReportLanguage.PT_BR, description="Report language")
     company_name: str = Field(default="pvSolar Energy", description="Company name")
-    company_logo: Optional[str] = Field(default=None, description="Logo path")
+    company_logo: str | None = Field(default=None, description="Logo path")
     primary_color: str = Field(default="#10B981", description="Primary color")
     secondary_color: str = Field(default="#3B82F6", description="Secondary color")
 
@@ -128,12 +129,12 @@ class ReportsConfig(BaseSettings):
     template: TemplateConfig = Field(default_factory=TemplateConfig)
     plant: PlantConfig = Field(default_factory=PlantConfig)
     api: APIConfig = Field(default_factory=APIConfig)
-    
-    formats: List[OutputFormat] = Field(
+
+    formats: list[OutputFormat] = Field(
         default=[OutputFormat.PDF, OutputFormat.EXCEL],
         description="Default output formats"
     )
-    report_types: List[ReportType] = Field(
+    report_types: list[ReportType] = Field(
         default=[ReportType.DAILY, ReportType.WEEKLY, ReportType.MONTHLY],
         description="Enabled report types"
     )
@@ -142,12 +143,12 @@ class ReportsConfig(BaseSettings):
     model_config = {"env_prefix": "PVREPORTS_"}
 
 
-def load_config(config_path: Optional[str] = None) -> ReportsConfig:
+def load_config(config_path: str | None = None) -> ReportsConfig:
     """Load configuration from file and environment."""
     import yaml
 
-    config_data: Dict[str, Any] = {}
-    
+    config_data: dict[str, Any] = {}
+
     if config_path:
         path = Path(config_path)
         if path.exists():

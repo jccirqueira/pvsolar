@@ -1,7 +1,7 @@
 import pytest
-from src.core.config import ExporterConfig, CollectorConfig
-from src.core.exporter import PrometheusExporter
 from src.collectors.scrape import ScrapeManager
+from src.core.config import CollectorConfig, ExporterConfig
+from src.core.exporter import PrometheusExporter
 
 
 @pytest.fixture

@@ -5,12 +5,11 @@ Handles persistence of trained models and feature extractors.
 """
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 import joblib
-import numpy as np
 import structlog
 
 from src.ml.maintenance.features import MaintenanceFeatureExtractor
@@ -59,7 +58,7 @@ class MaintenanceModelStore:
         # Save metadata
         metadata = {
             "name": name,
-            "saved_at": datetime.now(timezone.utc).isoformat(),
+            "saved_at": datetime.now(UTC).isoformat(),
             "model_version": predictor.model_version,
             "fitted": predictor._fitted,
             "horizons": list(predictor._models.keys()),
@@ -167,5 +166,5 @@ class MaintenanceModelStore:
 
     def _load_json(self, path: Path) -> Any:
         """Load data from JSON."""
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return json.load(f)

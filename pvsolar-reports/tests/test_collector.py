@@ -2,8 +2,8 @@
 Tests for pvSolar Reports Data Collector.
 """
 
-import pytest
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
+
 from src.collectors.data_collector import (
     AlarmData,
     DataCollector,
@@ -34,7 +34,7 @@ class TestTelemetryData:
 
 class TestAlarmData:
     def test_create_alarm(self):
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         alarm = AlarmData("alarm_1", "critical", "Test alarm", "inverter_1", now)
         assert alarm.alarm_id == "alarm_1"
         assert alarm.level == "critical"
@@ -43,7 +43,7 @@ class TestAlarmData:
         assert alarm.acknowledged is False
 
     def test_to_dict(self):
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         alarm = AlarmData("alarm_1", "warning", "High temp", "inv_1", now)
         d = alarm.to_dict()
         assert d["alarm_id"] == "alarm_1"

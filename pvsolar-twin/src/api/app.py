@@ -2,20 +2,17 @@
 
 from __future__ import annotations
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 
 from src.core.config import (
-    DegradationModel,
-    OptimizationTarget,
     ScenarioConfig,
-    ScenarioType,
     TwinConfig,
     load_config,
 )
-from src.models.panel_model import PanelModel
 from src.degradation.degradation_engine import DegradationEngine
-from src.scenarios.scenario_engine import ScenarioEngine
+from src.models.panel_model import PanelModel
 from src.optimizer.optimizer import Optimizer
+from src.scenarios.scenario_engine import ScenarioEngine
 
 
 def create_app(config: TwinConfig | None = None) -> FastAPI:

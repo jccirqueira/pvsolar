@@ -10,7 +10,7 @@ from src.core.screens import Screen, ScreenManager, Widget, WidgetType
 def create_performance_screen(screen_manager: ScreenManager) -> Screen:
     """Create the performance monitoring screen."""
     screen = screen_manager.create_screen("performance", "Performance", "📊")
-    
+
     # Performance Score Group
     screen.add_widget(Widget(
         widget_id="score_group",
@@ -18,7 +18,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         label="Performance Score",
         x=0, y=0, width=400, height=200,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="overall_score",
         widget_type=WidgetType.GAUGE,
@@ -37,7 +37,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
             {"min": 80, "max": 100, "color": "#4CAF50"},
         ],
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="performance_grade",
         widget_type=WidgetType.LABEL,
@@ -48,7 +48,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         bold=True,
         color="#4CAF50",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="performance_rank",
         widget_type=WidgetType.LABEL,
@@ -56,7 +56,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         x=200, y=80, width=100, height=30,
         value="--",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="performance_percentile",
         widget_type=WidgetType.LABEL,
@@ -64,7 +64,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         x=200, y=110, width=120, height=30,
         value="--",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="performance_trend",
         widget_type=WidgetType.LABEL,
@@ -72,7 +72,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         x=200, y=140, width=100, height=30,
         value="--",
     ))
-    
+
     # Performance Components Group
     screen.add_widget(Widget(
         widget_id="components_group",
@@ -80,7 +80,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         label="Performance Components",
         x=420, y=0, width=400, height=200,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="pr_score",
         widget_type=WidgetType.PROGRESS,
@@ -91,7 +91,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         max_val=100.0,
         color="#4CAF50",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="cef_score",
         widget_type=WidgetType.PROGRESS,
@@ -102,7 +102,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         max_val=100.0,
         color="#2196F3",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="availability_score",
         widget_type=WidgetType.PROGRESS,
@@ -113,7 +113,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         max_val=100.0,
         color="#FF9800",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="efficiency_score",
         widget_type=WidgetType.PROGRESS,
@@ -124,7 +124,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         max_val=100.0,
         color="#9C27B0",
     ))
-    
+
     # Performance Trends Group
     screen.add_widget(Widget(
         widget_id="perf_trend_group",
@@ -132,7 +132,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         label="Performance Trends",
         x=0, y=220, width=820, height=200,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="perf_trend_chart",
         widget_type=WidgetType.CHART,
@@ -143,7 +143,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         time_range="30d",
         show_legend=True,
     ))
-    
+
     # Benchmark Group
     screen.add_widget(Widget(
         widget_id="benchmark_group",
@@ -151,7 +151,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         label="Benchmark Comparison",
         x=0, y=440, width=400, height=140,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="vs_fleet_avg",
         widget_type=WidgetType.LABEL,
@@ -159,7 +159,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         x=10, y=470, width=180, height=30,
         value="--",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="vs_peer_avg",
         widget_type=WidgetType.LABEL,
@@ -167,7 +167,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         x=10, y=500, width=180, height=30,
         value="--",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="vs_historical",
         widget_type=WidgetType.LABEL,
@@ -175,7 +175,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         x=10, y=530, width=180, height=30,
         value="--",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="vs_best",
         widget_type=WidgetType.LABEL,
@@ -183,7 +183,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         x=10, y=560, width=180, height=30,
         value="--",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="benchmark_chart",
         widget_type=WidgetType.CHART,
@@ -192,7 +192,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         chart_type="radar",
         series=["pr", "cef", "availability", "efficiency"],
     ))
-    
+
     # Insights Group
     screen.add_widget(Widget(
         widget_id="insights_group",
@@ -200,7 +200,7 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
         label="Insights & Recommendations",
         x=420, y=440, width=400, height=140,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="insights_table",
         widget_type=WidgetType.TABLE,
@@ -211,5 +211,5 @@ def create_performance_screen(screen_manager: ScreenManager) -> Screen:
             ["--", "No recommendations available"],
         ],
     ))
-    
+
     return screen

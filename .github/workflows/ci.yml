@@ -25,6 +25,30 @@ jobs:
       - name: Validar 13 manuals (HTML)
         run: python docker/validate_manuals.py
 
+  lint:
+    name: Lint (ruff + eslint)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Instalar ruff (pinado = mesmo da dev local)
+        run: pip install ruff==0.16.7
+      - name: Ruff check (monorepo)
+        run: ruff check .
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: pvsolar-web/package-lock.json
+      - name: ESLint (pvsolar-web)
+        working-directory: pvsolar-web
+        run: |
+          npm ci
+          npm run lint
+
   testes-python:
     name: pytest ${{ matrix.projeto }}
     runs-on: windows-latest

@@ -8,12 +8,12 @@ import structlog
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.core.config import AuthConfig, Permission, TenantStatus, UserRole, UserStatus, load_config
-from src.users.user_manager import UserManager, User
 from src.auth.auth_engine import AuthEngine
-from src.rbac.rbac_engine import RBACEngine
-from src.tenants.tenant_manager import TenantManager, Tenant
+from src.core.config import AuthConfig, Permission, UserRole, load_config
 from src.db.service import PersistenceService
+from src.rbac.rbac_engine import RBACEngine
+from src.tenants.tenant_manager import Tenant, TenantManager
+from src.users.user_manager import User, UserManager
 
 logger = structlog.get_logger()
 
@@ -136,7 +136,7 @@ def create_app(config: AuthConfig | None = None) -> FastAPI:
                 tenant_id=data.get("tenant_id", ""),
             )
         except ValueError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
 
         # Write-through: se o banco falhar, desfaz a criação em memória para
         # não haver divergência entre o cache e a fonte de verdade.
@@ -145,7 +145,7 @@ def create_app(config: AuthConfig | None = None) -> FastAPI:
         except Exception as exc:
             user_manager.delete_user(user.id)
             logger.error("user.persist_failed", user_id=user.id, error=str(exc))
-            raise HTTPException(status_code=500, detail="Falha ao gravar usuário no banco")
+            raise HTTPException(status_code=500, detail="Falha ao gravar usuário no banco") from exc
         return user.to_dict()
 
     @app.get("/api/users")
@@ -169,7 +169,7 @@ def create_app(config: AuthConfig | None = None) -> FastAPI:
                 await persistence.save_user(user)
             except Exception as exc:
                 logger.error("user.persist_failed", user_id=user_id, error=str(exc))
-                raise HTTPException(status_code=500, detail="Falha ao gravar usuário no banco")
+                raise HTTPException(status_code=500, detail="Falha ao gravar usuário no banco") from exc
         return {"status": "updated"}
 
     @app.delete("/api/users/{user_id}")
@@ -181,7 +181,7 @@ def create_app(config: AuthConfig | None = None) -> FastAPI:
             await persistence.delete_user(user_id)
         except Exception as exc:
             logger.error("user.persist_failed", user_id=user_id, error=str(exc))
-            raise HTTPException(status_code=500, detail="Falha ao remover usuário do banco")
+            raise HTTPException(status_code=500, detail="Falha ao remover usuário do banco") from exc
         user_manager.delete_user(user_id)
         return {"status": "deleted"}
 
@@ -201,7 +201,7 @@ def create_app(config: AuthConfig | None = None) -> FastAPI:
             await persistence.save_user(user)
         except Exception as exc:
             logger.error("user.persist_failed", user_id=user.id, error=str(exc))
-            raise HTTPException(status_code=500, detail="Falha ao gravar usuário no banco")
+            raise HTTPException(status_code=500, detail="Falha ao gravar usuário no banco") from exc
 
         permissions = [p.value for p in rbac_engine.get_role_permissions(user.role.value)]
         tokens = auth_engine.create_token_pair(
@@ -243,7 +243,7 @@ def create_app(config: AuthConfig | None = None) -> FastAPI:
             await persistence.save_api_key(api_key)
         except Exception as exc:
             logger.error("apikey.persist_failed", key_id=api_key.id, error=str(exc))
-            raise HTTPException(status_code=500, detail="Falha ao gravar chave de API no banco")
+            raise HTTPException(status_code=500, detail="Falha ao gravar chave de API no banco") from exc
         return {"key": api_key.key, "id": api_key.id}
 
     @app.post("/api/auth/validate-api-key")
@@ -267,7 +267,7 @@ def create_app(config: AuthConfig | None = None) -> FastAPI:
         except Exception as exc:
             rbac_engine.delete_role(role.id)
             logger.error("role.persist_failed", role_id=role.id, error=str(exc))
-            raise HTTPException(status_code=500, detail="Falha ao gravar role no banco")
+            raise HTTPException(status_code=500, detail="Falha ao gravar role no banco") from exc
         return role.to_dict()
 
     @app.get("/api/roles")
@@ -297,14 +297,14 @@ def create_app(config: AuthConfig | None = None) -> FastAPI:
                 features=data.get("features", []),
             )
         except ValueError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
 
         try:
             await persistence.save_tenant(tenant)
         except Exception as exc:
             tenant_manager.delete_tenant(tenant.id)
             logger.error("tenant.persist_failed", tenant_id=tenant.id, error=str(exc))
-            raise HTTPException(status_code=500, detail="Falha ao gravar tenant no banco")
+            raise HTTPException(status_code=500, detail="Falha ao gravar tenant no banco") from exc
         return tenant.to_dict()
 
     @app.get("/api/tenants")
@@ -328,7 +328,7 @@ def create_app(config: AuthConfig | None = None) -> FastAPI:
                 await persistence.save_tenant(tenant)
             except Exception as exc:
                 logger.error("tenant.persist_failed", tenant_id=tenant_id, error=str(exc))
-                raise HTTPException(status_code=500, detail="Falha ao gravar tenant no banco")
+                raise HTTPException(status_code=500, detail="Falha ao gravar tenant no banco") from exc
         return {"status": "suspended"}
 
     @app.post("/api/tenants/{tenant_id}/activate")
@@ -341,7 +341,7 @@ def create_app(config: AuthConfig | None = None) -> FastAPI:
                 await persistence.save_tenant(tenant)
             except Exception as exc:
                 logger.error("tenant.persist_failed", tenant_id=tenant_id, error=str(exc))
-                raise HTTPException(status_code=500, detail="Falha ao gravar tenant no banco")
+                raise HTTPException(status_code=500, detail="Falha ao gravar tenant no banco") from exc
         return {"status": "activated"}
 
     # --- Statistics ---

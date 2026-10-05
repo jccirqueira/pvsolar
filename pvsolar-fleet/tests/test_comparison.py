@@ -2,9 +2,8 @@
 Tests for pvSolar Fleet Comparison Engine.
 """
 
-import pytest
-from src.core.config import ComparisonMetric, SiteConfig, SiteStatus
 from src.comparison.comparison_engine import ComparisonEngine, ComparisonResult, SiteRanking
+from src.core.config import ComparisonMetric, SiteConfig
 from src.sites.site_manager import SiteManager, SiteMetrics
 
 

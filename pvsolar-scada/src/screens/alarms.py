@@ -10,7 +10,7 @@ from src.core.screens import Screen, ScreenManager, Widget, WidgetType
 def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
     """Create the alarms monitoring screen."""
     screen = screen_manager.create_screen("alarms", "Alarms", "🔔")
-    
+
     # Alarm Summary Group
     screen.add_widget(Widget(
         widget_id="alarm_summary_group",
@@ -18,7 +18,7 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         label="Alarm Summary",
         x=0, y=0, width=820, height=80,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="critical_count",
         widget_type=WidgetType.LABEL,
@@ -29,7 +29,7 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         font_size=18,
         bold=True,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="warning_count",
         widget_type=WidgetType.LABEL,
@@ -40,7 +40,7 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         font_size=18,
         bold=True,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="info_count",
         widget_type=WidgetType.LABEL,
@@ -51,7 +51,7 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         font_size=18,
         bold=True,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="acknowledged_count",
         widget_type=WidgetType.LABEL,
@@ -62,7 +62,7 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         font_size=18,
         bold=True,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="unacknowledged_count",
         widget_type=WidgetType.LABEL,
@@ -73,7 +73,7 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         font_size=18,
         bold=True,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="total_alarms",
         widget_type=WidgetType.LABEL,
@@ -83,7 +83,7 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         font_size=18,
         bold=True,
     ))
-    
+
     # Alarm Controls
     screen.add_widget(Widget(
         widget_id="ack_all_button",
@@ -92,7 +92,7 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         x=720, y=25, width=90, height=35,
         color="#4CAF50",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="filter_combo",
         widget_type=WidgetType.COMBOBOX,
@@ -101,7 +101,7 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         options=["All", "Critical", "Warning", "Info", "Unacknowledged"],
         selected_index=0,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="search_input",
         widget_type=WidgetType.LINEEDIT,
@@ -109,7 +109,7 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         x=170, y=90, width=200, height=30,
         placeholder="Search alarms...",
     ))
-    
+
     # Active Alarms Table
     screen.add_widget(Widget(
         widget_id="alarms_table",
@@ -122,7 +122,7 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         selectable=True,
         row_height=25,
     ))
-    
+
     # Alarm Details Group
     screen.add_widget(Widget(
         widget_id="alarm_details_group",
@@ -130,7 +130,7 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         label="Alarm Details",
         x=0, y=440, width=400, height=140,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="alarm_detail_id",
         widget_type=WidgetType.LABEL,
@@ -138,7 +138,7 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         x=10, y=470, width=180, height=25,
         value="--",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="alarm_detail_level",
         widget_type=WidgetType.LABEL,
@@ -146,7 +146,7 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         x=10, y=500, width=100, height=25,
         value="--",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="alarm_detail_source",
         widget_type=WidgetType.LABEL,
@@ -154,7 +154,7 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         x=120, y=500, width=150, height=25,
         value="--",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="alarm_detail_time",
         widget_type=WidgetType.LABEL,
@@ -162,7 +162,7 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         x=10, y=530, width=180, height=25,
         value="--",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="alarm_ack_button",
         widget_type=WidgetType.BUTTON,
@@ -170,7 +170,7 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         x=10, y=560, width=100, height=30,
         color="#FF9800",
     ))
-    
+
     # Alarm History
     screen.add_widget(Widget(
         widget_id="alarm_history_group",
@@ -178,7 +178,7 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         label="Alarm History (Last 24h)",
         x=420, y=440, width=400, height=140,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="alarm_history_chart",
         widget_type=WidgetType.CHART,
@@ -188,5 +188,5 @@ def create_alarms_screen(screen_manager: ScreenManager) -> Screen:
         series=["critical", "warning", "info"],
         time_range="24h",
     ))
-    
+
     return screen

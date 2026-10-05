@@ -2,7 +2,6 @@
 Tests for pvSolar SCADA Configuration.
 """
 
-import pytest
 from src.core.config import (
     AlarmConfig,
     AnalyticsConfig,

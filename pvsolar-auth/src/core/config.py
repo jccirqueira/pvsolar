@@ -3,18 +3,17 @@
 from __future__ import annotations
 
 import os
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 import yaml
 from pydantic import BaseModel, Field
 
-
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
 
-class UserRole(str, Enum):
+class UserRole(StrEnum):
     SUPER_ADMIN = "super_admin"
     ADMIN = "admin"
     OPERATOR = "operator"
@@ -22,7 +21,7 @@ class UserRole(str, Enum):
     API = "api"
 
 
-class Permission(str, Enum):
+class Permission(StrEnum):
     READ = "read"
     WRITE = "write"
     DELETE = "delete"
@@ -34,14 +33,14 @@ class Permission(str, Enum):
     EXPORT_DATA = "export_data"
 
 
-class TenantStatus(str, Enum):
+class TenantStatus(StrEnum):
     ACTIVE = "active"
     INACTIVE = "inactive"
     SUSPENDED = "suspended"
     PENDING = "pending"
 
 
-class UserStatus(str, Enum):
+class UserStatus(StrEnum):
     ACTIVE = "active"
     INACTIVE = "inactive"
     LOCKED = "locked"
@@ -236,7 +235,7 @@ def load_config(config_path: str | Path | None = None) -> AuthConfig:
     if not path.exists():
         return _apply_env_overrides(AuthConfig())
 
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         data = yaml.safe_load(f) or {}
 
     return _apply_env_overrides(AuthConfig(**data))

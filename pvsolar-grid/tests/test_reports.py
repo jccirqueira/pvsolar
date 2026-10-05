@@ -1,7 +1,6 @@
 """Testes do report_generator do pvSolar Grid."""
 
 import pytest
-
 from src.core.config import ComplianceStatus, GridStandard
 from src.reports.report_generator import GridReport, ReportGenerator, ReportSection
 

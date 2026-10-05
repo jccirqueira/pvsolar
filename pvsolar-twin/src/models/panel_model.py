@@ -67,7 +67,7 @@ class PanelModel:
         self, temp_k: float, photocurrent: float
     ) -> float:
         """Calcula Voc com temperatura."""
-        vth = self.calculate_thermal_voltage(temp_k)
+        self.calculate_thermal_voltage(temp_k)
         voc_ref = self.config.voc
         temp_ref = 298.15
         temp_coeff_v = -0.003
@@ -90,7 +90,7 @@ class PanelModel:
         num_points: int = 100,
     ) -> IVCurve:
         """Calcula curva I-V completa."""
-        temp_k = ambient_temp + 273.15
+        ambient_temp + 273.15
         cell_temp_k = self.calculate_cell_temperature(ambient_temp, irradiance) + 273.15
         photocurrent = self.calculate_photo_current(irradiance, cell_temp_k)
         voc = self.calculate_voc_temperature(cell_temp_k, photocurrent)

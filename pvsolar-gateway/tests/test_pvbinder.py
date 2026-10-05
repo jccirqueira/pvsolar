@@ -2,14 +2,15 @@
 Unit tests for pvbrowser binder module.
 """
 
-import pytest
+import sys
 from pathlib import Path
 
-import sys
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from pvbinder.bridge import PVBrowserBridge, PVBrowserDataConverter
 from core.config import PVBrowserConfig
+from pvbinder.bridge import PVBrowserBridge, PVBrowserDataConverter
 
 
 @pytest.fixture
@@ -31,9 +32,9 @@ class TestPVBrowserDataConverter:
             "timestamp": "2024-01-01T00:00:00Z",
             "status": {"state": "running"}
         }
-        
+
         result = PVBrowserDataConverter.to_value_widget(data, "ac_power")
-        
+
         assert result["value"] == 5420.0
         assert result["unit"] == "W"
         assert result["quality"] == "good"
@@ -43,20 +44,20 @@ class TestPVBrowserDataConverter:
             "ac_power": 0.0,
             "status": {"state": "fault"}
         }
-        
+
         result = PVBrowserDataConverter.to_value_widget(data, "ac_power")
         assert result["quality"] == "bad"
 
     def test_to_gauge_data(self):
         data = {"efficiency": 96.5}
-        
+
         result = PVBrowserDataConverter.to_gauge_data(
             data,
             "efficiency",
             min_val=0,
             max_val=100
         )
-        
+
         assert result["value"] == 96.5
         assert result["min"] == 0
         assert result["max"] == 100
@@ -67,12 +68,12 @@ class TestPVBrowserDataConverter:
             "power": {"ac_power": 5000, "dc_power": 5200},
             "timestamp": "2024-01-01T00:00:00Z"
         }
-        
+
         result = PVBrowserDataConverter.to_trend_data(
             data,
             ["power.ac_power", "power.dc_power"]
         )
-        
+
         assert len(result) == 2
         assert result[0]["name"] == "power.ac_power"
         assert result[0]["value"] == 5000
@@ -98,7 +99,7 @@ class TestPVBrowserBridge:
 
     def test_normalize_data(self, pvb_config):
         bridge = PVBrowserBridge(pvb_config)
-        
+
         data = {
             "inverter_name": "Test Inverter",
             "ac_power": 5000.0,
@@ -118,9 +119,9 @@ class TestPVBrowserBridge:
                 "storage": {"state_of_charge": 75.0}
             }
         }
-        
+
         normalized = bridge._normalize_data("inv-001", data)
-        
+
         assert normalized["inverter_id"] == "inv-001"
         assert normalized["name"] == "Test Inverter"
         assert normalized["power"]["ac_power"] == 5000.0
@@ -131,10 +132,10 @@ class TestPVBrowserBridge:
 
     def test_pack_message(self, pvb_config):
         bridge = PVBrowserBridge(pvb_config)
-        
+
         payload = {"test": "data"}
         message = bridge._pack_message(0x01, payload)
-        
+
         # Verify message structure
         assert len(message) >= 4
         assert message[0] == 1  # Protocol version

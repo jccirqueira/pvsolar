@@ -1,23 +1,21 @@
 from __future__ import annotations
 
 import os
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
-from typing import Any, Optional
 
 import yaml
 from pydantic import BaseModel, Field
-from pydantic.dataclasses import dataclass
 
 
-class MetricType(str, Enum):
+class MetricType(StrEnum):
     COUNTER = "counter"
     GAUGE = "gauge"
     HISTOGRAM = "histogram"
     SUMMARY = "summary"
 
 
-class ServiceType(str, Enum):
+class ServiceType(StrEnum):
     GATEWAY = "gateway"
     ANALYTICS = "analytics"
     SCADA = "scada"

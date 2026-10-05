@@ -6,11 +6,10 @@ ecossistema. Ponto de entrada do uvicorn: ``src.api.app:app``.
 """
 
 from contextlib import asynccontextmanager
-from typing import Any, Dict, Optional
+from typing import Any
 
 import structlog
 from fastapi import FastAPI, HTTPException
-
 from src.app import PVSolarReports
 
 logger = structlog.get_logger(__name__)
@@ -18,7 +17,7 @@ logger = structlog.get_logger(__name__)
 SERVICE = "pvsolar-reports"
 
 
-def create_app(reports: Optional[PVSolarReports] = None) -> FastAPI:
+def create_app(reports: PVSolarReports | None = None) -> FastAPI:
     """Cria a aplicacao FastAPI do pvSolar Reports.
 
     Args:
@@ -49,7 +48,7 @@ def create_app(reports: Optional[PVSolarReports] = None) -> FastAPI:
         return app.state.reports
 
     @app.get("/health")
-    async def health() -> Dict[str, Any]:
+    async def health() -> dict[str, Any]:
         return {
             "service": SERVICE,
             "status": "ok",
@@ -57,7 +56,7 @@ def create_app(reports: Optional[PVSolarReports] = None) -> FastAPI:
         }
 
     @app.get("/api/status")
-    async def status() -> Dict[str, Any]:
+    async def status() -> dict[str, Any]:
         svc = _service()
         return {
             "service": SERVICE,
@@ -67,7 +66,7 @@ def create_app(reports: Optional[PVSolarReports] = None) -> FastAPI:
             "scheduler_enabled": svc.config.scheduler.enabled,
         }
 
-    async def _generate(call_name: str, coro) -> Dict[str, Any]:
+    async def _generate(call_name: str, coro) -> dict[str, Any]:
         try:
             result = await coro
         except Exception as exc:  # noqa: BLE001
@@ -80,19 +79,19 @@ def create_app(reports: Optional[PVSolarReports] = None) -> FastAPI:
         return result
 
     @app.post("/api/reports/daily")
-    async def daily() -> Dict[str, Any]:
+    async def daily() -> dict[str, Any]:
         return await _generate("daily", _service().generate_daily_report())
 
     @app.post("/api/reports/weekly")
-    async def weekly() -> Dict[str, Any]:
+    async def weekly() -> dict[str, Any]:
         return await _generate("weekly", _service().generate_weekly_report())
 
     @app.post("/api/reports/monthly")
-    async def monthly() -> Dict[str, Any]:
+    async def monthly() -> dict[str, Any]:
         return await _generate("monthly", _service().generate_monthly_report())
 
     @app.post("/api/reports/maintenance")
-    async def maintenance() -> Dict[str, Any]:
+    async def maintenance() -> dict[str, Any]:
         return await _generate("maintenance", _service().generate_maintenance_report())
 
     return app

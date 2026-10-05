@@ -2,7 +2,6 @@
 Unit tests for API routes.
 """
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from fastapi import FastAPI

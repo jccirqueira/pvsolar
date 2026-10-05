@@ -5,9 +5,9 @@ from typing import Any
 
 import structlog
 
+from src.collectors.collectors import BaseCollector, create_collector
 from src.core.config import ExporterConfig, ServiceType
-from src.core.exporter import PrometheusExporter, CollectorResult
-from src.collectors.collectors import create_collector, BaseCollector
+from src.core.exporter import CollectorResult, PrometheusExporter
 
 logger = structlog.get_logger()
 

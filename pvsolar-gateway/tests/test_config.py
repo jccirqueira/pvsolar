@@ -2,24 +2,24 @@
 Unit tests for pvSolar Gateway configuration module.
 """
 
-import os
-import tempfile
-import pytest
-import yaml
+import sys
 from pathlib import Path
 
-import sys
+import pytest
+import yaml
+from pydantic import ValidationError
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from core.config import (
     GatewayConfig,
     GatewaySettings,
-    MQTTConfig,
-    TLSConfig,
     InverterConfig,
     ModbusConnection,
-    load_config,
+    MQTTConfig,
+    TLSConfig,
     create_default_config,
+    load_config,
 )
 
 
@@ -122,7 +122,7 @@ class TestInverterConfig:
         assert config.polling_interval == 5.0
 
     def test_invalid_driver_raises_error(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             InverterConfig(
                 id="inv-001",
                 name="Test",
@@ -150,10 +150,10 @@ class TestLoadConfig:
             "mqtt": {"broker": "localhost", "port": 1883, "client_id": "test"},
             "inverters": []
         }
-        
+
         config_file = tmp_path / "gateway.yaml"
         config_file.write_text(yaml.dump(config_data))
-        
+
         config = load_config(str(config_file))
         assert config.gateway.name == "test-gateway"
         assert config.mqtt.broker == "localhost"
@@ -165,7 +165,7 @@ class TestLoadConfig:
     def test_load_empty_config(self, tmp_path):
         config_file = tmp_path / "empty.yaml"
         config_file.write_text("")
-        
+
         with pytest.raises(ValueError):
             load_config(str(config_file))
 
@@ -197,7 +197,7 @@ class TestFullConfig:
                 }
             ]
         }
-        
+
         config = GatewayConfig(**config_data)
         assert len(config.inverters) == 1
         assert config.inverters[0].driver == "sunspec"

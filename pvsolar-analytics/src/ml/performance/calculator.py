@@ -5,8 +5,7 @@ Calculates PR (Performance Ratio), CEF (Calendar Energy Factor),
 availability, efficiency, and overall health scores.
 """
 
-from datetime import datetime, timezone, timedelta
-from typing import Any
+from datetime import UTC, datetime
 
 import numpy as np
 import structlog
@@ -89,7 +88,7 @@ class PerformanceCalculator:
             self._history[inverter_id] = []
 
         self._history[inverter_id].append({
-            "timestamp": data.get("timestamp", datetime.now(timezone.utc)),
+            "timestamp": data.get("timestamp", datetime.now(UTC)),
             "ac_power": data.get("ac_power", 0),
             "dc_power": data.get("dc_power"),
             "ac_energy": data.get("ac_energy", 0),
@@ -247,7 +246,7 @@ class PerformanceCalculator:
         if installation_date:
             if isinstance(installation_date, str):
                 installation_date = datetime.fromisoformat(installation_date)
-            years_operating = (datetime.now(timezone.utc) - installation_date).days / 365.25
+            years_operating = (datetime.now(UTC) - installation_date).days / 365.25
             degradation = (1 - self.degradation_rate) ** years_operating
             expected_energy *= degradation
 

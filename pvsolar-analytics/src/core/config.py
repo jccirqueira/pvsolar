@@ -3,10 +3,9 @@ Configuration module with Pydantic validation.
 """
 
 from pathlib import Path
-from typing import Optional
 
 import yaml
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 
 
 class MQTTConfig(BaseModel):
@@ -19,8 +18,8 @@ class MQTTConfig(BaseModel):
     client_cert: str = Field(default="", description="Client certificate path")
     client_key: str = Field(default="", description="Client key path")
     client_id: str = Field(..., description="MQTT client ID")
-    username: Optional[str] = Field(default=None, description="MQTT username")
-    password: Optional[str] = Field(default=None, description="MQTT password")
+    username: str | None = Field(default=None, description="MQTT username")
+    password: str | None = Field(default=None, description="MQTT password")
     subscribe_topics: list[str] = Field(
         default_factory=lambda: [
             "pvsolar/+/telemetry/+",
@@ -143,7 +142,7 @@ def load_config(path: str) -> AnalyticsConfig:
     if not config_path.exists():
         raise FileNotFoundError(f"Configuration file not found: {path}")
 
-    with open(config_path, "r", encoding="utf-8") as f:
+    with open(config_path, encoding="utf-8") as f:
         raw = yaml.safe_load(f)
 
     return AnalyticsConfig(**raw)

@@ -1,7 +1,6 @@
 """Testes do tenant_manager do pvSolar Auth."""
 
 import pytest
-
 from src.core.config import TenantStatus
 from src.tenants.tenant_manager import Tenant, TenantManager
 

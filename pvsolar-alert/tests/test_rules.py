@@ -1,7 +1,6 @@
 """Testes do rules_engine do pvSolar Alert."""
 
 import pytest
-
 from src.core.config import (
     AlertRuleConfig,
     AlertSeverity,

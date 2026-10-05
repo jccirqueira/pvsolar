@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import structlog
 
-from src.core.config import Permission, UserRole
+from src.core.config import Permission
 
 logger = structlog.get_logger()
 
@@ -21,7 +21,7 @@ class Role:
     description: str = ""
     permissions: list[Permission] = field(default_factory=list)
     is_default: bool = False
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     def to_dict(self) -> dict:
         return {

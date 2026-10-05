@@ -4,9 +4,8 @@ Excel Report Generator.
 Generates Excel workbooks with charts using OpenPyXL.
 """
 
-from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import structlog
 from openpyxl import Workbook
@@ -71,7 +70,7 @@ class ExcelReportGenerator:
                     pass
             ws.column_dimensions[col_letter].width = min(max(max_length + 2, 10), 40)
 
-    def generate_daily_report(self, data: Dict[str, Any], output_path: str) -> str:
+    def generate_daily_report(self, data: dict[str, Any], output_path: str) -> str:
         path = Path(output_path)
         path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -162,7 +161,7 @@ class ExcelReportGenerator:
         logger.info("excel.generated", path=str(path))
         return str(path)
 
-    def generate_weekly_report(self, data: Dict[str, Any], output_path: str) -> str:
+    def generate_weekly_report(self, data: dict[str, Any], output_path: str) -> str:
         path = Path(output_path)
         path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -205,7 +204,7 @@ class ExcelReportGenerator:
         logger.info("excel.weekly_generated", path=str(path))
         return str(path)
 
-    def generate_monthly_report(self, data: Dict[str, Any], output_path: str) -> str:
+    def generate_monthly_report(self, data: dict[str, Any], output_path: str) -> str:
         path = Path(output_path)
         path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -257,7 +256,7 @@ class ExcelReportGenerator:
         logger.info("excel.monthly_generated", path=str(path))
         return str(path)
 
-    def generate_maintenance_report(self, data: Dict[str, Any], output_path: str) -> str:
+    def generate_maintenance_report(self, data: dict[str, Any], output_path: str) -> str:
         path = Path(output_path)
         path.parent.mkdir(parents=True, exist_ok=True)
 

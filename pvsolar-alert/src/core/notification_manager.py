@@ -4,14 +4,15 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
+import structlog
 
 from src.core.config import (
     AlertSeverity,
     AlertStatus,
     NotificationChannel,
 )
-import structlog
 
 logger = structlog.get_logger()
 
@@ -26,8 +27,8 @@ class Alert:
     message: str = ""
     severity: AlertSeverity = AlertSeverity.MEDIUM
     status: AlertStatus = AlertStatus.PENDING
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     acknowledged_at: datetime | None = None
     resolved_at: datetime | None = None
     metadata: dict = field(default_factory=dict)
@@ -36,21 +37,21 @@ class Alert:
     def acknowledge(self) -> None:
         """Marca o alerta como acknowledgado."""
         self.status = AlertStatus.ACKNOWLEDGED
-        self.acknowledged_at = datetime.now(timezone.utc)
-        self.updated_at = datetime.now(timezone.utc)
+        self.acknowledged_at = datetime.now(UTC)
+        self.updated_at = datetime.now(UTC)
         logger.info("alert.acknowledged", alert_id=self.id)
 
     def resolve(self) -> None:
         """Marca o alerta como resolvido."""
         self.status = AlertStatus.RESOLVED
-        self.resolved_at = datetime.now(timezone.utc)
-        self.updated_at = datetime.now(timezone.utc)
+        self.resolved_at = datetime.now(UTC)
+        self.updated_at = datetime.now(UTC)
         logger.info("alert.resolved", alert_id=self.id)
 
     def escalate(self) -> None:
         """Escalation do alerta."""
         self.status = AlertStatus.ESCALATED
-        self.updated_at = datetime.now(timezone.utc)
+        self.updated_at = datetime.now(UTC)
         logger.info("alert.escalated", alert_id=self.id)
 
     def to_dict(self) -> dict:
@@ -82,7 +83,7 @@ class NotificationResult:
     channel: NotificationChannel
     success: bool
     message: str = ""
-    sent_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    sent_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 @dataclass
@@ -187,7 +188,7 @@ class NotificationManager:
 
     def _check_rate_limit(self, max_per_hour: int, max_per_day: int) -> bool:
         """Verifica rate limit."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         self._rate_limit_hour = [
             t for t in self._rate_limit_hour if (now - t).total_seconds() < 3600
         ]
@@ -196,9 +197,7 @@ class NotificationManager:
         ]
         if len(self._rate_limit_hour) >= max_per_hour:
             return False
-        if len(self._rate_limit_day) >= max_per_day:
-            return False
-        return True
+        return not len(self._rate_limit_day) >= max_per_day
 
     def _record_notification(self, alert_id: str, result: NotificationResult) -> None:
         """Registra notificação enviada."""
@@ -211,7 +210,7 @@ class NotificationManager:
                 "sent_at": result.sent_at.isoformat(),
             }
         )
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         if result.success:
             self._rate_limit_hour.append(now)
             self._rate_limit_day.append(now)
@@ -241,7 +240,7 @@ class NotificationManager:
 
         alert.channels_sent.append(channel.value)
         alert.status = AlertStatus.SENT
-        alert.updated_at = datetime.now(timezone.utc)
+        alert.updated_at = datetime.now(UTC)
 
         self._record_notification(alert.id, result)
         logger.info(

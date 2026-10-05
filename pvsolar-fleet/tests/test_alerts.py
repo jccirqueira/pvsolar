@@ -2,7 +2,6 @@
 Tests for pvSolar Fleet Alert Aggregator.
 """
 
-import pytest
 from src.alerts.alert_aggregator import AlertAggregator, FleetAlert
 from src.core.config import AlertSeverity, AlertStatus
 

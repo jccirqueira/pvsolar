@@ -9,8 +9,9 @@ relatórios PDF/Excel, alertas multi-canal, gêmeo digital e deploy
 containerizado pronto para VPS com HTTPS automático.
 
 **Qualidade:** 1135 testes automatizados (12 suítes pytest + jest), cobertura de
-código com piso por projeto (gate na CI), validadores estruturais de
-compose/documentação e CI com build real das 13 imagens Docker.
+código com piso por projeto (gate na CI), lint contínuo (ruff + ESLint na CI e
+pre-commit local), validadores estruturais de compose/documentação e CI com
+build real das 13 imagens Docker.
 
 ---
 
@@ -88,19 +89,36 @@ python docker/validate_manuals.py    # 13 manuals (tags, âncoras, entrypoints)
 
 ---
 
+## Lint
+
+Config única em `ruff.toml` (raiz) para os 12 projetos Python; ESLint com
+`next/core-web-vitals` no web. A CI roda ambos no job **Lint**.
+
+```bash
+ruff check .                     # Python (zero violações)
+cd pvsolar-web && npm run lint   # ESLint
+
+# hooks opcionais em cada commit:
+pip install pre-commit && pre-commit install
+```
+
+---
+
 ## Estrutura
 
 ```
 PvBrowser/
 ├── docker-compose.yml        # stack única: 16 serviços
 ├── .env.example              # variáveis de ambiente documentadas
+├── ruff.toml                 # config única de lint Python
+├── .pre-commit-config.yaml   # hooks locais (ruff + higiene)
 ├── docker/
 │   ├── initdb/               # criação dos 5 bancos na 1ª subida
 │   ├── Caddyfile             # roteamento /auth/*, /gateway/*, ...
 │   ├── config/               # variantes de config p/ rede interna
 │   ├── mosquitto.conf
 │   └── validate_*.py         # validadores (compose, guia, manuals)
-├── .github/workflows/ci.yml  # CI: validadores + testes + build Docker
+├── .github/workflows/ci.yml  # CI: lint + validadores + testes + build Docker
 ├── Guia Completo ... .html   # guia de instalação completo
 └── pvsolar-*/                # 13 projetos (Resumo.txt + Manual.html cada)
 ```

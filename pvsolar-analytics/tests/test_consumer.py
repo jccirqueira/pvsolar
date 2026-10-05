@@ -2,12 +2,11 @@
 Unit tests for MQTT consumer module.
 """
 
-import json
-import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
-from mqtt.consumer import MQTTConsumer, parse_telemetry_message
+import pytest
 from core.config import MQTTConfig
+from mqtt.consumer import MQTTConsumer, parse_telemetry_message
 
 
 @pytest.fixture

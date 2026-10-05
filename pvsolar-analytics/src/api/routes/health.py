@@ -2,8 +2,8 @@
 
 from fastapi import APIRouter
 
-from src.core.database import check_database_health
 from src.core.app import get_consumer
+from src.core.database import check_database_health
 
 router = APIRouter()
 

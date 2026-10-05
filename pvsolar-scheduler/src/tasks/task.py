@@ -1,12 +1,11 @@
-import asyncio
-import time
 import uuid
-from datetime import datetime, timezone
-from typing import Any, Callable, Coroutine
+from collections.abc import Callable, Coroutine
+from datetime import UTC, datetime
+from typing import Any
 
 import structlog
 
-from src.core.config import TaskConfig, TaskStatus, TaskType, TaskPriority
+from src.core.config import TaskConfig, TaskStatus
 
 logger = structlog.get_logger()
 
@@ -20,7 +19,7 @@ class TaskResult:
         self.error = error
         self.duration_seconds = duration_seconds
         self.retries = retries
-        self.timestamp = datetime.now(timezone.utc).isoformat()
+        self.timestamp = datetime.now(UTC).isoformat()
 
     def to_dict(self) -> dict:
         return {

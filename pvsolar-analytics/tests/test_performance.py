@@ -4,13 +4,11 @@ Tests for Phase 5: Performance Scoring.
 Tests calculator, benchmarking, and scoring.
 """
 
-import pytest
-import numpy as np
-from datetime import datetime, timezone, timedelta
-from unittest.mock import MagicMock
 
+import numpy as np
+import pytest
+from src.ml.performance.benchmark import BenchmarkResult, PerformanceBenchmark
 from src.ml.performance.calculator import PerformanceCalculator, PerformanceScore
-from src.ml.performance.benchmark import PerformanceBenchmark, BenchmarkResult
 
 
 class TestPerformanceCalculator:
@@ -48,7 +46,7 @@ class TestPerformanceCalculator:
 
     def test_calculate_insufficient_data(self):
         calc = PerformanceCalculator()
-        for i in range(5):
+        for _i in range(5):
             calc.add_sample("INV001", {"ac_power": 5000})
 
         score = calc.calculate("INV001")
@@ -61,7 +59,7 @@ class TestPerformanceCalculator:
 
     def test_calculate_normal_data(self):
         calc = PerformanceCalculator()
-        for i in range(48):
+        for _i in range(48):
             calc.add_sample("INV001", {
                 "ac_power": 5000 + np.random.normal(0, 100),
                 "temperature": 25 + np.random.normal(0, 2),
@@ -84,7 +82,7 @@ class TestPerformanceCalculator:
         calc = PerformanceCalculator()
 
         # All running
-        for i in range(24):
+        for _ in range(24):
             calc.add_sample("INV001", {"ac_power": 5000, "status": "running"})
 
         score = calc.calculate("INV001", window_hours=24)
@@ -101,7 +99,7 @@ class TestPerformanceCalculator:
 
     def test_calculate_efficiency_with_dc_power(self):
         calc = PerformanceCalculator()
-        for i in range(24):
+        for _i in range(24):
             calc.add_sample("INV001", {
                 "ac_power": 4800,
                 "dc_power": 5000,
@@ -113,7 +111,7 @@ class TestPerformanceCalculator:
 
     def test_calculate_efficiency_from_temperature(self):
         calc = PerformanceCalculator()
-        for i in range(24):
+        for _i in range(24):
             calc.add_sample("INV001", {
                 "ac_power": 5000,
                 "temperature": 25,

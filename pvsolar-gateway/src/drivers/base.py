@@ -5,11 +5,10 @@ All inverter drivers must inherit from this class.
 """
 
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 import structlog
-
 from core.config import InverterConfig
 
 logger = structlog.get_logger(__name__)
@@ -17,48 +16,48 @@ logger = structlog.get_logger(__name__)
 
 class InverterData:
     """Standardized inverter data structure."""
-    
+
     def __init__(self):
-        self.timestamp: datetime = datetime.now(timezone.utc)
+        self.timestamp: datetime = datetime.now(UTC)
         self.inverter_id: str = ""
         self.inverter_name: str = ""
         self.manufacturer: str = ""
         self.model: str = ""
         self.serial_number: str = ""
         self.firmware_version: str = ""
-        
+
         # AC output
         self.ac_power: float = 0.0  # Watts
-        self.ac_voltage: List[float] = []  # Volts per phase
-        self.ac_current: List[float] = []  # Amps per phase
+        self.ac_voltage: list[float] = []  # Volts per phase
+        self.ac_current: list[float] = []  # Amps per phase
         self.ac_frequency: float = 0.0  # Hz
         self.ac_apparent_power: float = 0.0  # VA
         self.ac_reactive_power: float = 0.0  # VAR
         self.ac_power_factor: float = 0.0
-        
+
         # DC input
-        self.dc_inputs: List[Dict[str, float]] = []  # [{voltage, current, power}]
-        
+        self.dc_inputs: list[dict[str, float]] = []  # [{voltage, current, power}]
+
         # Energy
         self.total_energy: float = 0.0  # Wh
         self.daily_energy: float = 0.0  # Wh
-        
+
         # Status
         self.status: str = "unknown"  # running, standby, fault
         self.operating_state: int = 0
         self.fault_code: int = 0
         self.fault_message: str = ""
-        
+
         # Environmental
         self.temperature: float = 0.0  # Celsius
-        
+
         # Efficiency
         self.efficiency: float = 0.0  # percentage
-        
+
         # Custom data
-        self.custom: Dict[str, Any] = {}
-    
-    def to_dict(self) -> Dict[str, Any]:
+        self.custom: dict[str, Any] = {}
+
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for serialization."""
         return {
             'timestamp': self.timestamp.isoformat(),
@@ -91,72 +90,72 @@ class InverterData:
 class BaseInverterDriver(ABC):
     """
     Abstract base class for inverter drivers.
-    
+
     All drivers must implement:
     - connect(): Establish connection to inverter
     - disconnect(): Close connection
     - read_all(): Read all available data
     - get_status(): Get current inverter status
     """
-    
+
     def __init__(self, config: InverterConfig):
         self.config = config
         self._connected = False
-        self._last_read: Optional[datetime] = None
+        self._last_read: datetime | None = None
         self._error_count: int = 0
         self._consecutive_errors: int = 0
-    
+
     @abstractmethod
     async def connect(self):
         """Establish connection to inverter."""
         pass
-    
+
     @abstractmethod
     async def disconnect(self):
         """Close connection to inverter."""
         pass
-    
+
     @abstractmethod
-    async def read_all(self) -> Optional[InverterData]:
+    async def read_all(self) -> InverterData | None:
         """Read all available data from inverter."""
         pass
-    
+
     @abstractmethod
     async def get_status(self) -> str:
         """Get current inverter status."""
         pass
-    
+
     @abstractmethod
-    async def read_register(self, address: int, count: int = 1) -> List[int]:
+    async def read_register(self, address: int, count: int = 1) -> list[int]:
         """Read Modbus register(s)."""
         pass
-    
+
     @abstractmethod
     async def write_register(self, address: int, value: int) -> bool:
         """Write to Modbus register."""
         pass
-    
-    async def read_custom_registers(self, registers: List[Dict[str, Any]]) -> Dict[str, Any]:
+
+    async def read_custom_registers(self, registers: list[dict[str, Any]]) -> dict[str, Any]:
         """Read custom registers defined in config."""
         result = {}
-        
+
         for reg in registers:
             try:
                 values = await self.read_register(
                     reg['address'],
                     count=reg.get('count', 1)
                 )
-                
+
                 # Apply scaling
                 scale = reg.get('scale', 1.0)
                 value = values[0] * scale if values else 0
-                
+
                 result[reg['name']] = {
                     'value': value,
                     'unit': reg.get('unit', ''),
                     'address': reg['address']
                 }
-                
+
             except Exception as e:
                 logger.error(
                     "driver.register_read_error",
@@ -164,26 +163,26 @@ class BaseInverterDriver(ABC):
                     address=reg['address'],
                     error=str(e)
                 )
-        
+
         return result
-    
+
     def _handle_error(self, error: Exception):
         """Handle driver errors with exponential backoff."""
         self._error_count += 1
         self._consecutive_errors += 1
-        
+
         logger.error(
             "driver.error",
             inverter=self.config.id,
             error=str(error),
             consecutive_errors=self._consecutive_errors
         )
-    
+
     def _reset_errors(self):
         """Reset consecutive error count on successful read."""
         self._consecutive_errors = 0
-    
-    def get_stats(self) -> Dict[str, Any]:
+
+    def get_stats(self) -> dict[str, Any]:
         """Get driver statistics."""
         return {
             'inverter_id': self.config.id,
@@ -197,34 +196,34 @@ class BaseInverterDriver(ABC):
 def create_driver(config: InverterConfig) -> BaseInverterDriver:
     """
     Factory function to create appropriate driver based on config.
-    
+
     Args:
         config: Inverter configuration
-        
+
     Returns:
         Appropriate driver instance
     """
     driver_type = config.driver.lower()
-    
+
     if driver_type == 'sunspec':
         from .sunspec.driver import SunSpecDriver
         return SunSpecDriver(config)
-    
+
     elif driver_type == 'fronius':
         from .fronius.driver import FroniusDriver
         return FroniusDriver(config)
-    
+
     elif driver_type == 'growatt':
         from .growatt.driver import GrowattDriver
         return GrowattDriver(config)
-    
+
     elif driver_type == 'sma':
         from .sma.driver import SMADriver
         return SMADriver(config)
-    
+
     elif driver_type == 'huawei':
         from .huawei.driver import HuaweiDriver
         return HuaweiDriver(config)
-    
+
     else:
         raise ValueError(f"Unknown driver type: {driver_type}")

@@ -1,7 +1,6 @@
 """Testes do fault_recorder do pvSolar Grid."""
 
 import pytest
-
 from src.core.config import (
     ComplianceStatus,
     FaultType,

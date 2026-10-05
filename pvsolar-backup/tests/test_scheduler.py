@@ -1,6 +1,6 @@
 import pytest
-from src.core.config import BackupConfig, ScheduleFrequency
 from src.backup.engine import BackupEngine
+from src.core.config import BackupConfig, ScheduleFrequency
 from src.scheduler.scheduler import BackupScheduler
 
 
@@ -73,6 +73,7 @@ class TestBackupScheduler:
     def test_next_run_hourly_rollover_at_23h(self, engine, monkeypatch):
         # Regressao: as 23:57 UTC o hourly nao pode calcular "hora 24"
         from datetime import datetime as real_datetime
+
         import src.scheduler.scheduler as sched_mod
 
         class _FakeDateTime:
@@ -91,6 +92,7 @@ class TestBackupScheduler:
     def test_next_run_monthly_day_overflow(self, engine, monkeypatch):
         # Regressao: dia 31 nao pode estourar em meses com menos dias
         from datetime import datetime as real_datetime
+
         import src.scheduler.scheduler as sched_mod
 
         class _FakeDateTime:

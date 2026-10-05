@@ -2,7 +2,6 @@
 Tests for pvSolar SCADA Screen Manager.
 """
 
-import pytest
 from src.core.screens import Screen, ScreenManager, Widget, WidgetType
 
 
@@ -153,10 +152,10 @@ class TestScreenManager:
         manager = ScreenManager()
         manager.create_screen("dashboard", "Dashboard")
         manager.create_screen("inverters", "Inverters")
-        
+
         manager.set_current_screen("dashboard")
         manager.set_current_screen("inverters")
-        
+
         success = manager.go_back()
         assert success is True
         assert manager.current_screen == "dashboard"
@@ -170,7 +169,7 @@ class TestScreenManager:
         manager = ScreenManager()
         manager.create_screen("dashboard", "Dashboard", "🏠")
         manager.create_screen("inverters", "Inverters", "⚡")
-        
+
         screens_list = manager.get_screens_list()
         assert len(screens_list) == 2
         assert any(s["name"] == "dashboard" for s in screens_list)

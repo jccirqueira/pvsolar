@@ -3,9 +3,8 @@ MQTT consumer for pvSolar Gateway telemetry.
 """
 
 import json
-import re
-from datetime import datetime, timezone
-from typing import Any, Callable
+from collections.abc import Callable
+from datetime import UTC, datetime
 
 import paho.mqtt.client as mqtt
 import structlog
@@ -211,7 +210,7 @@ def parse_telemetry_message(payload: dict) -> dict:
 
     return {
         "inverter_id": payload.get("inverter_id", "unknown"),
-        "timestamp": payload.get("timestamp", datetime.now(timezone.utc).isoformat()),
+        "timestamp": payload.get("timestamp", datetime.now(UTC).isoformat()),
         "ac_power": data.get("ac_power", data.get("ac", {}).get("power")),
         "ac_voltage": data.get("ac_voltage", data.get("ac", {}).get("voltage")),
         "ac_current": data.get("ac_current", data.get("ac", {}).get("current")),

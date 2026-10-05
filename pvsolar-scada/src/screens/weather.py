@@ -10,7 +10,7 @@ from src.core.screens import Screen, ScreenManager, Widget, WidgetType
 def create_weather_screen(screen_manager: ScreenManager) -> Screen:
     """Create the weather monitoring screen."""
     screen = screen_manager.create_screen("weather", "Weather", "🌤️")
-    
+
     # Solar Resource Group
     screen.add_widget(Widget(
         widget_id="solar_group",
@@ -18,7 +18,7 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         label="Solar Resource",
         x=0, y=0, width=400, height=200,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="irradiance_gauge",
         widget_type=WidgetType.GAUGE,
@@ -31,7 +31,7 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         decimals=0,
         color="#FF9800",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="diffuse_irradiance",
         widget_type=WidgetType.LABEL,
@@ -39,7 +39,7 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         x=200, y=30, width=100, height=30,
         value="0 W/m²",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="direct_irradiance",
         widget_type=WidgetType.LABEL,
@@ -47,7 +47,7 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         x=200, y=60, width=100, height=30,
         value="0 W/m²",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="reflected_irradiance",
         widget_type=WidgetType.LABEL,
@@ -55,7 +55,7 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         x=200, y=90, width=100, height=30,
         value="0 W/m²",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="peak_sun_hours",
         widget_type=WidgetType.LABEL,
@@ -63,7 +63,7 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         x=200, y=120, width=120, height=30,
         value="0.0 h",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="solar_angle",
         widget_type=WidgetType.LABEL,
@@ -71,7 +71,7 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         x=200, y=150, width=120, height=30,
         value="0.0°",
     ))
-    
+
     # Ambient Conditions Group
     screen.add_widget(Widget(
         widget_id="ambient_group",
@@ -79,7 +79,7 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         label="Ambient Conditions",
         x=420, y=0, width=400, height=200,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="ambient_temp",
         widget_type=WidgetType.THERMOMETER,
@@ -91,7 +91,7 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         unit="°C",
         decimals=1,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="humidity",
         widget_type=WidgetType.GAUGE,
@@ -104,7 +104,7 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         decimals=0,
         color="#2196F3",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="wind_speed",
         widget_type=WidgetType.GAUGE,
@@ -117,7 +117,7 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         decimals=1,
         color="#9C27B0",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="wind_direction",
         widget_type=WidgetType.COMPASS,
@@ -128,7 +128,7 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         max_val=360.0,
         unit="°",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="pressure",
         widget_type=WidgetType.LABEL,
@@ -136,7 +136,7 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         x=500, y=140, width=100, height=30,
         value="0 hPa",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="rainfall",
         widget_type=WidgetType.LABEL,
@@ -144,7 +144,7 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         x=610, y=140, width=100, height=30,
         value="0.0 mm",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="weather_condition",
         widget_type=WidgetType.LABEL,
@@ -152,7 +152,7 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         x=720, y=140, width=80, height=30,
         value="--",
     ))
-    
+
     # Module Temperature Group
     screen.add_widget(Widget(
         widget_id="module_group",
@@ -160,7 +160,7 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         label="Module Temperature",
         x=0, y=220, width=820, height=120,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="module_temp_chart",
         widget_type=WidgetType.CHART,
@@ -170,7 +170,7 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         series=["module_temp", "ambient_temp"],
         time_range="24h",
     ))
-    
+
     # Solar Production vs Irradiance
     screen.add_widget(Widget(
         widget_id="production_group",
@@ -178,7 +178,7 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         label="Production vs Irradiance",
         x=0, y=360, width=820, height=200,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="production_irradiance_chart",
         widget_type=WidgetType.CHART,
@@ -188,5 +188,5 @@ def create_weather_screen(screen_manager: ScreenManager) -> Screen:
         series=["power", "irradiance"],
         time_range="24h",
     ))
-    
+
     return screen

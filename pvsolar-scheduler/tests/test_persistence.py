@@ -16,17 +16,16 @@ from __future__ import annotations
 
 import asyncio
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import func, select
-
 from src.api.app import create_app
 from src.core.config import (
     DatabaseConfig,
-    ScheduleType,
     SchedulerConfig,
+    ScheduleType,
     TaskConfig,
     TaskPriority,
     TaskStatus,
@@ -154,8 +153,8 @@ class TestTaskPersistence:
         registry = TaskRegistry()
         task = registry.add_task(sample_config())
         task.status = TaskStatus.COMPLETED
-        task.last_run = datetime.now(timezone.utc).isoformat()
-        task.next_run = (datetime.now(timezone.utc) + timedelta(hours=20)).isoformat()
+        task.last_run = datetime.now(UTC).isoformat()
+        task.next_run = (datetime.now(UTC) + timedelta(hours=20)).isoformat()
         task.run_count = 7
         task.failure_count = 2
         await service.save_task(task)
@@ -187,7 +186,7 @@ class TestTaskPersistence:
         # timestamps normalizados com fuso (obrigatório para _should_run)
         next_dt = datetime.fromisoformat(got.next_run)
         assert next_dt.tzinfo is not None
-        assert next_dt > datetime.now(timezone.utc)
+        assert next_dt > datetime.now(UTC)
         assert stats == {"tasks": 1, "results": 0}
         await service.dispose()
 

@@ -1,14 +1,12 @@
 """Testes do notification_manager do pvSolar Alert."""
 
 import pytest
-
 from src.core.config import AlertSeverity, AlertStatus, NotificationChannel
 from src.core.notification_manager import (
     Alert,
     NotificationManager,
     NotificationResult,
 )
-
 
 # ---------------------------------------------------------------------------
 # Alert

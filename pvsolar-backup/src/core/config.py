@@ -1,11 +1,11 @@
 import os
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
-from typing import Optional
+
 from pydantic import BaseModel, Field
 
 
-class StorageType(str, Enum):
+class StorageType(StrEnum):
     LOCAL = "local"
     S3 = "s3"
     FTP = "ftp"
@@ -14,7 +14,7 @@ class StorageType(str, Enum):
     GCS = "gcs"
 
 
-class CompressionType(str, Enum):
+class CompressionType(StrEnum):
     NONE = "none"
     GZIP = "gzip"
     ZIP = "zip"
@@ -22,7 +22,7 @@ class CompressionType(str, Enum):
     TAR_GZ = "tar.gz"
 
 
-class ScheduleFrequency(str, Enum):
+class ScheduleFrequency(StrEnum):
     HOURLY = "hourly"
     DAILY = "daily"
     WEEKLY = "weekly"
@@ -30,7 +30,7 @@ class ScheduleFrequency(str, Enum):
     CUSTOM = "custom"
 
 
-class BackupStatus(str, Enum):
+class BackupStatus(StrEnum):
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"

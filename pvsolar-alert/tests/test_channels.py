@@ -1,14 +1,12 @@
 """Testes dos channels do pvSolar Alert."""
 
 import pytest
-
-from src.core.config import ChannelConfig
 from src.channels.email_channel import EmailChannel
 from src.channels.sms_channel import SMSChannel
 from src.channels.telegram_channel import TelegramChannel
-from src.channels.whatsapp_channel import WhatsAppChannel
 from src.channels.webhook_channel import WebhookChannel
-
+from src.channels.whatsapp_channel import WhatsAppChannel
+from src.core.config import ChannelConfig
 
 # ---------------------------------------------------------------------------
 # EmailChannel

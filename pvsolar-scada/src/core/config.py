@@ -4,13 +4,14 @@ pvSolar SCADA Configuration.
 Centralized configuration using Pydantic for type-safe settings.
 """
 
-from enum import Enum
-from typing import Any, Dict, List, Optional
+from enum import StrEnum
+from typing import Any
+
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings
 
 
-class ScreenType(str, Enum):
+class ScreenType(StrEnum):
     """SCADA screen types."""
     DASHBOARD = "dashboard"
     INVERTERS = "inverters"
@@ -22,7 +23,7 @@ class ScreenType(str, Enum):
     SETTINGS = "settings"
 
 
-class WidgetType(str, Enum):
+class WidgetType(StrEnum):
     """pvBrowser widget types."""
     GAUGE = "gauge"
     CHART = "chart"
@@ -40,10 +41,10 @@ class MQTTConfig(BaseSettings):
     """MQTT connection settings."""
     broker: str = Field(default="localhost", description="MQTT broker host")
     port: int = Field(default=1883, description="MQTT broker port")
-    username: Optional[str] = Field(default=None, description="MQTT username")
-    password: Optional[str] = Field(default=None, description="MQTT password")
+    username: str | None = Field(default=None, description="MQTT username")
+    password: str | None = Field(default=None, description="MQTT password")
     client_id: str = Field(default="pvsolar-scada", description="MQTT client ID")
-    topics: List[str] = Field(
+    topics: list[str] = Field(
         default=[
             "pvsolar/+/telemetry",
             "pvsolar/+/status",
@@ -53,7 +54,7 @@ class MQTTConfig(BaseSettings):
     )
     qos: int = Field(default=1, ge=0, le=2, description="MQTT QoS level")
     tls: bool = Field(default=False, description="Enable TLS")
-    ca_cert: Optional[str] = Field(default=None, description="CA certificate path")
+    ca_cert: str | None = Field(default=None, description="CA certificate path")
 
     model_config = {"env_prefix": "MQTT_"}
 
@@ -73,7 +74,7 @@ class GatewayConfig(BaseSettings):
     """Gateway connection settings."""
     url: str = Field(default="http://localhost:8000", description="Gateway API URL")
     mqtt_bridge_port: int = Field(default=1884, description="Gateway MQTT bridge port")
-    api_key: Optional[str] = Field(default=None, description="API key")
+    api_key: str | None = Field(default=None, description="API key")
 
     model_config = {"env_prefix": "GATEWAY_"}
 
@@ -81,14 +82,14 @@ class GatewayConfig(BaseSettings):
 class AnalyticsConfig(BaseSettings):
     """Analytics service settings."""
     url: str = Field(default="http://localhost:8001", description="Analytics API URL")
-    api_key: Optional[str] = Field(default=None, description="API key")
+    api_key: str | None = Field(default=None, description="API key")
 
     model_config = {"env_prefix": "ANALYTICS_"}
 
 
 class AlarmConfig(BaseSettings):
     """Alarm configuration."""
-    levels: Dict[str, str] = Field(
+    levels: dict[str, str] = Field(
         default={
             "critical": "#FF0000",
             "warning": "#FFA500",
@@ -108,7 +109,7 @@ class TrendConfig(BaseSettings):
     """Trend/chart configuration."""
     max_points: int = Field(default=3600, ge=100, le=86400, description="Max trend points")
     update_rate: float = Field(default=1.0, ge=0.1, le=60.0, description="Trend update rate in seconds")
-    time_ranges: List[str] = Field(
+    time_ranges: list[str] = Field(
         default=["1h", "6h", "24h", "7d", "30d"],
         description="Available time ranges"
     )
@@ -137,8 +138,8 @@ class SCADAConfig(BaseSettings):
     alarms: AlarmConfig = Field(default_factory=AlarmConfig)
     trends: TrendConfig = Field(default_factory=TrendConfig)
     plant: PlantConfig = Field(default_factory=PlantConfig)
-    
-    screens: List[ScreenType] = Field(
+
+    screens: list[ScreenType] = Field(
         default=[
             ScreenType.DASHBOARD,
             ScreenType.INVERTERS,
@@ -155,19 +156,20 @@ class SCADAConfig(BaseSettings):
 
     @field_validator("screens", mode="before")
     @classmethod
-    def validate_screens(cls, v: Any) -> List[ScreenType]:
+    def validate_screens(cls, v: Any) -> list[ScreenType]:
         if isinstance(v, list):
             return [ScreenType(s) if isinstance(s, str) else s for s in v]
         return v
 
 
-def load_config(config_path: Optional[str] = None) -> SCADAConfig:
+def load_config(config_path: str | None = None) -> SCADAConfig:
     """Load configuration from file and environment."""
-    import yaml
     from pathlib import Path
 
-    config_data: Dict[str, Any] = {}
-    
+    import yaml
+
+    config_data: dict[str, Any] = {}
+
     if config_path:
         path = Path(config_path)
         if path.exists():

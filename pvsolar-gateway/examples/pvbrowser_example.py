@@ -18,17 +18,17 @@ from pvsolar.pvbinder.bridge import PVBrowserBridge, PVBrowserDataConverter
 
 async def main():
     """Main example function."""
-    
+
     # Load configuration
     config = load_config("config/gateway.yaml")
-    
+
     # Create pvbrowser bridge
     bridge = PVBrowserBridge(config.pvbrowser)
     await bridge.start()
-    
+
     print(f"pvbrowser bridge started on port {config.pvbrowser.socket_port}")
     print("Waiting for pvbrowser connections...")
-    
+
     # Example: Simulate inverter data
     example_data = {
         "inverter_name": "Fronius GEN24 Plus 8.0",
@@ -46,7 +46,6 @@ async def main():
         "operating_state": 4,
         "temperature": 42.5,
         "efficiency": 96.2,
-        "ac_frequency": 60.01,
         "custom": {
             "storage": {
                 "state_of_charge": 75.0,
@@ -57,39 +56,39 @@ async def main():
             }
         }
     }
-    
+
     # Update data
     await bridge.update_data("inv-001", example_data)
-    
+
     print("\nData sent to pvbrowser:")
     print(f"  AC Power: {example_data['ac_power']} W")
     print(f"  DC Power: {sum(d['power'] for d in example_data['dc_inputs']):.1f} W")
     print(f"  Efficiency: {example_data['efficiency']}%")
     print(f"  Daily Energy: {example_data['daily_energy']/1000:.2f} kWh")
-    
+
     # Convert data for pvbrowser widgets
     print("\npvbrowser Widget Examples:")
-    
+
     # Value widget
     value_widget = PVBrowserDataConverter.to_value_widget(example_data, "ac_power")
     print(f"  Value Widget: {value_widget}")
-    
+
     # Gauge widget
     gauge_widget = PVBrowserDataConverter.to_gauge_data(
-        example_data, 
+        example_data,
         "efficiency",
         min_val=0,
         max_val=100
     )
     print(f"  Gauge Widget: {gauge_widget}")
-    
+
     # Trend data
     trend_data = PVBrowserDataConverter.to_trend_data(
         example_data,
         ["ac_power", "dc_inputs.0.power", "dc_inputs.1.power"]
     )
     print(f"  Trend Data: {trend_data}")
-    
+
     # Keep running
     print("\nBridge is running. Press Ctrl+C to stop.")
     try:

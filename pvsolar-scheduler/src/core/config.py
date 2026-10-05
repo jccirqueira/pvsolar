@@ -1,11 +1,12 @@
 import os
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 
-class TaskType(str, Enum):
+class TaskType(StrEnum):
     DATA_SYNC = "data_sync"
     REPORT_GENERATE = "report_generate"
     BACKUP_RUN = "backup_run"
@@ -16,7 +17,7 @@ class TaskType(str, Enum):
     CUSTOM = "custom"
 
 
-class TaskStatus(str, Enum):
+class TaskStatus(StrEnum):
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"
@@ -25,7 +26,7 @@ class TaskStatus(str, Enum):
     PAUSED = "paused"
 
 
-class ScheduleType(str, Enum):
+class ScheduleType(StrEnum):
     ONCE = "once"
     INTERVAL = "interval"
     CRON = "cron"
@@ -34,7 +35,7 @@ class ScheduleType(str, Enum):
     MONTHLY = "monthly"
 
 
-class TaskPriority(str, Enum):
+class TaskPriority(StrEnum):
     LOW = "low"
     NORMAL = "normal"
     HIGH = "high"

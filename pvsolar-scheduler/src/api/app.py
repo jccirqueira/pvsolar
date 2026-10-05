@@ -4,10 +4,17 @@ import structlog
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from src.core.config import SchedulerConfig, TaskConfig, TaskType, ScheduleType, TaskPriority, load_config
+from src.core.config import (
+    SchedulerConfig,
+    ScheduleType,
+    TaskConfig,
+    TaskPriority,
+    TaskType,
+    load_config,
+)
 from src.db.service import PersistenceService
-from src.tasks.task import TaskRegistry
 from src.engine.scheduler import SchedulerEngine
+from src.tasks.task import TaskRegistry
 
 logger = structlog.get_logger()
 
@@ -133,7 +140,7 @@ def create_app(config: SchedulerConfig | None = None) -> FastAPI:
         except Exception as exc:
             registry.remove_task(task.config.id)
             logger.error("task.persist_failed", task_id=task.config.id, error=str(exc))
-            raise HTTPException(status_code=500, detail="Falha ao gravar tarefa no banco")
+            raise HTTPException(status_code=500, detail="Falha ao gravar tarefa no banco") from exc
         return task.to_dict()
 
     @app.get("/api/tasks")
@@ -158,7 +165,7 @@ def create_app(config: SchedulerConfig | None = None) -> FastAPI:
             await persistence.save_task(task)
         except Exception as exc:
             logger.error("task.persist_failed", task_id=task_id, error=str(exc))
-            raise HTTPException(status_code=500, detail="Falha ao gravar tarefa no banco")
+            raise HTTPException(status_code=500, detail="Falha ao gravar tarefa no banco") from exc
         return task.to_dict()
 
     @app.delete("/api/tasks/{task_id}")
@@ -170,7 +177,7 @@ def create_app(config: SchedulerConfig | None = None) -> FastAPI:
             await persistence.delete_task(task_id)
         except Exception as exc:
             logger.error("task.persist_failed", task_id=task_id, error=str(exc))
-            raise HTTPException(status_code=500, detail="Falha ao remover tarefa do banco")
+            raise HTTPException(status_code=500, detail="Falha ao remover tarefa do banco") from exc
         registry.remove_task(task_id)
         return {"deleted": task_id}
 

@@ -5,11 +5,10 @@ Manages solar plant sites with CRUD operations and status tracking.
 """
 
 import uuid
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 import structlog
-
 from src.core.config import SiteConfig, SiteStatus
 
 logger = structlog.get_logger(__name__)
@@ -31,12 +30,12 @@ class SiteInfo:
         self.region = config.region
         self.api_key = config.api_key
         self.status: SiteStatus = SiteStatus.OFFLINE
-        self.last_update: Optional[datetime] = None
-        self.registered_at: datetime = datetime.now(timezone.utc)
-        self.tags: List[str] = []
-        self.metadata: Dict[str, Any] = {}
+        self.last_update: datetime | None = None
+        self.registered_at: datetime = datetime.now(UTC)
+        self.tags: list[str] = []
+        self.metadata: dict[str, Any] = {}
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "name": self.name,
@@ -57,13 +56,13 @@ class SiteInfo:
 
     def update_status(self, status: SiteStatus) -> None:
         self.status = status
-        self.last_update = datetime.now(timezone.utc)
+        self.last_update = datetime.now(UTC)
 
     def update_info(self, **kwargs: Any) -> None:
         for key, value in kwargs.items():
             if hasattr(self, key) and key not in ("id", "registered_at"):
                 setattr(self, key, value)
-        self.last_update = datetime.now(timezone.utc)
+        self.last_update = datetime.now(UTC)
 
 
 class SiteMetrics:
@@ -71,7 +70,7 @@ class SiteMetrics:
 
     def __init__(self, site_id: str):
         self.site_id = site_id
-        self.timestamp: datetime = datetime.now(timezone.utc)
+        self.timestamp: datetime = datetime.now(UTC)
         self.power_kw: float = 0.0
         self.energy_kwh: float = 0.0
         self.pr: float = 0.0
@@ -84,7 +83,7 @@ class SiteMetrics:
         self.irradiance: float = 0.0
         self.temperature: float = 0.0
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "site_id": self.site_id,
             "timestamp": self.timestamp.isoformat(),
@@ -114,8 +113,8 @@ class SiteManager:
     """
 
     def __init__(self):
-        self._sites: Dict[str, SiteInfo] = {}
-        self._metrics: Dict[str, List[SiteMetrics]] = {}
+        self._sites: dict[str, SiteInfo] = {}
+        self._metrics: dict[str, list[SiteMetrics]] = {}
         self._max_metrics_per_site: int = 1000
 
     def add_site(self, config: SiteConfig) -> SiteInfo:
@@ -133,19 +132,19 @@ class SiteManager:
             return True
         return False
 
-    def get_site(self, site_id: str) -> Optional[SiteInfo]:
+    def get_site(self, site_id: str) -> SiteInfo | None:
         return self._sites.get(site_id)
 
-    def get_all_sites(self) -> List[SiteInfo]:
+    def get_all_sites(self) -> list[SiteInfo]:
         return list(self._sites.values())
 
-    def get_sites_by_region(self, region: str) -> List[SiteInfo]:
+    def get_sites_by_region(self, region: str) -> list[SiteInfo]:
         return [s for s in self._sites.values() if s.region == region]
 
-    def get_sites_by_status(self, status: SiteStatus) -> List[SiteInfo]:
+    def get_sites_by_status(self, status: SiteStatus) -> list[SiteInfo]:
         return [s for s in self._sites.values() if s.status == status]
 
-    def get_regions(self) -> List[str]:
+    def get_regions(self) -> list[str]:
         return list(set(s.region for s in self._sites.values()))
 
     def update_site_status(self, site_id: str, status: SiteStatus) -> bool:
@@ -170,11 +169,11 @@ class SiteManager:
             self._metrics[site_id] = self._metrics[site_id][-self._max_metrics_per_site:]
         return True
 
-    def get_latest_metrics(self, site_id: str) -> Optional[SiteMetrics]:
+    def get_latest_metrics(self, site_id: str) -> SiteMetrics | None:
         metrics = self._metrics.get(site_id, [])
         return metrics[-1] if metrics else None
 
-    def get_metrics_history(self, site_id: str, limit: int = 100) -> List[SiteMetrics]:
+    def get_metrics_history(self, site_id: str, limit: int = 100) -> list[SiteMetrics]:
         return self._metrics.get(site_id, [])[-limit:]
 
     def get_site_count(self) -> int:
@@ -183,7 +182,7 @@ class SiteManager:
     def get_total_capacity(self) -> float:
         return sum(s.capacity_kw for s in self._sites.values())
 
-    def get_fleet_summary(self) -> Dict[str, Any]:
+    def get_fleet_summary(self) -> dict[str, Any]:
         sites = self.get_all_sites()
         regions = self.get_regions()
         return {
@@ -197,7 +196,7 @@ class SiteManager:
             "total_inverters": sum(s.num_inverters for s in sites),
         }
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "sites": [s.to_dict() for s in self._sites.values()],
             "summary": self.get_fleet_summary(),

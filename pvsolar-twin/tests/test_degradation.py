@@ -1,7 +1,6 @@
 """Testes do degradation_engine do pvSolar Digital Twin."""
 
 import pytest
-
 from src.core.config import DegradationConfig, DegradationModel
 from src.degradation.degradation_engine import (
     DegradationEngine,

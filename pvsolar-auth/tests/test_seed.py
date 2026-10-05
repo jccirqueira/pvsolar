@@ -1,7 +1,6 @@
 """Testes do seed de usuário inicial do pvSolar Auth."""
 
 from fastapi.testclient import TestClient
-
 from src.api.app import create_app
 from src.core.config import AuthConfig, SeedConfig, UserRole
 

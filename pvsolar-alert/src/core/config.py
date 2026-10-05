@@ -2,19 +2,17 @@
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
-from typing import Optional
 
 import yaml
 from pydantic import BaseModel, Field
-
 
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
 
-class NotificationChannel(str, Enum):
+class NotificationChannel(StrEnum):
     EMAIL = "email"
     SMS = "sms"
     TELEGRAM = "telegram"
@@ -22,7 +20,7 @@ class NotificationChannel(str, Enum):
     WEBHOOK = "webhook"
 
 
-class AlertSeverity(str, Enum):
+class AlertSeverity(StrEnum):
     CRITICAL = "critical"
     HIGH = "high"
     MEDIUM = "medium"
@@ -30,7 +28,7 @@ class AlertSeverity(str, Enum):
     INFO = "info"
 
 
-class AlertStatus(str, Enum):
+class AlertStatus(StrEnum):
     PENDING = "pending"
     SENT = "sent"
     ACKNOWLEDGED = "acknowledged"
@@ -38,14 +36,14 @@ class AlertStatus(str, Enum):
     ESCALATED = "escalated"
 
 
-class EscalationLevel(str, Enum):
+class EscalationLevel(StrEnum):
     LEVEL_1 = "level_1"
     LEVEL_2 = "level_2"
     LEVEL_3 = "level_3"
     LEVEL_4 = "level_4"
 
 
-class TimeWindow(str, Enum):
+class TimeWindow(StrEnum):
     BUSINESS_HOURS = "business_hours"
     AFTER_HOURS = "after_hours"
     WEEKEND = "weekend"
@@ -58,36 +56,36 @@ class TimeWindow(str, Enum):
 
 class ChannelConfig(BaseModel):
     enabled: bool = Field(default=False)
-    api_key: Optional[str] = Field(default=None)
-    api_secret: Optional[str] = Field(default=None)
-    from_address: Optional[str] = Field(default=None)
-    from_name: Optional[str] = Field(default=None)
-    base_url: Optional[str] = Field(default=None)
-    bot_token: Optional[str] = Field(default=None)
-    chat_id: Optional[str] = Field(default=None)
-    account_sid: Optional[str] = Field(default=None)
-    auth_token: Optional[str] = Field(default=None)
-    from_number: Optional[str] = Field(default=None)
-    webhook_url: Optional[str] = Field(default=None)
+    api_key: str | None = Field(default=None)
+    api_secret: str | None = Field(default=None)
+    from_address: str | None = Field(default=None)
+    from_name: str | None = Field(default=None)
+    base_url: str | None = Field(default=None)
+    bot_token: str | None = Field(default=None)
+    chat_id: str | None = Field(default=None)
+    account_sid: str | None = Field(default=None)
+    auth_token: str | None = Field(default=None)
+    from_number: str | None = Field(default=None)
+    webhook_url: str | None = Field(default=None)
     timeout: int = Field(default=30)
 
 
 class RecipientConfig(BaseModel):
     name: str = Field(default="")
-    email: Optional[str] = Field(default=None)
-    phone: Optional[str] = Field(default=None)
-    telegram_chat_id: Optional[str] = Field(default=None)
-    whatsapp_number: Optional[str] = Field(default=None)
+    email: str | None = Field(default=None)
+    phone: str | None = Field(default=None)
+    telegram_chat_id: str | None = Field(default=None)
+    whatsapp_number: str | None = Field(default=None)
     channels: list[NotificationChannel] = Field(default_factory=list)
     time_window: TimeWindow = Field(default=TimeWindow.ALWAYS)
 
 
 class EscalationContact(BaseModel):
     name: str = Field(default="")
-    email: Optional[str] = Field(default=None)
-    phone: Optional[str] = Field(default=None)
-    telegram_chat_id: Optional[str] = Field(default=None)
-    whatsapp_number: Optional[str] = Field(default=None)
+    email: str | None = Field(default=None)
+    phone: str | None = Field(default=None)
+    telegram_chat_id: str | None = Field(default=None)
+    whatsapp_number: str | None = Field(default=None)
     channels: list[NotificationChannel] = Field(default_factory=list)
 
 
@@ -170,7 +168,7 @@ def load_config(config_path: str | Path | None = None) -> AlertConfig:
     if not path.exists():
         return AlertConfig()
 
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         data = yaml.safe_load(f) or {}
 
     return AlertConfig(**data)

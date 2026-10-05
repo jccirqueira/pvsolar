@@ -2,11 +2,10 @@
 Time-series storage operations for TimescaleDB.
 """
 
-from datetime import datetime, timedelta, timezone
-from typing import Any
+from datetime import UTC, datetime
 
 import structlog
-from sqlalchemy import delete, func, select, update
+from sqlalchemy import select, update
 
 from src.core.database import get_session
 from src.storage.models import (
@@ -37,7 +36,7 @@ class TimeSeriesStore:
         if isinstance(timestamp, str):
             timestamp = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
         elif timestamp is None:
-            timestamp = datetime.now(timezone.utc)
+            timestamp = datetime.now(UTC)
 
         telemetry = Telemetry(
             time=timestamp,
@@ -113,7 +112,7 @@ class TimeSeriesStore:
     async def store_anomaly(self, anomaly_data: dict) -> None:
         """Store a detected anomaly."""
         anomaly = Anomaly(
-            time=anomaly_data.get("time", datetime.now(timezone.utc)),
+            time=anomaly_data.get("time", datetime.now(UTC)),
             inverter_id=anomaly_data["inverter_id"],
             metric=anomaly_data["metric"],
             value=anomaly_data.get("value"),
@@ -145,7 +144,7 @@ class TimeSeriesStore:
             query = select(Anomaly)
 
             if inverter_id:
-                query = query.where(Anverter.inverter_id == inverter_id)
+                query = query.where(Anomaly.inverter_id == inverter_id)
             if severity:
                 query = query.where(Anomaly.severity == severity)
             if start:
@@ -172,7 +171,7 @@ class TimeSeriesStore:
     async def store_maintenance_prediction(self, prediction: dict) -> None:
         """Store a maintenance prediction."""
         pred = MaintenancePrediction(
-            time=prediction.get("time", datetime.now(timezone.utc)),
+            time=prediction.get("time", datetime.now(UTC)),
             inverter_id=prediction["inverter_id"],
             failure_prob_7d=prediction.get("failure_prob_7d"),
             failure_prob_30d=prediction.get("failure_prob_30d"),
@@ -214,7 +213,7 @@ class TimeSeriesStore:
     async def store_energy_forecast(self, forecast: dict) -> None:
         """Store an energy forecast."""
         fc = EnergyForecast(
-            time=forecast.get("time", datetime.now(timezone.utc)),
+            time=forecast.get("time", datetime.now(UTC)),
             inverter_id=forecast["inverter_id"],
             forecast_horizon=forecast["forecast_horizon"],
             predicted_power=forecast.get("predicted_power"),
@@ -255,7 +254,7 @@ class TimeSeriesStore:
     async def store_performance_score(self, score_data: dict) -> None:
         """Store a performance score."""
         score = PerformanceScore(
-            time=score_data.get("time", datetime.now(timezone.utc)),
+            time=score_data.get("time", datetime.now(UTC)),
             inverter_id=score_data["inverter_id"],
             score=score_data.get("score"),
             degradation_rate=score_data.get("degradation_rate"),
@@ -298,7 +297,7 @@ class TimeSeriesStore:
             existing = await session.get(Inverter, inverter_data["id"])
 
             if existing:
-                existing.last_seen = datetime.now(timezone.utc)
+                existing.last_seen = datetime.now(UTC)
                 existing.status = inverter_data.get("status", "unknown")
                 if inverter_data.get("name"):
                     existing.name = inverter_data["name"]
@@ -355,7 +354,7 @@ class TimeSeriesStore:
     async def store_alert(self, alert_data: dict) -> None:
         """Store an alert."""
         alert = Alert(
-            time=alert_data.get("time", datetime.now(timezone.utc)),
+            time=alert_data.get("time", datetime.now(UTC)),
             inverter_id=alert_data["inverter_id"],
             alert_type=alert_data["alert_type"],
             severity=alert_data.get("severity", "info"),
@@ -409,7 +408,7 @@ class TimeSeriesStore:
                 .values(
                     acknowledged=1,
                     acknowledged_by=user,
-                    acknowledged_at=datetime.now(timezone.utc),
+                    acknowledged_at=datetime.now(UTC),
                 )
             )
             return result.rowcount > 0

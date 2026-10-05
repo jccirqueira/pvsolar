@@ -3,7 +3,6 @@
 from pathlib import Path
 
 import pytest
-
 from src.core.config import (
     ComplianceStatus,
     EventRecord,
@@ -21,7 +20,6 @@ from src.core.config import (
     VoltageLevel,
     load_config,
 )
-
 
 # ---------------------------------------------------------------------------
 # Enums

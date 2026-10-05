@@ -9,7 +9,6 @@ from __future__ import annotations
 import time
 
 from fastapi.testclient import TestClient
-
 from src.api.app import create_app
 from src.core.config import SchedulerConfig, TaskConfig
 

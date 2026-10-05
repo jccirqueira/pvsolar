@@ -2,7 +2,6 @@
 Tests for pvSolar Reports Email Sender.
 """
 
-import pytest
 from src.core.config import EmailConfig
 from src.core.email_sender import EmailSender
 

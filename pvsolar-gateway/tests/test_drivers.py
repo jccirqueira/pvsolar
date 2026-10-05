@@ -2,16 +2,16 @@
 Unit tests for pvSolar Gateway driver base module.
 """
 
-import pytest
-from datetime import datetime, timezone
-from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
-
 import sys
+from pathlib import Path
+
+import pytest
+from pydantic import ValidationError
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from drivers.base import BaseInverterDriver, InverterData, create_driver
 from core.config import InverterConfig, ModbusConnection
+from drivers.base import BaseInverterDriver, InverterData, create_driver
 
 
 class TestInverterData:
@@ -29,9 +29,9 @@ class TestInverterData:
         data.inverter_id = "inv-001"
         data.ac_power = 5000.0
         data.ac_voltage = [220.0, 221.0, 219.5]
-        
+
         result = data.to_dict()
-        
+
         assert result["inverter_id"] == "inv-001"
         assert result["ac_power"] == 5000.0
         assert len(result["ac_voltage"]) == 3
@@ -43,7 +43,7 @@ class TestInverterData:
             {"voltage": 380.0, "current": 7.5, "power": 2850.0},
             {"voltage": 382.0, "current": 7.3, "power": 2788.6}
         ]
-        
+
         result = data.to_dict()
         assert len(result["dc_inputs"]) == 2
         assert result["dc_inputs"][0]["power"] == 2850.0
@@ -69,7 +69,7 @@ class TestBaseInverterDriver:
             driver="custom",
             connection=ModbusConnection(host="localhost")
         )
-        
+
         class ConcreteDriver(BaseInverterDriver):
             async def connect(self): pass
             async def disconnect(self): pass
@@ -77,19 +77,19 @@ class TestBaseInverterDriver:
             async def get_status(self): return "unknown"
             async def read_register(self, address, count=1): return []
             async def write_register(self, address, value): return True
-        
+
         driver = ConcreteDriver(config)
-        
+
         # Test error handling
         error = Exception("Test error")
         driver._handle_error(error)
         assert driver._error_count == 1
         assert driver._consecutive_errors == 1
-        
+
         # Multiple errors increase counter
         driver._handle_error(error)
         assert driver._consecutive_errors == 2
-        
+
         # Reset errors
         driver._reset_errors()
         assert driver._consecutive_errors == 0
@@ -101,7 +101,7 @@ class TestBaseInverterDriver:
             driver="custom",
             connection=ModbusConnection(host="localhost")
         )
-        
+
         class ConcreteDriver(BaseInverterDriver):
             async def connect(self): pass
             async def disconnect(self): pass
@@ -109,10 +109,10 @@ class TestBaseInverterDriver:
             async def get_status(self): return "unknown"
             async def read_register(self, address, count=1): return []
             async def write_register(self, address, value): return True
-        
+
         driver = ConcreteDriver(config)
         stats = driver.get_stats()
-        
+
         assert stats["inverter_id"] == "test-inv"
         assert stats["connected"] is False
         assert stats["error_count"] == 0
@@ -172,7 +172,7 @@ class TestCreateDriver:
         assert driver.__class__.__name__ == "HuaweiDriver"
 
     def test_invalid_driver_raises_error(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             InverterConfig(
                 id="test",
                 name="Test",

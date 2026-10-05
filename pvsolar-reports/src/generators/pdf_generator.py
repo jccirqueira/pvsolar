@@ -4,25 +4,22 @@ PDF Report Generator.
 Generates professional PDF reports using ReportLab.
 """
 
-import os
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import structlog
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
-from reportlab.lib.units import cm, mm
+from reportlab.lib.units import cm
 from reportlab.platypus import (
+    Paragraph,
     SimpleDocTemplate,
+    Spacer,
     Table,
     TableStyle,
-    Paragraph,
-    Spacer,
-    PageBreak,
-    HRFlowable,
 )
 
 logger = structlog.get_logger(__name__)
@@ -45,7 +42,7 @@ class PDFReportGenerator:
         company_name: str = "pvSolar Energy",
         primary_color: str = "#10B981",
         secondary_color: str = "#3B82F6",
-        logo_path: Optional[str] = None,
+        logo_path: str | None = None,
     ):
         self.company_name = company_name
         self.primary_color = colors.HexColor(primary_color)
@@ -114,7 +111,7 @@ class PDFReportGenerator:
         canvas.drawRightString(A4[0] - 2*cm, 1*cm, "pvSolar Reports v1.0.0")
         canvas.restoreState()
 
-    def _make_table(self, headers: List[str], rows: List[List[str]], col_widths: Optional[List[float]] = None) -> Table:
+    def _make_table(self, headers: list[str], rows: list[list[str]], col_widths: list[float] | None = None) -> Table:
         data = [headers] + rows
         table = Table(data, colWidths=col_widths, repeatRows=1)
         table.setStyle(TableStyle([
@@ -136,7 +133,7 @@ class PDFReportGenerator:
         ]))
         return table
 
-    def _make_kpi_row(self, kpis: List[Dict[str, Any]]) -> Table:
+    def _make_kpi_row(self, kpis: list[dict[str, Any]]) -> Table:
         cells = []
         for kpi in kpis:
             cell = [
@@ -157,7 +154,7 @@ class PDFReportGenerator:
         ]))
         return table
 
-    def generate_daily_report(self, data: Dict[str, Any], output_path: str) -> str:
+    def generate_daily_report(self, data: dict[str, Any], output_path: str) -> str:
         """Generate a daily report PDF."""
         path = Path(output_path)
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -176,7 +173,7 @@ class PDFReportGenerator:
         performance = data.get("performance")
         inverters = data.get("inverters", [])
         alarms = data.get("alarms", [])
-        anomalies = data.get("anomalies", [])
+        data.get("anomalies", [])
         forecast = data.get("forecast")
 
         elements.append(Paragraph("Daily Report", self.styles["ReportTitle"]))
@@ -243,7 +240,7 @@ class PDFReportGenerator:
         logger.info("pdf.generated", path=str(path), pages=doc.page)
         return str(path)
 
-    def generate_weekly_report(self, data: Dict[str, Any], output_path: str) -> str:
+    def generate_weekly_report(self, data: dict[str, Any], output_path: str) -> str:
         path = Path(output_path)
         path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -274,7 +271,7 @@ class PDFReportGenerator:
         logger.info("pdf.weekly_generated", path=str(path))
         return str(path)
 
-    def generate_monthly_report(self, data: Dict[str, Any], output_path: str) -> str:
+    def generate_monthly_report(self, data: dict[str, Any], output_path: str) -> str:
         path = Path(output_path)
         path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -315,7 +312,7 @@ class PDFReportGenerator:
         logger.info("pdf.monthly_generated", path=str(path))
         return str(path)
 
-    def generate_maintenance_report(self, data: Dict[str, Any], output_path: str) -> str:
+    def generate_maintenance_report(self, data: dict[str, Any], output_path: str) -> str:
         path = Path(output_path)
         path.parent.mkdir(parents=True, exist_ok=True)
 

@@ -4,16 +4,12 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import structlog
 
 from src.core.config import (
-    ComplianceReport,
-    ComplianceStatus,
     GridStandard,
-    QualityMeasurement,
-    EventRecord,
 )
 
 logger = structlog.get_logger()
@@ -37,7 +33,7 @@ class GridReport:
     period_start: str = ""
     period_end: str = ""
     standard: GridStandard = GridStandard.PRODIST
-    generated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    generated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     sections: list[ReportSection] = field(default_factory=list)
     summary: dict = field(default_factory=dict)
 

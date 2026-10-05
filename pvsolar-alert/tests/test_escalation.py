@@ -1,7 +1,6 @@
 """Testes do escalation_engine do pvSolar Alert."""
 
 import pytest
-
 from src.core.config import (
     AlertSeverity,
     EscalationContact,

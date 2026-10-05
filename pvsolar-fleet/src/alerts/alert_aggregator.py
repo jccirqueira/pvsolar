@@ -4,12 +4,11 @@ Alert Aggregator Module.
 Centralizes and manages alerts across all sites.
 """
 
-from datetime import datetime, timezone
-from enum import Enum
-from typing import Any, Callable, Dict, List, Optional
+from collections.abc import Callable
+from datetime import UTC, datetime
+from typing import Any
 
 import structlog
-
 from src.core.config import AlertSeverity, AlertStatus
 
 logger = structlog.get_logger(__name__)
@@ -34,27 +33,27 @@ class FleetAlert:
         self.message = message
         self.source = source
         self.status: AlertStatus = AlertStatus.ACTIVE
-        self.created_at: datetime = datetime.now(timezone.utc)
-        self.acknowledged_at: Optional[datetime] = None
-        self.acknowledged_by: Optional[str] = None
-        self.resolved_at: Optional[datetime] = None
+        self.created_at: datetime = datetime.now(UTC)
+        self.acknowledged_at: datetime | None = None
+        self.acknowledged_by: str | None = None
+        self.resolved_at: datetime | None = None
         self.escalation_level: int = 0
-        self.tags: List[str] = []
-        self.context: Dict[str, Any] = {}
+        self.tags: list[str] = []
+        self.context: dict[str, Any] = {}
 
     def acknowledge(self, user: str = "system") -> None:
         self.status = AlertStatus.ACKNOWLEDGED
-        self.acknowledged_at = datetime.now(timezone.utc)
+        self.acknowledged_at = datetime.now(UTC)
         self.acknowledged_by = user
 
     def resolve(self) -> None:
         self.status = AlertStatus.RESOLVED
-        self.resolved_at = datetime.now(timezone.utc)
+        self.resolved_at = datetime.now(UTC)
 
     def escalate(self) -> None:
         self.escalation_level += 1
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "alert_id": self.alert_id,
             "site_id": self.site_id,
@@ -85,9 +84,9 @@ class AlertAggregator:
     """
 
     def __init__(self, max_alerts: int = 1000):
-        self._alerts: List[FleetAlert] = []
+        self._alerts: list[FleetAlert] = []
         self._max_alerts = max_alerts
-        self._callbacks: List[Callable] = []
+        self._callbacks: list[Callable] = []
 
     def add_alert(self, alert: FleetAlert) -> None:
         self._alerts.insert(0, alert)
@@ -151,11 +150,11 @@ class AlertAggregator:
 
     def get_alerts(
         self,
-        site_id: Optional[str] = None,
-        severity: Optional[AlertSeverity] = None,
-        status: Optional[AlertStatus] = None,
+        site_id: str | None = None,
+        severity: AlertSeverity | None = None,
+        status: AlertStatus | None = None,
         limit: int = 100,
-    ) -> List[FleetAlert]:
+    ) -> list[FleetAlert]:
         results = self._alerts
         if site_id:
             results = [a for a in results if a.site_id == site_id]
@@ -165,16 +164,16 @@ class AlertAggregator:
             results = [a for a in results if a.status == status]
         return results[:limit]
 
-    def get_active_alerts(self) -> List[FleetAlert]:
+    def get_active_alerts(self) -> list[FleetAlert]:
         return self.get_alerts(status=AlertStatus.ACTIVE)
 
-    def get_critical_alerts(self) -> List[FleetAlert]:
+    def get_critical_alerts(self) -> list[FleetAlert]:
         return self.get_alerts(severity=AlertSeverity.CRITICAL, status=AlertStatus.ACTIVE)
 
-    def get_site_alerts(self, site_id: str) -> List[FleetAlert]:
+    def get_site_alerts(self, site_id: str) -> list[FleetAlert]:
         return self.get_alerts(site_id=site_id)
 
-    def get_statistics(self) -> Dict[str, Any]:
+    def get_statistics(self) -> dict[str, Any]:
         active = self.get_active_alerts()
         return {
             "total_alerts": len(self._alerts),
@@ -186,7 +185,7 @@ class AlertAggregator:
             "resolved": len([a for a in self._alerts if a.status == AlertStatus.RESOLVED]),
         }
 
-    def get_site_statistics(self, site_id: str) -> Dict[str, Any]:
+    def get_site_statistics(self, site_id: str) -> dict[str, Any]:
         site_alerts = self.get_site_alerts(site_id)
         active = [a for a in site_alerts if a.status == AlertStatus.ACTIVE]
         return {
@@ -201,7 +200,7 @@ class AlertAggregator:
     def register_callback(self, callback: Callable) -> None:
         self._callbacks.append(callback)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "alerts": [a.to_dict() for a in self._alerts[:100]],
             "statistics": self.get_statistics(),

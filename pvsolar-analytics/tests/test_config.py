@@ -2,21 +2,19 @@
 Unit tests for configuration module.
 """
 
-import pytest
-from pathlib import Path
-from pydantic import ValidationError
 
+import pytest
 from core.config import (
     AnalyticsConfig,
-    MQTTConfig,
-    DatabaseConfig,
-    RedisConfig,
-    MLConfig,
-    AlertsConfig,
     APIConfig,
-    load_config,
+    DatabaseConfig,
+    MLConfig,
+    MQTTConfig,
+    RedisConfig,
     create_default_config,
+    load_config,
 )
+from pydantic import ValidationError
 
 
 class TestMQTTConfig:

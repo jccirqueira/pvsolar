@@ -14,7 +14,7 @@ banco) para manter o crescimento sob controle.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
 import structlog
@@ -43,8 +43,8 @@ def _as_utc(value: datetime | None) -> datetime | None:
     if value is None:
         return None
     if value.tzinfo is None:
-        return value.replace(tzinfo=timezone.utc)
-    return value.astimezone(timezone.utc)
+        return value.replace(tzinfo=UTC)
+    return value.astimezone(UTC)
 
 
 def _parse_iso(value: str | None) -> datetime | None:
@@ -214,7 +214,7 @@ class PersistenceService:
 
     # -- hidratação -------------------------------------------------------
 
-    async def hydrate(self, registry: TaskRegistry, engine: "SchedulerEngine") -> dict:
+    async def hydrate(self, registry: TaskRegistry, engine: SchedulerEngine) -> dict:
         """Carrega tarefas e histórico do banco.
 
         O banco é a fonte de verdade: uma tarefa existente no banco substitui
@@ -295,7 +295,7 @@ class PersistenceService:
         if not self.enabled:
             return
         sessions = self._require()
-        ts = _parse_iso(result.timestamp) or datetime.now(timezone.utc)
+        ts = _parse_iso(result.timestamp) or datetime.now(UTC)
         async with sessions() as session:
             session.add(
                 TaskResultRow(

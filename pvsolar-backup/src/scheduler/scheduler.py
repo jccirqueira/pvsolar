@@ -1,12 +1,12 @@
 import asyncio
 import calendar
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import structlog
 from croniter import croniter
 
-from src.core.config import BackupConfig, ScheduleFrequency
 from src.backup.engine import BackupEngine
+from src.core.config import BackupConfig, ScheduleFrequency
 
 logger = structlog.get_logger()
 
@@ -21,7 +21,7 @@ class BackupScheduler:
         self.next_run: str | None = None
 
     def _calculate_next_run(self) -> str:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         freq = self.config.schedule.frequency
 
         if freq == ScheduleFrequency.CUSTOM and self.config.schedule.cron_expression:
@@ -67,7 +67,7 @@ class BackupScheduler:
     def should_run(self) -> bool:
         if not self.config.schedule.enabled:
             return False
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         if self.next_run is None:
             self.next_run = self._calculate_next_run()
         next_dt = datetime.fromisoformat(self.next_run)
@@ -75,7 +75,7 @@ class BackupScheduler:
 
     async def _run_backup(self):
         logger.info("scheduler.running_backup")
-        self.last_run = datetime.now(timezone.utc).isoformat()
+        self.last_run = datetime.now(UTC).isoformat()
         self.next_run = self._calculate_next_run()
         await self.backup_engine.create_backup()
         logger.info("scheduler.backup_complete", next_run=self.next_run)

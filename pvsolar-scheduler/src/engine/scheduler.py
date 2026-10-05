@@ -1,6 +1,7 @@
 import asyncio
+import contextlib
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import TYPE_CHECKING
 
 import structlog
@@ -16,7 +17,7 @@ logger = structlog.get_logger()
 
 # Data distante usada como "nunca mais" para tarefas do tipo ``once``
 # apos sua unica execucao.
-_NEVER = datetime(9999, 12, 31, 23, 59, 59, tzinfo=timezone.utc)
+_NEVER = datetime(9999, 12, 31, 23, 59, 59, tzinfo=UTC)
 
 
 class SchedulerEngine:
@@ -29,13 +30,13 @@ class SchedulerEngine:
         self.config = config
         self.registry = registry
         # Camada opcional de persistência (write-through); None = só memória.
-        self.persistence: "PersistenceService | None" = persistence
+        self.persistence: PersistenceService | None = persistence
         self._running = False
         self._task: asyncio.Task | None = None
         self.history: list[TaskResult] = []
 
     def _calculate_next_run(self, task: Task) -> str:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         cfg = task.config
         st = cfg.schedule_type
 
@@ -89,13 +90,13 @@ class SchedulerEngine:
             return False
         if task.next_run is None:
             task.next_run = self._calculate_next_run(task)
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         next_dt = datetime.fromisoformat(task.next_run)
         return now >= next_dt
 
     async def _execute_task(self, task: Task) -> TaskResult:
         task.status = TaskStatus.RUNNING
-        task.last_run = datetime.now(timezone.utc).isoformat()
+        task.last_run = datetime.now(UTC).isoformat()
         logger.info("task.executing", task_id=task.config.id, name=task.config.name)
 
         start = time.time()
@@ -213,10 +214,8 @@ class SchedulerEngine:
         task, self._task = self._task, None
         if task is not None and task is not asyncio.current_task():
             task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await task
-            except asyncio.CancelledError:
-                pass
         logger.info("scheduler.stopped")
         return True
 

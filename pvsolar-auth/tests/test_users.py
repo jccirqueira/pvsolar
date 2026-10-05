@@ -1,12 +1,11 @@
 """Testes do user_manager do pvSolar Auth."""
 
 import pytest
-
 from src.core.config import UserRole, UserStatus
 from src.users.user_manager import (
     APIKey,
-    UserManager,
     User,
+    UserManager,
     hash_password,
     verify_password,
 )

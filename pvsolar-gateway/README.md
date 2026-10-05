@@ -225,11 +225,11 @@ cloud:
     endpoint: "xxxxxxxxx.iot.us-east-1.amazonaws.com"
     cert_path: "/etc/pvsolar/certs/aws/"
     thing_name: "pvsolar-gateway-001"
-    
+
   azure_iot:
     enabled: false
     connection_string: "HostName=xxx;DeviceId=xxx;SharedAccessKey=xxx"
-    
+
   mqtt_local:
     enabled: true
     broker: "localhost"
@@ -242,7 +242,7 @@ edge:
     database: "/var/lib/pvsolar/edge.db"
     max_buffer_hours: 72
     sync_interval: 30
-  
+
   processing:
     enabled: true
     aggregation: "1min"

@@ -59,12 +59,12 @@ def analyze(base: Path) -> dict:
             for child in ast.iter_child_nodes(node):
                 parent[child] = node
 
-        def in_scope(node) -> bool:
-            cur = parent.get(node)
+        def in_scope(node, _parent=parent) -> bool:
+            cur = _parent.get(node)
             while cur is not None:
                 if isinstance(cur, SCOPED):
                     return True
-                cur = parent.get(cur)
+                cur = _parent.get(cur)
             return False
 
         apps, runs = [], []
@@ -80,11 +80,16 @@ def analyze(base: Path) -> dict:
                 for alias in node.names:
                     if alias.asname in ("app", "application") or (alias.name in ("app", "application") and alias.asname is None):
                         apps.append(f"L{node.lineno}:from {node.module} import {alias.name}")
-            elif isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
-                if node.func.attr == "run" and isinstance(node.func.value, ast.Name) and node.func.value.id == "uvicorn":
-                    arg = node.args[0] if node.args else None
-                    desc = describe_value(arg) if arg is not None else "?"
-                    runs.append(f"L{node.lineno}:uvicorn.run({desc})")
+            elif (
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and node.func.attr == "run"
+                and isinstance(node.func.value, ast.Name)
+                and node.func.value.id == "uvicorn"
+            ):
+                arg = node.args[0] if node.args else None
+                desc = describe_value(arg) if arg is not None else "?"
+                runs.append(f"L{node.lineno}:uvicorn.run({desc})")
         if apps or runs:
             rel = py.relative_to(base).with_suffix("")
             parts = ["src" if p == "src" else p for p in rel.parts]

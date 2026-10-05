@@ -5,20 +5,14 @@ Handles persistence of trained models and detection state.
 """
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import joblib
-import numpy as np
 import structlog
 
 from src.ml.anomaly.detector import (
     AnomalyDetector,
-    IsolationForestDetector,
-    ZScoreDetector,
-    RollingMeanDetector,
-    SPCDetector,
-    ThresholdDetector,
 )
 
 logger = structlog.get_logger(__name__)
@@ -80,7 +74,7 @@ class AnomalyModelStore:
         # Save metadata
         metadata = {
             "name": name,
-            "saved_at": datetime.now(timezone.utc).isoformat(),
+            "saved_at": datetime.now(UTC).isoformat(),
             "isolation_forest_fitted": detector.isolation_forest._fitted,
             "zscore_metrics": list(detector.zscore._history.keys()),
             "rolling_mean_metrics": list(detector.rolling_mean._history.keys()),
@@ -179,5 +173,5 @@ class AnomalyModelStore:
 
     def _load_json(self, path: Path) -> dict:
         """Load dictionary from JSON."""
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return json.load(f)

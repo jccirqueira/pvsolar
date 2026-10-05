@@ -5,12 +5,11 @@ Collects data from pvSolar Gateway and Analytics APIs.
 """
 
 import asyncio
-from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 import aiohttp
 import structlog
-
 from src.core.config import AnalyticsConfig, GatewayConfig
 
 logger = structlog.get_logger(__name__)
@@ -20,16 +19,16 @@ class TelemetryData:
     """Represents collected telemetry data."""
 
     def __init__(self):
-        self.timestamp: datetime = datetime.now(timezone.utc)
+        self.timestamp: datetime = datetime.now(UTC)
         self.power_kw: float = 0.0
         self.energy_kwh: float = 0.0
         self.irradiance: float = 0.0
         self.temperature: float = 0.0
         self.efficiency: float = 0.0
-        self.inverters: List[Dict[str, Any]] = []
-        self.weather: Dict[str, Any] = {}
+        self.inverters: list[dict[str, Any]] = []
+        self.weather: dict[str, Any] = {}
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "timestamp": self.timestamp.isoformat(),
             "power_kw": self.power_kw,
@@ -53,7 +52,7 @@ class AlarmData:
         self.timestamp = timestamp
         self.acknowledged: bool = False
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "alarm_id": self.alarm_id,
             "level": self.level,
@@ -74,9 +73,9 @@ class PerformanceData:
         self.cef: float = 0.0
         self.availability: float = 0.0
         self.efficiency: float = 0.0
-        self.recommendations: List[str] = []
+        self.recommendations: list[str] = []
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "overall_score": self.overall_score,
             "grade": self.grade,
@@ -92,12 +91,12 @@ class MaintenanceData:
     """Represents maintenance prediction data."""
 
     def __init__(self):
-        self.predictions: List[Dict[str, Any]] = []
+        self.predictions: list[dict[str, Any]] = []
         self.risk_level: str = "low"
-        self.next_maintenance: Optional[str] = None
-        self.urgent_actions: List[str] = []
+        self.next_maintenance: str | None = None
+        self.urgent_actions: list[str] = []
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "predictions": self.predictions,
             "risk_level": self.risk_level,
@@ -120,8 +119,8 @@ class DataCollector:
     def __init__(self, gateway_config: GatewayConfig, analytics_config: AnalyticsConfig):
         self.gateway = gateway_config
         self.analytics = analytics_config
-        self._session: Optional[aiohttp.ClientSession] = None
-        self._cache: Dict[str, Any] = {}
+        self._session: aiohttp.ClientSession | None = None
+        self._cache: dict[str, Any] = {}
 
     async def start(self) -> None:
         self._session = aiohttp.ClientSession()
@@ -132,13 +131,13 @@ class DataCollector:
             await self._session.close()
         logger.info("collector.stopped")
 
-    def _headers(self, config) -> Dict[str, str]:
+    def _headers(self, config) -> dict[str, str]:
         headers = {"Content-Type": "application/json"}
         if config.api_key:
             headers["Authorization"] = f"Bearer {config.api_key}"
         return headers
 
-    async def _get(self, base_url: str, path: str, config) -> Optional[Dict[str, Any]]:
+    async def _get(self, base_url: str, path: str, config) -> dict[str, Any] | None:
         if not self._session:
             return None
         try:
@@ -153,8 +152,8 @@ class DataCollector:
             logger.error("collector.request_error", path=path, error=str(e))
         return None
 
-    async def get_telemetry(self, device_id: str, date: Optional[datetime] = None) -> Optional[TelemetryData]:
-        target = date or datetime.now(timezone.utc)
+    async def get_telemetry(self, device_id: str, date: datetime | None = None) -> TelemetryData | None:
+        target = date or datetime.now(UTC)
         result = await self._get(self.gateway.url, f"/api/v1/telemetry/{device_id}", self.gateway)
         if not result:
             return None
@@ -168,11 +167,11 @@ class DataCollector:
         data.efficiency = result.get("efficiency", 0.0)
         return data
 
-    async def get_inverters_status(self) -> List[Dict[str, Any]]:
+    async def get_inverters_status(self) -> list[dict[str, Any]]:
         result = await self._get(self.gateway.url, "/api/v1/inverters", self.gateway)
         return result.get("inverters", []) if result else []
 
-    async def get_alarms(self, start: datetime, end: datetime) -> List[AlarmData]:
+    async def get_alarms(self, start: datetime, end: datetime) -> list[AlarmData]:
         params = f"?start={start.isoformat()}&end={end.isoformat()}"
         result = await self._get(self.gateway.url, f"/api/v1/alarms{params}", self.gateway)
         if not result:
@@ -185,11 +184,11 @@ class DataCollector:
                 level=a.get("level", "info"),
                 message=a.get("message", ""),
                 source=a.get("source", ""),
-                timestamp=datetime.fromisoformat(a.get("timestamp", datetime.now(timezone.utc).isoformat())),
+                timestamp=datetime.fromisoformat(a.get("timestamp", datetime.now(UTC).isoformat())),
             ))
         return alarms
 
-    async def get_performance(self) -> Optional[PerformanceData]:
+    async def get_performance(self) -> PerformanceData | None:
         result = await self._get(self.analytics.url, "/api/v1/performance/current", self.analytics)
         if not result:
             return None
@@ -204,7 +203,7 @@ class DataCollector:
         perf.recommendations = result.get("recommendations", [])
         return perf
 
-    async def get_maintenance(self) -> Optional[MaintenanceData]:
+    async def get_maintenance(self) -> MaintenanceData | None:
         result = await self._get(self.analytics.url, "/api/v1/maintenance/predictions", self.analytics)
         if not result:
             return None
@@ -216,17 +215,17 @@ class DataCollector:
         maint.urgent_actions = result.get("urgent_actions", [])
         return maint
 
-    async def get_anomalies(self, start: datetime, end: datetime) -> List[Dict[str, Any]]:
+    async def get_anomalies(self, start: datetime, end: datetime) -> list[dict[str, Any]]:
         params = f"?start={start.isoformat()}&end={end.isoformat()}"
         result = await self._get(self.analytics.url, f"/api/v1/anomalies/detect{params}", self.analytics)
         return result.get("anomalies", []) if result else []
 
-    async def get_forecast(self, days: int = 1) -> Optional[Dict[str, Any]]:
+    async def get_forecast(self, days: int = 1) -> dict[str, Any] | None:
         result = await self._get(self.analytics.url, f"/api/v1/forecast/energy?days={days}", self.analytics)
         return result
 
-    async def collect_daily_data(self, date: Optional[datetime] = None) -> Dict[str, Any]:
-        target = date or datetime.now(timezone.utc)
+    async def collect_daily_data(self, date: datetime | None = None) -> dict[str, Any]:
+        target = date or datetime.now(UTC)
         start = target.replace(hour=0, minute=0, second=0, microsecond=0)
         end = start + timedelta(days=1)
 
@@ -265,11 +264,11 @@ class DataCollector:
             "maintenance": maintenance.to_dict() if maintenance else None,
             "anomalies": anomalies,
             "forecast": forecast,
-            "collected_at": datetime.now(timezone.utc).isoformat(),
+            "collected_at": datetime.now(UTC).isoformat(),
         }
 
-    async def collect_weekly_data(self, end_date: Optional[datetime] = None) -> Dict[str, Any]:
-        target = end_date or datetime.now(timezone.utc)
+    async def collect_weekly_data(self, end_date: datetime | None = None) -> dict[str, Any]:
+        target = end_date or datetime.now(UTC)
         start = target - timedelta(days=7)
 
         daily_data = []
@@ -282,14 +281,14 @@ class DataCollector:
         return {
             "period": f"{start.strftime('%Y-%m-%d')} to {target.strftime('%Y-%m-%d')}",
             "daily_data": daily_data,
-            "collected_at": datetime.now(timezone.utc).isoformat(),
+            "collected_at": datetime.now(UTC).isoformat(),
         }
 
-    async def collect_monthly_data(self, year: int, month: int) -> Dict[str, Any]:
+    async def collect_monthly_data(self, year: int, month: int) -> dict[str, Any]:
         import calendar
         days_in_month = calendar.monthrange(year, month)[1]
-        start = datetime(year, month, 1, tzinfo=timezone.utc)
-        end = datetime(year, month, days_in_month, tzinfo=timezone.utc)
+        start = datetime(year, month, 1, tzinfo=UTC)
+        end = datetime(year, month, days_in_month, tzinfo=UTC)
 
         daily_data = []
         current = start
@@ -301,5 +300,5 @@ class DataCollector:
         return {
             "period": f"{year}-{month:02d}",
             "daily_data": daily_data,
-            "collected_at": datetime.now(timezone.utc).isoformat(),
+            "collected_at": datetime.now(UTC).isoformat(),
         }

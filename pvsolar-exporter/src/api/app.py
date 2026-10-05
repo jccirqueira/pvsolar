@@ -4,9 +4,9 @@ from typing import Any
 
 from fastapi import FastAPI, Response
 
-from src.core.config import ExporterConfig, load_config, CollectorConfig, ServiceType
-from src.core.exporter import PrometheusExporter, MetricDefinition, MetricType
 from src.collectors.scrape import ScrapeManager
+from src.core.config import load_config
+from src.core.exporter import PrometheusExporter
 
 config = load_config()
 exporter = PrometheusExporter(config)

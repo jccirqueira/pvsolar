@@ -5,7 +5,7 @@ from __future__ import annotations
 from fastapi import FastAPI, HTTPException
 
 from src.core.config import AlertConfig, AlertSeverity, load_config
-from src.core.notification_manager import Alert, NotificationManager
+from src.core.notification_manager import NotificationManager
 from src.escalation.escalation_engine import EscalationManager
 from src.rules.rules_engine import RulesEngine
 

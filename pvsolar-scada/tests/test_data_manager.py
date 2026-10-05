@@ -2,11 +2,9 @@
 Tests for pvSolar SCADA Data Manager.
 """
 
-import json
-from datetime import datetime, timezone
-from unittest.mock import AsyncMock, MagicMock, patch
+from datetime import UTC, datetime, timezone
+from unittest.mock import MagicMock
 
-import pytest
 from src.core.config import AnalyticsConfig, GatewayConfig, MQTTConfig
 from src.core.data_manager import AlarmData, DataManager, TelemetryData
 
@@ -108,7 +106,7 @@ class TestDataManager:
             analytics_config=self.analytics_config,
         )
         dm._process_telemetry("inverter_1", {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "values": {"power": 50.0, "voltage": 220.0},
         })
         assert "inverter_1" in dm._telemetry

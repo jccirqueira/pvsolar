@@ -1,9 +1,9 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 
 import pytest
-from src.core.config import SchedulerConfig, TaskConfig, ScheduleType, TaskType, TaskStatus
-from src.tasks.task import TaskRegistry
+from src.core.config import SchedulerConfig, ScheduleType, TaskConfig, TaskStatus, TaskType
 from src.engine.scheduler import SchedulerEngine
+from src.tasks.task import TaskRegistry
 
 
 @pytest.fixture
@@ -30,14 +30,14 @@ class TestSchedulerEngine:
         next_run = engine._calculate_next_run(task)
         assert next_run is not None
         # deve vencer daqui a ~300s (e nao "agora")
-        delta = (datetime.fromisoformat(next_run) - datetime.now(timezone.utc)).total_seconds()
+        delta = (datetime.fromisoformat(next_run) - datetime.now(UTC)).total_seconds()
         assert 290 <= delta <= 310
 
     def test_calculate_next_run_once_before_executing(self, engine, registry):
         # horario ja passou no dia => vence imediatamente
         task = registry.add_task(TaskConfig(id="t1", schedule_type=ScheduleType.ONCE, time="00:00"))
         next_run = engine._calculate_next_run(task)
-        assert datetime.fromisoformat(next_run) <= datetime.now(timezone.utc)
+        assert datetime.fromisoformat(next_run) <= datetime.now(UTC)
 
     def test_calculate_next_run_once_never_again_after_run(self, engine, registry):
         task = registry.add_task(TaskConfig(id="t1", schedule_type=ScheduleType.ONCE, time="00:00"))

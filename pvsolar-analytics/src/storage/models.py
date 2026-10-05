@@ -2,7 +2,7 @@
 Database models for TimescaleDB.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import (
     JSON,
@@ -160,6 +160,6 @@ class Inverter(Base):
     model = Column(String(100), nullable=True)
     serial_number = Column(String(100), nullable=True)
     site_id = Column(String(100), nullable=True)
-    registered_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    registered_at = Column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
     last_seen = Column(DateTime(timezone=True), nullable=True)
     status = Column(String(20), default="unknown")

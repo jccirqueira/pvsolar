@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import structlog
 
@@ -31,7 +31,7 @@ class OptimizationResult:
     payback_years: float = 0.0
     npv: float = 0.0
     parameters: dict = field(default_factory=dict)
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     def to_dict(self) -> dict:
         return {
@@ -79,8 +79,8 @@ class Optimizer:
         latitude = self.plant.latitude
 
         for tilt in range(int(tilt_range[0]), int(tilt_range[1]) + 1, int(step)):
-            tilt_rad = math.radians(tilt)
-            lat_rad = math.radians(latitude)
+            math.radians(tilt)
+            math.radians(latitude)
             factor = 1.0 - 0.0001 * (tilt - latitude) ** 2
             energy_est = base_energy * factor
 

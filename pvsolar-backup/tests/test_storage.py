@@ -1,11 +1,17 @@
 import os
 import tempfile
-import pytest
 from pathlib import Path
+
+import pytest
 from src.core.config import StorageConfig, StorageType
 from src.storage.backends import (
-    LocalStorage, FTPStorage, S3Storage, SMBStorage,
-    AzureStorage, GCSStorage, create_storage,
+    AzureStorage,
+    FTPStorage,
+    GCSStorage,
+    LocalStorage,
+    S3Storage,
+    SMBStorage,
+    create_storage,
 )
 
 

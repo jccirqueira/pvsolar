@@ -4,8 +4,6 @@ pvSolar Gateway - Web Dashboard (FastAPI).
 Provides REST API and real-time dashboard for monitoring solar inverters.
 """
 
-import asyncio
-from typing import Any, Dict, List, Optional
 
 import structlog
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
@@ -17,12 +15,12 @@ logger = structlog.get_logger(__name__)
 def create_app(config, drivers: list, metrics) -> FastAPI:
     """
     Create and configure the FastAPI web application.
-    
+
     Args:
         config: Gateway configuration
         drivers: List of inverter driver instances
         metrics: Metrics collector instance
-    
+
     Returns:
         Configured FastAPI application
     """
@@ -37,7 +35,7 @@ def create_app(config, drivers: list, metrics) -> FastAPI:
     app.state.config = config
     app.state.drivers = drivers
     app.state.metrics = metrics
-    app.state.ws_clients: List[WebSocket] = []
+    app.state.ws_clients: list[WebSocket] = []
 
     _register_routes(app)
     _register_websocket(app)

@@ -2,7 +2,6 @@
 Tests for pvSolar Fleet Site Manager.
 """
 
-import pytest
 from src.core.config import SiteConfig, SiteStatus
 from src.sites.site_manager import SiteInfo, SiteManager, SiteMetrics
 

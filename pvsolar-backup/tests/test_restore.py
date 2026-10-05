@@ -1,9 +1,10 @@
 import os
+import tarfile
 import tempfile
 import zipfile
-import tarfile
-import pytest
 from pathlib import Path
+
+import pytest
 from src.core.config import BackupConfig, CompressionType
 from src.restore.engine import RestoreEngine, RestoreResult
 

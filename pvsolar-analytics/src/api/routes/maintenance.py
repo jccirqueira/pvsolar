@@ -1,6 +1,6 @@
 """Predictive maintenance routes."""
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException
 
 from src.core.app import get_predictor, get_store
 
@@ -102,8 +102,8 @@ async def list_maintenance_models():
 
     Returns metadata for each saved model version.
     """
-    from src.ml.maintenance.models import MaintenanceModelStore
     from src.core.app import get_config
+    from src.ml.maintenance.models import MaintenanceModelStore
 
     config = get_config()
     store = MaintenanceModelStore(config.ml.model_dir)

@@ -4,7 +4,6 @@ from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
-
 from src.api.app import create_app
 
 

@@ -1,8 +1,10 @@
 """Performance scoring routes."""
 
+from datetime import UTC
+
 from fastapi import APIRouter, HTTPException, Query
 
-from src.core.app import get_perf_calculator, get_perf_benchmark, get_store
+from src.core.app import get_perf_benchmark, get_perf_calculator, get_store
 
 router = APIRouter()
 
@@ -86,11 +88,11 @@ async def get_performance_history(
 
     # Filter by days
     if history:
-        from datetime import datetime, timezone, timedelta
-        cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+        from datetime import datetime, timedelta
+        cutoff = datetime.now(UTC) - timedelta(days=days)
         history = [
             h for h in history
-            if h.get("timestamp", datetime.min.replace(tzinfo=timezone.utc)) > cutoff
+            if h.get("timestamp", datetime.min.replace(tzinfo=UTC)) > cutoff
         ]
 
     return {

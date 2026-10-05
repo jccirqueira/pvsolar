@@ -2,18 +2,16 @@
 Unit tests for storage models.
 """
 
-import pytest
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 
 from storage.models import (
-    Base,
-    Telemetry,
-    Anomaly,
-    MaintenancePrediction,
-    EnergyForecast,
-    PerformanceScore,
     Alert,
+    Anomaly,
+    EnergyForecast,
     Inverter,
+    MaintenancePrediction,
+    PerformanceScore,
+    Telemetry,
 )
 
 
@@ -22,7 +20,7 @@ class TestTelemetryModel:
 
     def test_create_telemetry(self):
         telemetry = Telemetry(
-            time=datetime.now(timezone.utc),
+            time=datetime.now(UTC),
             inverter_id="inv-001",
             ac_power=5000.0,
             temperature=42.5,
@@ -45,7 +43,7 @@ class TestAnomalyModel:
 
     def test_create_anomaly(self):
         anomaly = Anomaly(
-            time=datetime.now(timezone.utc),
+            time=datetime.now(UTC),
             inverter_id="inv-001",
             metric="ac_power",
             value=100.0,
@@ -64,7 +62,7 @@ class TestMaintenancePredictionModel:
 
     def test_create_prediction(self):
         prediction = MaintenancePrediction(
-            time=datetime.now(timezone.utc),
+            time=datetime.now(UTC),
             inverter_id="inv-001",
             failure_prob_7d=0.1,
             failure_prob_30d=0.3,
@@ -82,7 +80,7 @@ class TestEnergyForecastModel:
 
     def test_create_forecast(self):
         forecast = EnergyForecast(
-            time=datetime.now(timezone.utc),
+            time=datetime.now(UTC),
             inverter_id="inv-001",
             forecast_horizon="24h",
             predicted_power=4500.0,
@@ -99,7 +97,7 @@ class TestPerformanceScoreModel:
 
     def test_create_score(self):
         score = PerformanceScore(
-            time=datetime.now(timezone.utc),
+            time=datetime.now(UTC),
             inverter_id="inv-001",
             score=85.5,
             degradation_rate=0.02,
@@ -116,7 +114,7 @@ class TestAlertModel:
 
     def test_create_alert(self):
         alert = Alert(
-            time=datetime.now(timezone.utc),
+            time=datetime.now(UTC),
             inverter_id="inv-001",
             alert_type="over_temperature",
             severity="warning",

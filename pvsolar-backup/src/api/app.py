@@ -1,8 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from src.core.config import BackupConfig, load_config
 from src.backup.engine import BackupEngine
+from src.core.config import load_config
 from src.restore.engine import RestoreEngine
 from src.scheduler.scheduler import BackupScheduler
 from src.storage.backends import create_storage

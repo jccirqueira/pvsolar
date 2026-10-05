@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import structlog
 
@@ -13,8 +12,6 @@ from src.core.config import (
     EventRecord,
     FaultType,
     FRTConfig,
-    HVRTCurve,
-    LVRTCurve,
 )
 
 logger = structlog.get_logger()
@@ -101,7 +98,7 @@ class FaultRecorder:
 
         event = EventRecord(
             id=str(uuid.uuid4()),
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
             event_type=event_type,
             duration_ms=duration_ms,
             voltage_pu=voltage_pu,

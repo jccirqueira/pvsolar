@@ -4,13 +4,10 @@ pvSolar Reports Application.
 Main application that initializes and runs the report generation system.
 """
 
-import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Optional
 
 import structlog
-
 from src.collectors.data_collector import DataCollector
 from src.core.config import ReportsConfig, load_config
 from src.core.email_sender import EmailSender
@@ -32,7 +29,7 @@ class PVSolarReports:
     - Scheduled reports
     """
 
-    def __init__(self, config: Optional[ReportsConfig] = None, config_path: Optional[str] = None):
+    def __init__(self, config: ReportsConfig | None = None, config_path: str | None = None):
         if config:
             self.config = config
         else:
@@ -86,14 +83,11 @@ class PVSolarReports:
             )
 
     def _output_path(self, report_type: str, fmt: str, date_str: str) -> str:
-        if fmt == "pdf":
-            base = self.config.output.pdf_dir
-        else:
-            base = self.config.output.excel_dir
+        base = self.config.output.pdf_dir if fmt == "pdf" else self.config.output.excel_dir
         return str(Path(base) / f"{report_type}_{date_str}.{fmt}")
 
-    async def generate_daily_report(self, date: Optional[datetime] = None) -> dict:
-        target = date or datetime.now(timezone.utc)
+    async def generate_daily_report(self, date: datetime | None = None) -> dict:
+        target = date or datetime.now(UTC)
         date_str = target.strftime("%Y-%m-%d")
         logger.info("app.generating_daily", date=date_str)
 
@@ -120,8 +114,8 @@ class PVSolarReports:
         logger.info("app.daily_done", files=results["files"])
         return results
 
-    async def generate_weekly_report(self, end_date: Optional[datetime] = None) -> dict:
-        target = end_date or datetime.now(timezone.utc)
+    async def generate_weekly_report(self, end_date: datetime | None = None) -> dict:
+        target = end_date or datetime.now(UTC)
         date_str = target.strftime("%Y-%m-%d")
         logger.info("app.generating_weekly", end_date=date_str)
 
@@ -140,15 +134,15 @@ class PVSolarReports:
         if self.config.email.enabled:
             await self.email_sender.send_async(
                 subject=f"Weekly Report - {self.config.plant.name}",
-                body=f"Weekly report is attached.",
+                body="Weekly report is attached.",
                 attachments=results["files"],
             )
 
         logger.info("app.weekly_done", files=results["files"])
         return results
 
-    async def generate_monthly_report(self, year: Optional[int] = None, month: Optional[int] = None) -> dict:
-        now = datetime.now(timezone.utc)
+    async def generate_monthly_report(self, year: int | None = None, month: int | None = None) -> dict:
+        now = datetime.now(UTC)
         y = year or now.year
         m = month or now.month
         date_str = f"{y}-{m:02d}"
@@ -183,7 +177,7 @@ class PVSolarReports:
         data = {"maintenance": maintenance.to_dict() if maintenance else {}}
 
         results = {"files": []}
-        date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        date_str = datetime.now(UTC).strftime("%Y-%m-%d")
 
         for fmt in self.config.formats:
             path = self._output_path("maintenance", fmt.value, date_str)

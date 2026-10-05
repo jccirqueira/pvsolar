@@ -2,10 +2,9 @@
 Unit tests for anomaly detection module.
 """
 
-import pytest
-import numpy as np
-from unittest.mock import MagicMock, patch
 
+import numpy as np
+import pytest
 from ml.anomaly.detector import (
     AnomalyDetector,
     AnomalyResult,
@@ -106,7 +105,7 @@ class TestZScoreDetector:
     def test_no_anomaly_with_normal_data(self):
         detector = ZScoreDetector(threshold=3.0, min_samples=10)
         np.random.seed(42)
-        for i in range(50):
+        for _i in range(50):
             detector.update("power", 1000 + np.random.normal(0, 10))
 
         result = detector.detect("power", 1005)
@@ -115,7 +114,7 @@ class TestZScoreDetector:
     def test_detect_anomaly(self):
         detector = ZScoreDetector(threshold=3.0, min_samples=10)
         np.random.seed(42)
-        for i in range(50):
+        for _i in range(50):
             detector.update("power", 1000 + np.random.normal(0, 10))
 
         result = detector.detect("power", 2000)
@@ -124,7 +123,7 @@ class TestZScoreDetector:
 
     def test_insufficient_data(self):
         detector = ZScoreDetector(min_samples=100)
-        for i in range(5):
+        for _i in range(5):
             detector.update("power", 1000)
 
         result = detector.detect("power", 2000)
@@ -141,7 +140,7 @@ class TestRollingMeanDetector:
     def test_no_anomaly_stable_data(self):
         detector = RollingMeanDetector(window=20, threshold=2.5)
         np.random.seed(42)
-        for i in range(50):
+        for _i in range(50):
             detector.update("power", 5000 + np.random.normal(0, 50))
 
         result = detector.detect("power", 5010)
@@ -150,7 +149,7 @@ class TestRollingMeanDetector:
     def test_detect_sudden_change(self):
         detector = RollingMeanDetector(window=10, threshold=2.5)
         np.random.seed(42)
-        for i in range(30):
+        for _i in range(30):
             detector.update("power", 5000 + np.random.normal(0, 5))
 
         result = detector.detect("power", 10000)
@@ -209,7 +208,7 @@ class TestSPCDetector:
     def test_no_anomaly_stable_process(self):
         detector = SPCDetector(window=20)
         np.random.seed(42)
-        for i in range(50):
+        for _i in range(50):
             detector.update("power", 5000 + np.random.normal(0, 50))
 
         result = detector.detect("power", 5010)
@@ -218,7 +217,7 @@ class TestSPCDetector:
     def test_detect_out_of_control(self):
         detector = SPCDetector(window=20)
         np.random.seed(42)
-        for i in range(50):
+        for _i in range(50):
             detector.update("power", 5000 + np.random.normal(0, 50))
 
         result = detector.detect("power", 7000)

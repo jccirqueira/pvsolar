@@ -1,8 +1,7 @@
 """Testes do quality_analyzer do pvSolar Grid."""
 
 import pytest
-
-from src.core.config import ComplianceStatus, QualityMetric, PRODISTLimits
+from src.core.config import ComplianceStatus, PRODISTLimits, QualityMetric
 from src.quality.quality_analyzer import QualityAnalyzer
 
 

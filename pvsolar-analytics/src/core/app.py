@@ -2,15 +2,15 @@
 pvSolar Analytics - FastAPI application factory.
 """
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.core.config import AnalyticsConfig, load_config
-from src.core.database import check_database_health, close_database, init_database
+from src.core.database import close_database, init_database
 from src.mqtt.consumer import MQTTConsumer
 from src.storage.timeseries import TimeSeriesStore
 
@@ -123,9 +123,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         logger.info("anomaly_detector.created")
 
     # Initialize maintenance predictor
-    from src.ml.maintenance.predictor import MaintenancePredictor
     from src.ml.maintenance.features import MaintenanceFeatureExtractor
     from src.ml.maintenance.models import MaintenanceModelStore
+    from src.ml.maintenance.predictor import MaintenancePredictor
 
     maint_store = MaintenanceModelStore(_config.ml.model_dir)
     loaded_predictor = maint_store.load_predictor("default")
@@ -146,9 +146,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         logger.info("feature_extractor.created")
 
     # Initialize energy forecast predictor
-    from src.ml.forecast.predictor import EnergyForecastPredictor
     from src.ml.forecast.features import ForecastFeatureExtractor
     from src.ml.forecast.models import ForecastModelStore
+    from src.ml.forecast.predictor import EnergyForecastPredictor
 
     forecast_store = ForecastModelStore(_config.ml.model_dir)
     loaded_forecast = forecast_store.load_predictor("default")
@@ -169,8 +169,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         logger.info("forecast_extractor.created")
 
     # Initialize performance calculator and benchmark
-    from src.ml.performance.calculator import PerformanceCalculator
     from src.ml.performance.benchmark import PerformanceBenchmark
+    from src.ml.performance.calculator import PerformanceCalculator
 
     _perf_calculator = PerformanceCalculator(
         nominal_power=getattr(_config.ml, 'nominal_power', 5000),

@@ -1,9 +1,8 @@
 """Testes do compliance_engine do pvSolar Grid."""
 
 import pytest
-
-from src.core.config import ComplianceStatus, GridStandard, PRODISTLimits
 from src.compliance.compliance_engine import ComplianceCheck, ComplianceEngine
+from src.core.config import ComplianceStatus, GridStandard, PRODISTLimits
 
 
 class TestComplianceCheck:

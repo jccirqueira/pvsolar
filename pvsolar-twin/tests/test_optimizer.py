@@ -1,7 +1,6 @@
 """Testes do optimizer do pvSolar Digital Twin."""
 
 import pytest
-
 from src.core.config import (
     DegradationConfig,
     FinancialConfig,
@@ -9,7 +8,7 @@ from src.core.config import (
     PanelConfig,
     PlantConfig,
 )
-from src.optimizer.optimizer import Optimizer, OptimizationResult
+from src.optimizer.optimizer import OptimizationResult, Optimizer
 
 
 class TestOptimizer:

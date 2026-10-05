@@ -3,16 +3,15 @@
 from __future__ import annotations
 
 import uuid
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import structlog
 
 from src.core.config import (
     ComplianceStatus,
+    PRODISTLimits,
     QualityMeasurement,
     QualityMetric,
-    PRODISTLimits,
 )
 
 logger = structlog.get_logger()
@@ -34,7 +33,7 @@ class QualityAnalyzer:
         )
         m = QualityMeasurement(
             id=str(uuid.uuid4()),
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
             metric=QualityMetric.THD_V,
             value=thd_percent,
             unit="%",
@@ -54,7 +53,7 @@ class QualityAnalyzer:
         )
         m = QualityMeasurement(
             id=str(uuid.uuid4()),
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
             metric=QualityMetric.THD_I,
             value=thd_percent,
             unit="%",
@@ -66,16 +65,14 @@ class QualityAnalyzer:
 
     def analyze_voltage(self, voltage_pu: float) -> QualityMeasurement:
         """Analisa tensão no PCC."""
-        if voltage_pu < self.limits.voltage_min_pu:
-            compliance = ComplianceStatus.NON_COMPLIANT
-        elif voltage_pu > self.limits.voltage_max_pu:
+        if voltage_pu < self.limits.voltage_min_pu or voltage_pu > self.limits.voltage_max_pu:
             compliance = ComplianceStatus.NON_COMPLIANT
         else:
             compliance = ComplianceStatus.COMPLIANT
 
         m = QualityMeasurement(
             id=str(uuid.uuid4()),
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
             metric=QualityMetric.PCC_VOLTAGE,
             value=voltage_pu,
             unit="p.u.",
@@ -94,7 +91,7 @@ class QualityAnalyzer:
         )
         m = QualityMeasurement(
             id=str(uuid.uuid4()),
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
             metric=QualityMetric.POWER_FACTOR,
             value=pf,
             unit="",
@@ -106,16 +103,14 @@ class QualityAnalyzer:
 
     def analyze_frequency(self, freq_hz: float) -> QualityMeasurement:
         """Analisa frequência."""
-        if freq_hz < self.limits.frequency_min:
-            compliance = ComplianceStatus.NON_COMPLIANT
-        elif freq_hz > self.limits.frequency_max:
+        if freq_hz < self.limits.frequency_min or freq_hz > self.limits.frequency_max:
             compliance = ComplianceStatus.NON_COMPLIANT
         else:
             compliance = ComplianceStatus.COMPLIANT
 
         m = QualityMeasurement(
             id=str(uuid.uuid4()),
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
             metric=QualityMetric.FREQUENCY,
             value=freq_hz,
             unit="Hz",
@@ -134,7 +129,7 @@ class QualityAnalyzer:
         )
         m = QualityMeasurement(
             id=str(uuid.uuid4()),
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
             metric=QualityMetric.FLICKER,
             value=pst,
             unit="Pst",
@@ -153,7 +148,7 @@ class QualityAnalyzer:
         )
         m = QualityMeasurement(
             id=str(uuid.uuid4()),
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
             metric=QualityMetric.UNBALANCE,
             value=unbalance_percent,
             unit="%",
@@ -174,7 +169,7 @@ class QualityAnalyzer:
         )
         m = QualityMeasurement(
             id=str(uuid.uuid4()),
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
             metric=QualityMetric.REACTIVE_POWER,
             value=q_kvar,
             unit="kVAr",

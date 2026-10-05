@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 
 import jwt
 import structlog
 
-from src.core.config import JWTConfig, UserStatus, UserRole
+from src.core.config import JWTConfig, UserRole
 
 logger = structlog.get_logger()
 
@@ -64,7 +64,7 @@ class AuthEngine:
         permissions: list[str] | None = None,
     ) -> str:
         """Cria access token."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         exp = now + timedelta(minutes=self.config.access_token_expire_minutes)
 
         payload = {
@@ -92,7 +92,7 @@ class AuthEngine:
 
     def create_refresh_token(self, user_id: str) -> str:
         """Cria refresh token."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         exp = now + timedelta(days=self.config.refresh_token_expire_days)
 
         payload = {
@@ -154,8 +154,8 @@ class AuthEngine:
                 role=payload.get("role", ""),
                 tenant_id=payload.get("tenant_id", ""),
                 permissions=payload.get("permissions", []),
-                exp=datetime.fromtimestamp(payload["exp"], tz=timezone.utc),
-                iat=datetime.fromtimestamp(payload["iat"], tz=timezone.utc),
+                exp=datetime.fromtimestamp(payload["exp"], tz=UTC),
+                iat=datetime.fromtimestamp(payload["iat"], tz=UTC),
                 jti=payload.get("jti", ""),
                 token_type=payload.get("token_type", "access"),
             )
@@ -218,7 +218,7 @@ class AuthEngine:
         self.active_sessions[session_id] = {
             "user_id": user_id,
             "token": token,
-            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(UTC).isoformat(),
         }
         return session_id
 

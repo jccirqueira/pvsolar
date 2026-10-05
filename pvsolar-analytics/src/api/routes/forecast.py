@@ -2,7 +2,11 @@
 
 from fastapi import APIRouter, HTTPException, Query
 
-from src.core.app import get_forecast_predictor, get_forecast_feature_extractor, get_store
+from src.core.app import (
+    get_forecast_feature_extractor,
+    get_forecast_predictor,
+    get_store,
+)
 
 router = APIRouter()
 
@@ -126,8 +130,8 @@ async def list_forecast_models():
 
     Returns metadata for each saved model version.
     """
-    from src.ml.forecast.models import ForecastModelStore
     from src.core.app import get_config
+    from src.ml.forecast.models import ForecastModelStore
 
     config = get_config()
     store = ForecastModelStore(config.ml.model_dir)

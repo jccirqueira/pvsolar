@@ -1,7 +1,6 @@
 """Testes do scenario_engine do pvSolar Digital Twin."""
 
 import pytest
-
 from src.core.config import ScenarioConfig, ScenarioType
 from src.scenarios.scenario_engine import ScenarioEngine, ScenarioResult
 

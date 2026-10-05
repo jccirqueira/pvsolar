@@ -4,15 +4,13 @@ Tests for Phase 3: Predictive Maintenance.
 Tests feature extraction, model training, and prediction.
 """
 
-import pytest
-import numpy as np
-from datetime import datetime, timezone
-from unittest.mock import MagicMock
 
+import numpy as np
+import pytest
 from src.ml.maintenance.features import MaintenanceFeatureExtractor
 from src.ml.maintenance.predictor import (
-    MaintenancePredictor,
     MaintenancePrediction,
+    MaintenancePredictor,
     RiskLevel,
 )
 
@@ -46,7 +44,7 @@ class TestMaintenanceFeatureExtractor:
 
     def test_extract_features_insufficient_data(self):
         extractor = MaintenanceFeatureExtractor()
-        for i in range(5):
+        for _i in range(5):
             extractor.add_sample("INV001", {"ac_power": 5000})
 
         features = extractor.extract_features("INV001")
@@ -59,7 +57,7 @@ class TestMaintenanceFeatureExtractor:
 
     def test_extract_features_normal_data(self):
         extractor = MaintenanceFeatureExtractor()
-        for i in range(50):
+        for _i in range(50):
             extractor.add_sample("INV001", {
                 "ac_power": 5000 + np.random.normal(0, 100),
                 "temperature": 25 + np.random.normal(0, 2),
@@ -94,7 +92,7 @@ class TestMaintenanceFeatureExtractor:
     def test_extract_features_stability(self):
         extractor = MaintenanceFeatureExtractor()
         # Very stable data
-        for i in range(50):
+        for _i in range(50):
             extractor.add_sample("INV001", {
                 "ac_power": 5000 + np.random.normal(0, 0.001),
                 "temperature": 25,

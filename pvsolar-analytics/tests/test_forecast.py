@@ -4,13 +4,11 @@ Tests for Phase 4: Energy Forecasting.
 Tests feature extraction, LSTM model, and forecasting.
 """
 
-import pytest
-import numpy as np
-from datetime import datetime, timezone, timedelta
-from unittest.mock import MagicMock
+from datetime import UTC, datetime, timedelta, timezone
 
+import numpy as np
 from src.ml.forecast.features import ForecastFeatureExtractor
-from src.ml.forecast.predictor import EnergyForecastPredictor, EnergyForecast
+from src.ml.forecast.predictor import EnergyForecast, EnergyForecastPredictor
 
 
 class TestForecastFeatureExtractor:
@@ -31,7 +29,7 @@ class TestForecastFeatureExtractor:
         extractor.add_sample("INV001", {
             "ac_power": 5000,
             "temperature": 25.0,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         })
 
         history = extractor.get_history("INV001")
@@ -45,7 +43,7 @@ class TestForecastFeatureExtractor:
                 "ac_power": 5000 + i,
                 "temperature": 25 + i * 0.1,
                 "efficiency": 0.95,
-                "timestamp": (datetime.now(timezone.utc) + timedelta(hours=i)).isoformat(),
+                "timestamp": (datetime.now(UTC) + timedelta(hours=i)).isoformat(),
             })
 
         history = extractor.get_history("INV001")
@@ -53,7 +51,7 @@ class TestForecastFeatureExtractor:
 
     def test_extract_features_insufficient_data(self):
         extractor = ForecastFeatureExtractor(sequence_length=24)
-        for i in range(10):
+        for _i in range(10):
             extractor.add_sample("INV001", {"ac_power": 5000})
 
         features = extractor.extract_features("INV001")
@@ -71,7 +69,7 @@ class TestForecastFeatureExtractor:
                 "ac_power": 5000 + np.random.normal(0, 100),
                 "temperature": 25 + np.random.normal(0, 2),
                 "efficiency": 0.95 + np.random.normal(0, 0.01),
-                "timestamp": (datetime.now(timezone.utc) + timedelta(hours=i)).isoformat(),
+                "timestamp": (datetime.now(UTC) + timedelta(hours=i)).isoformat(),
             })
 
         features = extractor.extract_features("INV001")
@@ -90,7 +88,7 @@ class TestForecastFeatureExtractor:
             extractor.add_sample("INV001", {
                 "ac_power": 5000 + i * 10,
                 "temperature": 25,
-                "timestamp": (datetime.now(timezone.utc) + timedelta(hours=i)).isoformat(),
+                "timestamp": (datetime.now(UTC) + timedelta(hours=i)).isoformat(),
             })
 
         features = extractor.extract_features("INV001")
@@ -106,7 +104,7 @@ class TestForecastFeatureExtractor:
             extractor.add_sample("INV001", {
                 "ac_power": 5000 + i,
                 "temperature": 25,
-                "timestamp": (datetime.now(timezone.utc) + timedelta(hours=i)).isoformat(),
+                "timestamp": (datetime.now(UTC) + timedelta(hours=i)).isoformat(),
             })
 
         features = extractor.extract_features("INV001")
@@ -122,7 +120,7 @@ class TestForecastFeatureExtractor:
             extractor.add_sample("INV001", {
                 "ac_power": 5000 - i * 10,
                 "temperature": 25,
-                "timestamp": (datetime.now(timezone.utc) + timedelta(hours=i)).isoformat(),
+                "timestamp": (datetime.now(UTC) + timedelta(hours=i)).isoformat(),
             })
 
         features = extractor.extract_features("INV001")
@@ -134,7 +132,7 @@ class TestForecastFeatureExtractor:
 
     def test_extract_features_temporal(self):
         extractor = ForecastFeatureExtractor(sequence_length=24)
-        base_time = datetime(2024, 6, 15, 12, 0, 0, tzinfo=timezone.utc)  # Saturday noon
+        base_time = datetime(2024, 6, 15, 12, 0, 0, tzinfo=UTC)  # Saturday noon
 
         # Add 72 samples (3 days) to have enough history
         for i in range(72):

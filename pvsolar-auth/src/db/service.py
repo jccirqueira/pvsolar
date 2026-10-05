@@ -15,7 +15,7 @@ intactos e a persistência fica isolada e testável.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import structlog
 from sqlalchemy import delete, select
@@ -40,8 +40,8 @@ def _as_utc(value: datetime | None) -> datetime | None:
     if value is None:
         return None
     if value.tzinfo is None:
-        return value.replace(tzinfo=timezone.utc)
-    return value.astimezone(timezone.utc)
+        return value.replace(tzinfo=UTC)
+    return value.astimezone(UTC)
 
 
 # ---------------------------------------------------------------------------
@@ -58,8 +58,8 @@ def _user_from_row(row: UserRow, api_key_ids: list[str]) -> User:
         role=UserRole(row.role),
         status=UserStatus(row.status),
         tenant_id=row.tenant_id,
-        created_at=_as_utc(row.created_at) or datetime.now(timezone.utc),
-        updated_at=_as_utc(row.updated_at) or datetime.now(timezone.utc),
+        created_at=_as_utc(row.created_at) or datetime.now(UTC),
+        updated_at=_as_utc(row.updated_at) or datetime.now(UTC),
         last_login=_as_utc(row.last_login),
         login_attempts=row.login_attempts or 0,
         locked_until=_as_utc(row.locked_until),
@@ -89,7 +89,7 @@ def _api_key_from_row(row: APIKeyRow) -> APIKey:
         name=row.name,
         user_id=row.user_id,
         tenant_id=row.tenant_id,
-        created_at=_as_utc(row.created_at) or datetime.now(timezone.utc),
+        created_at=_as_utc(row.created_at) or datetime.now(UTC),
         expires_at=_as_utc(row.expires_at),
         is_active=row.is_active,
         permissions=list(row.permissions or []),
@@ -113,8 +113,8 @@ def _tenant_from_row(row: TenantRow) -> Tenant:
         name=row.name,
         slug=row.slug,
         status=TenantStatus(row.status),
-        created_at=_as_utc(row.created_at) or datetime.now(timezone.utc),
-        updated_at=_as_utc(row.updated_at) or datetime.now(timezone.utc),
+        created_at=_as_utc(row.created_at) or datetime.now(UTC),
+        updated_at=_as_utc(row.updated_at) or datetime.now(UTC),
         max_users=row.max_users,
         max_api_keys=row.max_api_keys,
         features=list(row.features or []),
@@ -141,7 +141,7 @@ def _role_from_row(row: RoleRow) -> Role:
         description=row.description,
         permissions=[Permission(p) for p in (row.permissions or [])],
         is_default=row.is_default,
-        created_at=_as_utc(row.created_at) or datetime.now(timezone.utc),
+        created_at=_as_utc(row.created_at) or datetime.now(UTC),
     )
 
 

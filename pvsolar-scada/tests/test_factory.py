@@ -2,7 +2,6 @@
 Tests for pvSolar SCADA Screen Factory and Application.
 """
 
-import pytest
 from src.core.config import SCADAConfig
 from src.core.screens import ScreenManager
 from src.screens.factory import ScreenFactory

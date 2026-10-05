@@ -1,5 +1,5 @@
 import pytest
-from src.core.config import TaskConfig, TaskType, TaskStatus, TaskPriority
+from src.core.config import TaskConfig, TaskPriority, TaskStatus, TaskType
 from src.tasks.task import Task, TaskRegistry, TaskResult
 
 

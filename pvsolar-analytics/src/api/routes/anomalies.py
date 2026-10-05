@@ -1,6 +1,6 @@
 """Anomaly detection routes."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, HTTPException, Query
 
@@ -20,7 +20,7 @@ async def list_anomalies(
     store = get_store()
 
     if start is None:
-        start = datetime.now(timezone.utc) - timedelta(days=30)
+        start = datetime.now(UTC) - timedelta(days=30)
 
     anomalies = await store.get_anomalies(
         inverter_id=inverter_id,

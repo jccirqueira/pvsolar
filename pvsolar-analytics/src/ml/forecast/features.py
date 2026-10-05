@@ -4,7 +4,7 @@ Feature engineering for energy forecasting.
 Extracts features from historical energy production data for LSTM model.
 """
 
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime
 from typing import Any
 
 import numpy as np
@@ -56,7 +56,7 @@ class ForecastFeatureExtractor:
         if isinstance(timestamp, str):
             timestamp = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
         elif timestamp is None:
-            timestamp = datetime.now(timezone.utc)
+            timestamp = datetime.now(UTC)
 
         self._history[inverter_id].append({
             "timestamp": timestamp,

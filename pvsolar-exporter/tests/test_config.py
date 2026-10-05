@@ -1,7 +1,10 @@
 import pytest
 from src.core.config import (
-    ExporterConfig, CollectorConfig, APIConfig,
-    MetricType, ServiceType,
+    APIConfig,
+    CollectorConfig,
+    ExporterConfig,
+    MetricType,
+    ServiceType,
     load_config,
 )
 

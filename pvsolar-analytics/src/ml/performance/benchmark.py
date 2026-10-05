@@ -5,8 +5,7 @@ Compares inverter performance against fleet averages, peer groups,
 and historical baselines.
 """
 
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
 
 import numpy as np
 import structlog
@@ -83,7 +82,7 @@ class PerformanceBenchmark:
         self._fleet_scores[inverter_id] = {
             "score": score,
             "peer_group": peer_group,
-            "timestamp": datetime.now(timezone.utc),
+            "timestamp": datetime.now(UTC),
         }
 
         # Update peer group mapping
@@ -98,7 +97,7 @@ class PerformanceBenchmark:
 
         self._historical[inverter_id].append({
             "score": score,
-            "timestamp": datetime.now(timezone.utc),
+            "timestamp": datetime.now(UTC),
         })
 
         # Keep bounded

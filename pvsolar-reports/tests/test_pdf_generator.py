@@ -4,7 +4,7 @@ Tests for pvSolar Reports PDF Generator.
 
 import os
 import tempfile
-import pytest
+
 from src.generators.pdf_generator import PDFReportGenerator
 
 

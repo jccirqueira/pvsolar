@@ -2,20 +2,19 @@
 Tests for pvSolar Reports Configuration.
 """
 
-import pytest
 from src.core.config import (
     AnalyticsConfig,
     APIConfig,
     EmailConfig,
     GatewayConfig,
     OutputConfig,
+    OutputFormat,
     PlantConfig,
+    ReportLanguage,
     ReportsConfig,
+    ReportType,
     SchedulerConfig,
     TemplateConfig,
-    OutputFormat,
-    ReportLanguage,
-    ReportType,
     load_config,
 )
 

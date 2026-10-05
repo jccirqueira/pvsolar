@@ -4,11 +4,9 @@ Tests for pvSolar SCADA Server.
 
 import json
 import socket
-import threading
 import time
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
-import pytest
 from src.core.config import PVBrowserConfig
 from src.core.server import ClientConnection, PVBrowserServer
 

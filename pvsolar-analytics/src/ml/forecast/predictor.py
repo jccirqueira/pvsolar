@@ -4,7 +4,7 @@ Energy forecast predictor.
 Combines feature extraction with LSTM model for energy production forecasting.
 """
 
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import numpy as np
@@ -152,7 +152,7 @@ class EnergyForecastPredictor:
         batch_size = min(32, len(X))
         n_batches = (len(X) + batch_size - 1) // batch_size
 
-        for epoch in range(100):
+        for _epoch in range(100):
             total_loss = 0
             for i in range(n_batches):
                 start_idx = i * batch_size
@@ -225,7 +225,7 @@ class EnergyForecastPredictor:
             confidence = self._estimate_confidence(features)
 
             # Generate forecast timestamps
-            now = datetime.now(timezone.utc)
+            now = datetime.now(UTC)
             forecast_start = now.isoformat()
             forecast_end = (now + timedelta(hours=len(hourly))).isoformat()
 
@@ -345,8 +345,8 @@ class EnergyForecastPredictor:
             daily_forecast=0.0,
             weekly_forecast=0.0,
             confidence=0.0,
-            forecast_start=datetime.now(timezone.utc).isoformat(),
-            forecast_end=(datetime.now(timezone.utc) + timedelta(hours=self.forecast_horizon)).isoformat(),
+            forecast_start=datetime.now(UTC).isoformat(),
+            forecast_end=(datetime.now(UTC) + timedelta(hours=self.forecast_horizon)).isoformat(),
             model_version="untrained",
         )
 

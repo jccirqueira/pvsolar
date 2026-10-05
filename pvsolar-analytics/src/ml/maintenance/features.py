@@ -4,8 +4,7 @@ Feature engineering for predictive maintenance.
 Extracts features from inverter telemetry data for failure prediction.
 """
 
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
 
 import numpy as np
 import structlog
@@ -45,7 +44,7 @@ class MaintenanceFeatureExtractor:
             self._history[inverter_id] = []
 
         self._history[inverter_id].append({
-            "timestamp": data.get("timestamp", datetime.now(timezone.utc).isoformat()),
+            "timestamp": data.get("timestamp", datetime.now(UTC).isoformat()),
             "ac_power": data.get("ac_power"),
             "ac_voltage": data.get("ac_voltage"),
             "ac_current": data.get("ac_current"),

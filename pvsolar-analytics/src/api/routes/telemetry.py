@@ -1,6 +1,6 @@
 """Telemetry data routes."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Query
 
@@ -24,7 +24,7 @@ async def get_telemetry(
     store = get_store()
 
     if end is None:
-        end = datetime.now(timezone.utc)
+        end = datetime.now(UTC)
     if start is None:
         start = end - timedelta(hours=24)
 

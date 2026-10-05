@@ -1,7 +1,6 @@
 import gzip
 import tarfile
 import zipfile
-from datetime import datetime, timezone
 from pathlib import Path
 
 import structlog
@@ -57,9 +56,8 @@ class RestoreEngine:
         dest_path = Path(destination)
         dest_path.mkdir(parents=True, exist_ok=True)
         out_file = dest_path / "restored_file"
-        with gzip.open(filepath, 'rb') as gz_f:
-            with open(out_file, 'wb') as out_f:
-                out_f.write(gz_f.read())
+        with gzip.open(filepath, 'rb') as gz_f, open(out_file, 'wb') as out_f:
+            out_f.write(gz_f.read())
         return 1
 
     def _restore_tar(self, filepath: str, destination: str, mode: str = "r:*") -> int:

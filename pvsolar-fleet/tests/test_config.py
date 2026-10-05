@@ -2,13 +2,12 @@
 Tests for pvSolar Fleet Configuration.
 """
 
-import pytest
 from src.core.config import (
     AlertAggregatorConfig,
     AlertSeverity,
     AlertStatus,
-    APIConfig,
     AnalyticsServiceConfig,
+    APIConfig,
     ComparisonConfig,
     ComparisonMetric,
     FleetConfig,

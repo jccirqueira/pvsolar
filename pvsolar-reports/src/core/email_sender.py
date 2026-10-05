@@ -10,10 +10,8 @@ from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import List, Optional
 
 import structlog
-
 from src.core.config import EmailConfig
 
 logger = structlog.get_logger(__name__)
@@ -37,8 +35,8 @@ class EmailSender:
         self,
         subject: str,
         body: str,
-        recipients: List[str],
-        attachments: Optional[List[str]] = None,
+        recipients: list[str],
+        attachments: list[str] | None = None,
     ) -> MIMEMultipart:
         msg = MIMEMultipart()
         msg["From"] = self.config.from_address
@@ -78,8 +76,8 @@ class EmailSender:
         self,
         subject: str,
         body: str,
-        recipients: Optional[List[str]] = None,
-        attachments: Optional[List[str]] = None,
+        recipients: list[str] | None = None,
+        attachments: list[str] | None = None,
     ) -> bool:
         if not self.config.enabled:
             logger.info("email.disabled")
@@ -111,8 +109,8 @@ class EmailSender:
         self,
         subject: str,
         body: str,
-        recipients: Optional[List[str]] = None,
-        attachments: Optional[List[str]] = None,
+        recipients: list[str] | None = None,
+        attachments: list[str] | None = None,
     ) -> bool:
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, lambda: self.send(subject, body, recipients, attachments))

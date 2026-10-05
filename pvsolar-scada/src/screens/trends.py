@@ -10,7 +10,7 @@ from src.core.screens import Screen, ScreenManager, Widget, WidgetType
 def create_trends_screen(screen_manager: ScreenManager) -> Screen:
     """Create the trends/screening screen."""
     screen = screen_manager.create_screen("trends", "Trends", "📈")
-    
+
     # Trend Controls
     screen.add_widget(Widget(
         widget_id="trend_controls_group",
@@ -18,7 +18,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         label="Trend Controls",
         x=0, y=0, width=820, height=60,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="time_range_combo",
         widget_type=WidgetType.COMBOBOX,
@@ -27,7 +27,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         options=["1h", "6h", "24h", "7d", "30d"],
         selected_index=2,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="refresh_rate_combo",
         widget_type=WidgetType.COMBOBOX,
@@ -36,7 +36,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         options=["1s", "5s", "10s", "30s", "1m"],
         selected_index=1,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="trend_pause_button",
         widget_type=WidgetType.BUTTON,
@@ -44,7 +44,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         x=250, y=25, width=70, height=30,
         color="#FF9800",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="trend_export_button",
         widget_type=WidgetType.BUTTON,
@@ -52,7 +52,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         x=330, y=25, width=80, height=30,
         color="#2196F3",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="trend_screenshot_button",
         widget_type=WidgetType.BUTTON,
@@ -60,7 +60,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         x=420, y=25, width=90, height=30,
         color="#9C27B0",
     ))
-    
+
     # Main Power Trend
     screen.add_widget(Widget(
         widget_id="power_trend_group",
@@ -68,7 +68,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         label="Power Production Trend",
         x=0, y=70, width=820, height=200,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="power_trend_chart",
         widget_type=WidgetType.CHART,
@@ -80,7 +80,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         show_legend=True,
         show_grid=True,
     ))
-    
+
     # Multi-parameter Trend
     screen.add_widget(Widget(
         widget_id="multi_trend_group",
@@ -88,7 +88,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         label="Multi-parameter Trend",
         x=0, y=280, width=820, height=200,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="multi_trend_chart",
         widget_type=WidgetType.CHART,
@@ -100,7 +100,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         show_legend=True,
         show_grid=True,
     ))
-    
+
     # Parameter Selection
     screen.add_widget(Widget(
         widget_id="param_check_power",
@@ -110,7 +110,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         checked=True,
         color="#4CAF50",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="param_check_irradiance",
         widget_type=WidgetType.CHECKBOX,
@@ -119,7 +119,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         checked=True,
         color="#FF9800",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="param_check_temperature",
         widget_type=WidgetType.CHECKBOX,
@@ -128,7 +128,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         checked=True,
         color="#F44336",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="param_check_efficiency",
         widget_type=WidgetType.CHECKBOX,
@@ -137,7 +137,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         checked=True,
         color="#2196F3",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="param_check_voltage",
         widget_type=WidgetType.CHECKBOX,
@@ -146,7 +146,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         checked=False,
         color="#9C27B0",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="param_check_current",
         widget_type=WidgetType.CHECKBOX,
@@ -155,7 +155,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         checked=False,
         color="#00BCD4",
     ))
-    
+
     # Statistics Summary
     screen.add_widget(Widget(
         widget_id="stats_group",
@@ -163,7 +163,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         label="Statistics Summary",
         x=0, y=520, width=820, height=60,
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="stat_min",
         widget_type=WidgetType.LABEL,
@@ -171,7 +171,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         x=10, y=545, width=100, height=25,
         value="0.0 kW",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="stat_max",
         widget_type=WidgetType.LABEL,
@@ -179,7 +179,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         x=120, y=545, width=100, height=25,
         value="0.0 kW",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="stat_avg",
         widget_type=WidgetType.LABEL,
@@ -187,7 +187,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         x=230, y=545, width=100, height=25,
         value="0.0 kW",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="stat_total",
         widget_type=WidgetType.LABEL,
@@ -195,7 +195,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         x=340, y=545, width=120, height=25,
         value="0.0 kWh",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="stat_stddev",
         widget_type=WidgetType.LABEL,
@@ -203,7 +203,7 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         x=470, y=545, width=100, height=25,
         value="0.0 kW",
     ))
-    
+
     screen.add_widget(Widget(
         widget_id="stat_cpf",
         widget_type=WidgetType.LABEL,
@@ -211,5 +211,5 @@ def create_trends_screen(screen_manager: ScreenManager) -> Screen:
         x=580, y=545, width=120, height=25,
         value="0.0%",
     ))
-    
+
     return screen

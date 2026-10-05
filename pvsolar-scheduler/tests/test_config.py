@@ -1,8 +1,13 @@
 import pytest
 from src.core import config as config_module
 from src.core.config import (
-    SchedulerConfig, TaskConfig, APIConfig,
-    TaskType, TaskStatus, ScheduleType, TaskPriority,
+    APIConfig,
+    SchedulerConfig,
+    ScheduleType,
+    TaskConfig,
+    TaskPriority,
+    TaskStatus,
+    TaskType,
     load_config,
 )
 
