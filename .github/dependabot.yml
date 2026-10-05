@@ -1,0 +1,56 @@
+# ============================================================
+# pvSolar - Dependabot: alertas + PRs automaticos de atualizacao
+# - pip: 12 projetos Python (requisitos em pvsolar-*/requirements.txt)
+# - npm: pvsolar-web
+# - github-actions: pins das actions nesta propria CI
+# Agrupado em 1 PR/semana por ecossistema para nao poluir o feed.
+# ============================================================
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directories:
+      - "/pvsolar-gateway"
+      - "/pvsolar-analytics"
+      - "/pvsolar-scada"
+      - "/pvsolar-reports"
+      - "/pvsolar-fleet"
+      - "/pvsolar-alert"
+      - "/pvsolar-grid"
+      - "/pvsolar-twin"
+      - "/pvsolar-auth"
+      - "/pvsolar-backup"
+      - "/pvsolar-scheduler"
+      - "/pvsolar-exporter"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    groups:
+      python-deps:
+        patterns: ["*"]
+    labels:
+      - "dependencies"
+      - "python"
+
+  - package-ecosystem: "npm"
+    directory: "/pvsolar-web"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    groups:
+      web-deps:
+        patterns: ["*"]
+    labels:
+      - "dependencies"
+      - "javascript"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    groups:
+      actions:
+        patterns: ["*"]
+    labels:
+      - "dependencies"
+      - "ci"

@@ -10,8 +10,9 @@ containerizado pronto para VPS com HTTPS automático.
 
 **Qualidade:** 1135 testes automatizados (12 suítes pytest + jest), cobertura de
 código com piso por projeto (gate na CI), lint contínuo (ruff + ESLint na CI e
-pre-commit local), validadores estruturais de compose/documentação e CI com
-build real das 13 imagens Docker.
+pre-commit local), validadores estruturais de compose/documentação, CI com
+build real das 13 imagens Docker + **smoke-test E2E** (stack completa sobe no
+ar da CI com probes HTTP e healthchecks) e Dependabot semanal.
 
 ---
 
@@ -118,7 +119,9 @@ PvBrowser/
 │   ├── config/               # variantes de config p/ rede interna
 │   ├── mosquitto.conf
 │   └── validate_*.py         # validadores (compose, guia, manuals)
-├── .github/workflows/ci.yml  # CI: lint + validadores + testes + build Docker
+├── .github/
+│   ├── workflows/ci.yml      # CI: lint + validadores + testes + build/smoke
+│   └── dependabot.yml        # atualizações semanais (pip, npm, actions)
 ├── Guia Completo ... .html   # guia de instalação completo
 └── pvsolar-*/                # 13 projetos (Resumo.txt + Manual.html cada)
 ```
