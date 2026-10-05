@@ -1,0 +1,92 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pvsolar-gateway"
+version = "1.0.0"
+description = "Enterprise-grade solar inverter monitoring gateway with MQTT integration"
+readme = "README.md"
+license = "GPL-3.0-only"
+requires-python = ">=3.9"
+authors = [
+    { name = "pvSolar Team", email = "dev@pvsolar.io" }
+]
+keywords = ["solar", "inverter", "scada", "mqtt", "iot", "sunspec", "modbus"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Manufacturing",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Home Automation",
+    "Topic :: System :: Monitoring",
+    "Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator",
+]
+dependencies = [
+    "pyyaml>=6.0",
+    "pydantic>=2.0",
+    "structlog>=23.0",
+    "click>=8.0",
+    "pymodbus>=3.0.0",
+    "paho-mqtt>=1.6.0",
+    "certifi>=2023.0",
+    "aiosqlite>=0.19.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "jinja2>=3.1.0",
+    "python-multipart>=0.0.6",
+    "cryptography>=41.0.0",
+    "prometheus-client>=0.17.0",
+    "psutil>=5.9.0",
+]
+
+[project.optional-dependencies]
+aws = ["boto3>=1.28.0"]
+azure = ["azure-iot-device>=2.0"]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0",
+    "ruff>=0.0.280",
+    "mypy>=1.5.0",
+]
+
+[project.scripts]
+pvsolar = "pvsolar.core.gateway:main"
+
+[project.urls]
+Homepage = "https://github.com/your-org/pvsolar-gateway"
+Documentation = "https://docs.pvsolar.io"
+Repository = "https://github.com/your-org/pvsolar-gateway"
+"Bug Tracker" = "https://github.com/your-org/pvsolar-gateway/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 88
+target-version = ["py39", "py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

@@ -1,0 +1,234 @@
+================================================================================
+ pvSolar Alert v1.0.0
+ Sistema Avançado de Notificações Multi-Canal
+================================================================================
+
+Autor: pvSolar Team
+Licença: GPLv3
+Data: Setembro 2026
+Plataforma: Windows / Linux / Docker
+
+================================================================================
+1. CONTEXTO E OBJETIVO
+================================================================================
+
+O pvSolar Alert é o sistema de notificações do ecossistema pvSolar.
+Ele permite envio de alertas por múltiplos canais (Email, SMS, Telegram,
+WhatsApp, Webhook) com escalation automático e regras personalizáveis.
+
+Objetivos:
+- Notificações multi-canal
+- Escalation automático (4 níveis)
+- Regras personalizáveis
+- Rate limiting inteligente
+- API REST para integração
+
+================================================================================
+2. STACK TECNOLÓGICO
+================================================================================
+
+- Python 3.10+ (servidor de alertas)
+- FastAPI (API REST)
+- aiohttp (chamadas HTTP async)
+- aiosqlite (banco SQLite assíncrono)
+- Pydantic (configuração type-safe)
+- structlog (logging estruturado)
+- Docker / Docker Compose
+
+================================================================================
+3. ESTRUTURA DO PROJETO
+================================================================================
+
+pvsolar-alert/
+├── pyproject.toml              # Build config
+├── requirements.txt            # Dependências
+├── Resumo.txt                  # Este arquivo
+├── Manual.html                 # Manual profissional HTML
+├── src/
+│   ├── __init__.py
+│   ├── app.py                  # Aplicação principal
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── config.py           # 12 classes Pydantic + 6 enums
+│   │   └── notification_manager.py  # Gerenciador multi-canal
+│   ├── channels/
+│   │   ├── __init__.py
+│   │   ├── email_channel.py    # Canal Email
+│   │   ├── sms_channel.py      # Canal SMS
+│   │   ├── telegram_channel.py # Canal Telegram
+│   │   ├── whatsapp_channel.py # Canal WhatsApp
+│   │   └── webhook_channel.py  # Canal Webhook
+│   ├── escalation/
+│   │   ├── __init__.py
+│   │   └── escalation_engine.py # Engine de escalation
+│   ├── rules/
+│   │   ├── __init__.py
+│   │   └── rules_engine.py     # Engine de regras
+│   └── api/
+│       ├── __init__.py
+│       └── app.py              # API REST
+├── config/
+│   └── alert.example.yaml      # Config de exemplo
+├── docker/
+│   ├── Dockerfile
+│   └── docker-compose.yml
+└── tests/
+    ├── __init__.py
+    ├── test_config.py          # 35 testes
+    ├── test_notification.py    # 23 testes
+    ├── test_escalation.py      # 21 testes
+    ├── test_rules.py           # 21 testes
+    └── test_channels.py        # 20 testes
+
+================================================================================
+4. MÓDULOS
+================================================================================
+
+4.1 CONFIG.PY (12 classes Pydantic + 6 enums)
+----------------------------------------------
+- NotificationChannel: EMAIL, SMS, TELEGRAM, WHATSAPP, WEBHOOK
+- AlertSeverity: CRITICAL, HIGH, MEDIUM, LOW, INFO
+- AlertStatus: PENDING, SENT, ACKNOWLEDGED, RESOLVED, ESCALATED
+- EscalationLevel: LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4
+- TimeWindow: BUSINESS_HOURS, AFTER_HOURS, WEEKEND, ALWAYS
+- ChannelConfig: config de cada canal
+- RecipientConfig: destinatário
+- EscalationContact: contato de escalation
+- EscalationRuleConfig: regra de escalation
+- NotificationConfig: limites de notificação
+- AlertRuleConfig: regra de alerta
+- AlertConfig: config principal
+
+4.2 NOTIFICATION_MANAGER.PY (Multi-Canal)
+------------------------------------------
+- Alert: representa um alerta
+- NotificationManager: gerencia envio
+  - create_alert: cria alerta
+  - send_notification: envia por 1 canal
+  - send_multi_channel: envia por N canais
+  - acknowledge/resolve: gerencia status
+  - get_statistics: estatísticas
+  - rate_limit: controle por hora/dia
+
+4.3 CANAIS (5 canais)
+---------------------
+- EmailChannel: envio via SMTP/API
+- SMSChannel: envio via Twilio/API
+- TelegramChannel: envio via Bot API
+- WhatsAppChannel: envio via API
+- WebhookChannel: envio via HTTP POST
+
+4.4 ESCALATION_ENGINE.PY (4 níveis)
+------------------------------------
+- Mapeia severidade → nível inicial
+- Escalation automático (1→2→3→4)
+- Contatos por nível
+- Canais por nível
+- Tempo de espera configurável
+
+4.5 RULES_ENGINE.PY (Regras Personalizáveis)
+--------------------------------------------
+- 6 operadores: eq, ne, gt, gte, lt, lte
+- Múltiplas condições por regra
+- Avaliação em tempo real
+- Filtros por severidade
+- CRUD de regras
+
+================================================================================
+5. FLUXO DE NOTIFICAÇÃO
+================================================================================
+
+1. Alerta é criado (via API ou regra)
+2. Rules Engine avalia condições
+3. Notification Manager envia pelos canais
+4. Rate limiting verifica limites
+5. Se não ack em X segundos → escalation
+6. Próximo nível é notificado
+7. Ciclo repete até nível 4
+
+================================================================================
+6. TESTES
+================================================================================
+
+Total: 120 testes — 120 passando (100%)
+
+test_config.py:         35 testes (enums, configs, load)
+test_notification.py:   23 testes (Alert, NotificationManager)
+test_escalation.py:     21 testes (helpers, EscalationManager)
+test_rules.py:          21 testes (RulesEngine, conditions)
+test_channels.py:       20 testes (5 canais × 4 testes cada)
+
+================================================================================
+7. CONFIGURAÇÃO
+================================================================================
+
+Exemplo (config/alert.yaml):
+
+email:
+  enabled: true
+  from_address: "alerts@pvsolar.com.br"
+
+telegram:
+  enabled: true
+  bot_token: "123456:ABC-DEF..."
+
+escalation:
+  - level: "level_1"
+    wait_seconds: 300
+    contacts:
+      - name: "Operador"
+        email: "op@pvsolar.com.br"
+
+rules:
+  - id: "rule_overheat"
+    name: "Superaquecimento"
+    conditions:
+      - field: "temperature"
+        operator: "gt"
+        value: 80.0
+    severity: "high"
+
+Variáveis de ambiente:
+  PVALERT_DEBUG
+  EMAIL_ENABLED, EMAIL_API_KEY
+  SMS_ENABLED, SMS_ACCOUNT_SID
+  TELEGRAM_ENABLED, TELEGRAM_BOT_TOKEN
+  API_HOST, API_PORT
+
+================================================================================
+8. DOCKER
+================================================================================
+
+Serviços:
+- pvsolar-alert: Python 3.11, porta 8004
+
+Comandos:
+  docker-compose up -d          # Iniciar
+  docker-compose logs -f        # Ver logs
+  docker-compose down           # Parar
+
+================================================================================
+9. INTEGRAÇÃO COM ECOSSISTEMA pvSolar
+================================================================================
+
+pvSolar SCADA (5000)     →  pvSolar Alert (alertas)
+pvSolar Fleet (8003)     →  pvSolar Alert (alertas multi-site)
+pvSolar Alert (8004)     →  Email/SMS/Telegram/WhatsApp
+
+Fluxo:
+  SCADA detecta alarme → Alert distribui → Operador recebe notificação
+
+================================================================================
+10. NOTAS TÉCNICAS
+================================================================================
+
+- datetime.now(timezone.utc), NÃO timedelta.utc
+- Imports absolutos: from src.core.config import X
+- structlog: usar event_type=, não event=
+- Pydantic: Field(default=...) para todos os campos
+- aiohttp: ClientSession para HTTP async
+- Rate limiting: controle por hora e por dia
+
+================================================================================
+ FIM DO RESUMO
+================================================================================

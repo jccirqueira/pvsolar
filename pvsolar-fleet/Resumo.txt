@@ -1,0 +1,235 @@
+================================================================================
+ pvSolar Fleet v1.0.0
+ Plataforma de Gestão Multi-Site para Usinas Solares
+================================================================================
+
+Autor: pvSolar Team
+Licença: GPLv3
+Data: Setembro 2026
+Plataforma: Windows / Linux / Docker
+
+================================================================================
+1. CONTEXTO E OBJETIVO
+================================================================================
+
+O pvSolar Fleet é a plataforma de gestão multi-site do ecossistema pvSolar.
+Ele permite gerenciar múltiplas usinas solares a partir de um único painel,
+consolidando dados, comparando performance e centralizando alertas.
+
+Objetivos:
+- Gestão centralizada de múltiplas usinas
+- Dashboard consolidado de toda a frota
+- Comparação de performance entre sites
+- Alertas centralizados por região
+- API REST para integração
+
+================================================================================
+2. STACK TECNOLÓGICO
+================================================================================
+
+- Python 3.10+ (servidor de gestão)
+- FastAPI (API REST)
+- aiohttp (chamadas HTTP async)
+- Pydantic (configuração type-safe)
+- structlog (logging estruturado)
+- Docker / Docker Compose
+
+================================================================================
+3. ESTRUTURA DO PROJETO
+================================================================================
+
+pvsolar-fleet/
+├── pyproject.toml              # Build config
+├── requirements.txt            # Dependências
+├── Resumo.txt                  # Este arquivo
+├── Manual.html                 # Manual profissional HTML
+├── src/
+│   ├── __init__.py
+│   ├── app.py                  # Aplicação principal
+│   ├── core/
+│   │   ├── __init__.py
+│   │   └── config.py           # 8 classes Pydantic
+│   ├── sites/
+│   │   ├── __init__.py
+│   │   ├── site_manager.py     # CRUD de usinas
+│   │   └── fleet_aggregator.py # Consolidação de dados
+│   ├── alerts/
+│   │   ├── __init__.py
+│   │   └── alert_aggregator.py # Alertas centralizados
+│   ├── comparison/
+│   │   ├── __init__.py
+│   │   └── comparison_engine.py # Benchmarking
+│   └── api/
+│       ├── __init__.py
+│       └── app.py              # API HTTP (FastAPI) - entry uvicorn
+├── config/
+│   └── fleet.example.yaml      # Config de exemplo
+├── docker/
+│   ├── Dockerfile
+│   └── docker-compose.yml
+└── tests/
+    ├── __init__.py
+    ├── test_config.py          # 16 testes
+    ├── test_site_manager.py    # 18 testes
+    ├── test_alerts.py          # 18 testes
+    ├── test_comparison.py      # 13 testes
+    └── test_api.py             # 18 testes (API HTTP)
+
+================================================================================
+4. MÓDULOS
+================================================================================
+
+4.1 CONFIG.PY (8 classes Pydantic)
+-----------------------------------
+- SiteConfig: configuração de cada usina
+- GatewayServiceConfig: URL do serviço Gateway
+- AnalyticsServiceConfig: URL do serviço Analytics
+- AlertAggregatorConfig: configuração de alertas
+- ComparisonConfig: configuração de comparação
+- APIConfig: configuração da API
+- FleetConfig: configuração principal
+- Enums: SiteStatus, AlertSeverity, AlertStatus, ComparisonMetric
+
+4.2 SITE_MANAGER.PY (Gestão de Usinas)
+---------------------------------------
+- SiteInfo: representa uma usina
+- SiteMetrics: métricas de uma usina
+- SiteManager: CRUD de usinas
+  - add_site, remove_site, get_site, get_all_sites
+  - get_sites_by_region, get_sites_by_status
+  - add_metrics, get_latest_metrics
+  - get_fleet_summary
+
+4.3 FLEET_AGGREGATOR.PY (Consolidação)
+---------------------------------------
+- FleetMetrics: métricas consolidadas da frota
+- FleetAggregator: coleta e agrega dados
+  - collect_all_sites: coleta dados de todas as usinas
+  - aggregate_fleet: consolida métricas
+  - get_region_aggregation: consolida por região
+
+4.4 ALERT_AGGREGATOR.PY (Alertas Centralizados)
+------------------------------------------------
+- FleetAlert: alerta com site, severidade, status
+- AlertAggregator: gerencia alertas
+  - create_alert, acknowledge_alert, resolve_alert
+  - get_alerts, get_active_alerts, get_critical_alerts
+  - get_statistics, get_site_statistics
+
+4.5 COMPARISON_ENGINE.PY (Benchmarking)
+----------------------------------------
+- SiteRanking: posição no ranking
+- ComparisonResult: resultado da comparação
+- ComparisonEngine: compara e ranqueia usinas
+  - compare_sites: compara por métrica
+  - compare_all_metrics: compara todas as métricas
+  - get_vs_average: comparação com média
+  - get_vs_best: comparação com melhor
+  - get_best_performers, get_worst_performers
+
+================================================================================
+5. MÉTRICAS DE COMPARAÇÃO
+================================================================================
+
+- ENERGY: energia produzida (kWh)
+- PR: Performance Ratio (%)
+- EFFICIENCY: eficiência (%)
+- AVAILABILITY: disponibilidade (%)
+- CEF: Cleanliness Factor (%)
+- SCORE: score geral (0-100)
+
+================================================================================
+6. TESTES
+================================================================================
+
+Total: 83 testes — 83 passando (100%)
+
+test_config.py:         16 testes (configs + enums + load + PVSOLAR_CONFIG)
+test_site_manager.py:   18 testes (SiteInfo, SiteMetrics, SiteManager)
+test_alerts.py:         18 testes (FleetAlert, AlertAggregator)
+test_comparison.py:     13 testes (SiteRanking, ComparisonResult, Engine)
+test_api.py:            18 testes (health, sites CRUD, frota, alertas, ranking)
+
+================================================================================
+7. CONFIGURAÇÃO
+================================================================================
+
+Exemplo (config/fleet.yaml):
+
+sites:
+  - id: "site_1"
+    name: "Usina Solar SP"
+    gateway_url: "http://192.168.1.100:8000"
+    analytics_url: "http://192.168.1.100:8001"
+    capacity_kw: 500.0
+    num_inverters: 10
+    region: "sudeste"
+
+  - id: "site_2"
+    name: "Usina Solar RJ"
+    gateway_url: "http://192.168.1.101:8000"
+    analytics_url: "http://192.168.1.101:8001"
+    capacity_kw: 300.0
+    num_inverters: 6
+    region: "sudeste"
+
+alerts:
+  enabled: true
+  max_alerts_per_site: 100
+
+comparison:
+  enabled: true
+  default_metric: "pr"
+
+Variáveis de ambiente:
+  PVFLEET_DEBUG
+  GATEWAY_URL, GATEWAY_API_KEY
+  ANALYTICS_URL, ANALYTICS_API_KEY
+  ALERT_ENABLED, ALERT_MAX_ALERTS
+  COMPARISON_DEFAULT_METRIC
+  API_HOST, API_PORT
+
+================================================================================
+8. DOCKER
+================================================================================
+
+Serviços:
+- pvsolar-fleet: Python 3.11, porta 8003
+- Entry point: uvicorn src.api.app:app (API HTTP com /health, /api/sites,
+  /api/fleet/*)
+
+Compose:
+  Subir pelo compose da raiz do ecossistema (recomendado):
+    docker compose up -d fleet
+  As variantes de config para Docker ficam em docker/config/fleet.yaml
+  (URLs gateway/analytics com nomes de serviço da rede interna).
+
+Comandos (legado, compose do próprio projeto):
+  docker-compose up -d          # Iniciar
+  docker-compose logs -f        # Ver logs
+  docker-compose down           # Parar
+
+================================================================================
+9. INTEGRAÇÃO COM ECOSSISTEMA pvSolar
+================================================================================
+
+pvSolar Gateway (8000)     →  pvSolar Fleet (coleta dados)
+pvSolar Analytics (8001)   →  pvSolar Fleet (ML insights)
+pvSolar Fleet (8003)       →  API REST (gestão multi-site)
+
+Fluxo:
+  Usinas → Gateways → Fleet → Dashboard/Alertas/Comparações
+
+================================================================================
+10. NOTAS TÉCNICAS
+================================================================================
+
+- datetime.now(timezone.utc), NÃO timedelta.utc
+- Imports absolutos: from src.core.config import X
+- structlog: usar event_type=, não event=
+- Pydantic: Field(default=...) para todos os campos
+- aiohttp: ClientSession para HTTP async
+
+================================================================================
+ FIM DO RESUMO
+================================================================================

@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pvSolar - Guia Completo de Instalacao</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #f59e0b;
+            --primary-dark: #d97706;
+            --primary-light: #fbbf24;
+            --secondary: #3b82f6;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --purple: #8b5cf6;
+            --dark: #1f2937;
+            --darker: #111827;
+            --light: #f3f4f6;
+            --lighter: #f9fafb;
+            --gray: #6b7280;
+            --gray-light: #e5e7eb;
+            --gradient-solar: linear-gradient(135deg, #f59e0b 0%, #ef4444 50%, #8b5cf6 100%);
+            --gradient-gateway: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            --gradient-analytics: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            --gradient-scada: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+            --gradient-reports: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            --gradient-fleet: linear-gradient(135deg, #10b981 0%, #f59e0b 100%);
+            --gradient-alert: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+            --gradient-grid: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --gradient-twin: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            --gradient-auth: linear-gradient(135deg, #f43f5e 0%, #a855f7 100%);
+            --gradient-web: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            --gradient-backup: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --gradient-scheduler: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            --gradient-exporter: linear-gradient(135deg, #e11d48 0%, #9333ea 100%);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-xs: 6px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--lighter); color: var(--dark); line-height: 1.7; }
+
+        /* HEADER */
+        .header { background: var(--gradient-solar); color: white; padding: 1rem 0; position: sticky; top: 0; z-index: 1000; box-shadow: var(--shadow-xl); }
+        .header-content { max-width: 1400px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; }
+        .logo { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon { width: 45px; height: 45px; background: rgba(255,255,255,0.2); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; backdrop-filter: blur(10px); }
+        .logo-text h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-text span { font-size: 0.8rem; opacity: 0.9; font-weight: 500; }
+        .header-nav { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .header-nav a { color: white; text-decoration: none; font-weight: 500; padding: 0.5rem 0.9rem; border-radius: 50px; transition: var(--transition); display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; }
+        .header-nav a:hover { background: rgba(255,255,255,0.2); transform: translateY(-1px); }
+
+        /* HERO */
+        .hero { background: var(--gradient-solar); color: white; padding: 5rem 2rem 4rem; text-align: center; position: relative; overflow: hidden; }
+        .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); opacity: 0.3; }
+        .hero h1 { font-size: 3.2rem; font-weight: 900; margin-bottom: 1rem; position: relative; letter-spacing: -1px; }
+        .hero h1 i { margin-right: 0.5rem; }
+        .hero p { font-size: 1.2rem; opacity: 0.95; max-width: 750px; margin: 0 auto 2.5rem; position: relative; line-height: 1.8; }
+        .hero-badges { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; }
+        .badge { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 0.6rem 1.2rem; border-radius: 50px; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; border: 1px solid rgba(255,255,255,0.2); transition: var(--transition); }
+        .badge:hover { background: rgba(255,255,255,0.25); transform: translateY(-2px); }
+
+        /* CONTAINER */
+        .container { max-width: 1400px; margin: 0 auto; padding: 3rem 2rem; display: grid; grid-template-columns: 300px 1fr; gap: 2rem; }
+
+        /* SIDEBAR */
+        .sidebar { position: sticky; top: 80px; height: fit-content; background: white; border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-lg); border: 1px solid var(--gray-light); }
+        .sidebar-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gray); margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--gray-light); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav li { margin-bottom: 0.15rem; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 1rem; color: var(--dark); text-decoration: none; border-radius: var(--radius-sm); transition: var(--transition); font-size: 0.9rem; font-weight: 500; }
+        .sidebar-nav a:hover { background: linear-gradient(135deg, #fef3c7, #fde68a); color: var(--primary-dark); transform: translateX(4px); }
+        .sidebar-nav a i { width: 20px; text-align: center; font-size: 0.9rem; }
+        .sidebar-section { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--gray); margin-top: 1.25rem; margin-bottom: 0.5rem; padding-left: 1rem; }
+
+        /* MAIN */
+        .main-content { min-width: 0; }
+
+        /* SECTION */
+        .section { background: white; border-radius: var(--radius); padding: 2.5rem; margin-bottom: 2rem; box-shadow: var(--shadow); border: 1px solid var(--gray-light); transition: var(--transition); }
+        .section:hover { box-shadow: var(--shadow-lg); }
+        .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 2px solid var(--gray-light); }
+        .section-icon { width: 55px; height: 55px; background: var(--gradient-solar); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.4rem; box-shadow: var(--shadow); }
+        .section-title { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; }
+        .section-subtitle { font-size: 0.9rem; color: var(--gray); margin-top: 0.2rem; }
+        h2 { font-size: 1.8rem; font-weight: 800; margin: 2.5rem 0 1rem; letter-spacing: -0.5px; }
+        h3 { font-size: 1.3rem; font-weight: 700; margin: 2rem 0 0.75rem; }
+        p { margin-bottom: 1rem; color: #374151; }
+
+        /* FEATURES GRID */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
+        .feature-card { background: var(--lighter); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--gray-light); transition: var(--transition); }
+        .feature-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+        .feature-icon { width: 50px; height: 50px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3rem; margin-bottom: 1rem; }
+        .feature-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .feature-desc { font-size: 0.9rem; color: var(--gray); line-height: 1.6; }
+
+        /* ARCHITECTURE DIAGRAM */
+        .arch-diagram { background: var(--darker); border-radius: var(--radius); padding: 2rem; margin: 1.5rem 0; overflow-x: auto; }
+        .arch-diagram code { font-family: 'Fira Code', monospace; font-size: 0.82rem; color: #a5f3fc; line-height: 1.5; white-space: pre; display: block; }
+
+        /* CODE BLOCK */
+        .code-block { background: #1e293b; border-radius: var(--radius); padding: 1.5rem; margin: 1rem 0; overflow-x: auto; position: relative; border: 1px solid #334155; }
+        .code-block::before { content: attr(data-lang); position: absolute; top: 0; right: 0; background: var(--primary); color: white; padding: 0.3rem 0.9rem; font-size: 0.7rem; font-weight: 700; border-radius: 0 var(--radius) 0 var(--radius-xs); text-transform: uppercase; letter-spacing: 0.5px; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.85rem; color: #e2e8f0; line-height: 1.7; }
+        .code-block .comment { color: #64748b; }
+        .code-block .string { color: #86efac; }
+        .code-block .keyword { color: #c4b5fd; }
+        .code-block .number { color: #fbbf24; }
+
+        /* ALERT */
+        .alert { padding: 1.25rem 1.5rem; border-radius: var(--radius-sm); margin: 1.25rem 0; display: flex; align-items: flex-start; gap: 1rem; border-left: 4px solid; }
+        .alert-icon { font-size: 1.3rem; margin-top: 0.1rem; flex-shrink: 0; }
+        .alert-content { flex: 1; }
+        .alert-title { font-weight: 700; margin-bottom: 0.3rem; font-size: 0.95rem; }
+        .alert-text { font-size: 0.9rem; line-height: 1.6; }
+        .alert-info { background: #eff6ff; border-color: #3b82f6; color: #1e40af; }
+        .alert-success { background: #f0fdf4; border-color: #10b981; color: #166534; }
+        .alert-warning { background: #fffbeb; border-color: #f59e0b; color: #92400e; }
+        .alert-danger { background: #fef2f2; border-color: #ef4444; color: #991b1b; }
+
+        /* TABLE */
+        .table-wrapper { overflow-x: auto; margin: 1.5rem 0; border-radius: var(--radius); border: 1px solid var(--gray-light); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th { background: var(--gradient-solar); color: white; padding: 0.85rem 1rem; text-align: left; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--gray-light); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: #fefce8; }
+        td code { background: #1e293b; color: #a5f3fc; padding: 0.2rem 0.5rem; border-radius: var(--radius-xs); font-family: 'Fira Code', monospace; font-size: 0.8rem; }
+
+        /* STEPS */
+        .steps { counter-reset: step; margin: 1.5rem 0; }
+        .step { display: flex; gap: 1.5rem; margin-bottom: 1.5rem; padding: 1.75rem; background: var(--lighter); border-radius: var(--radius); border-left: 4px solid var(--primary); transition: var(--transition); }
+        .step:hover { background: #fefce8; transform: translateX(4px); }
+        .step::before { counter-increment: step; content: counter(step); min-width: 40px; height: 40px; background: var(--gradient-solar); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; flex-shrink: 0; box-shadow: var(--shadow); }
+        .step-content { flex: 1; }
+        .step-title { font-weight: 700; margin-bottom: 0.5rem; font-size: 1.1rem; color: var(--dark); }
+        .step-desc { font-size: 0.9rem; color: var(--gray); margin-bottom: 0.75rem; }
+
+        /* SERVICE CARDS */
+        .service-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin: 1.5rem 0; }
+        .service-card { background: white; border-radius: var(--radius); padding: 1.25rem; border: 1px solid var(--gray-light); display: flex; align-items: center; gap: 1rem; transition: var(--transition); }
+        .service-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+        .service-icon { width: 50px; height: 50px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; flex-shrink: 0; }
+        .service-info { flex: 1; }
+        .service-name { font-weight: 700; font-size: 1rem; margin-bottom: 0.15rem; }
+        .service-desc { font-size: 0.8rem; color: var(--gray); }
+        .service-port { background: #1e293b; color: #a5f3fc; padding: 0.25rem 0.6rem; border-radius: 50px; font-family: 'Fira Code', monospace; font-size: 0.75rem; font-weight: 600; flex-shrink: 0; }
+
+        /* PORT TABLE */
+        .port-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+        .port-item { background: white; border-radius: var(--radius-sm); padding: 1rem; border: 1px solid var(--gray-light); text-align: center; transition: var(--transition); }
+        .port-item:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+        .port-number { font-family: 'Fira Code', monospace; font-size: 1.8rem; font-weight: 800; background: var(--gradient-solar); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .port-service { font-weight: 700; font-size: 0.9rem; margin-top: 0.25rem; }
+        .port-desc { font-size: 0.75rem; color: var(--gray); margin-top: 0.15rem; }
+
+        /* TROUBLESHOOT */
+        .troubleshoot-item { background: var(--lighter); border-radius: var(--radius-sm); padding: 1.25rem; margin-bottom: 1rem; border: 1px solid var(--gray-light); }
+        .troubleshoot-problem { font-weight: 700; color: var(--danger); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .troubleshoot-solution { color: var(--dark); font-size: 0.9rem; }
+        .troubleshoot-solution code { background: #1e293b; color: #a5f3fc; padding: 0.15rem 0.4rem; border-radius: var(--radius-xs); font-family: 'Fira Code', monospace; font-size: 0.8rem; }
+
+        /* FOOTER */
+        .footer { background: var(--darker); color: white; padding: 3rem 2rem; text-align: center; margin-top: 3rem; }
+        .footer-links { display: flex; gap: 2rem; justify-content: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .footer-links a { color: var(--primary-light); text-decoration: none; font-weight: 500; transition: var(--transition); }
+        .footer-links a:hover { color: white; }
+        .footer-text { opacity: 0.7; font-size: 0.9rem; }
+        .footer-copyright { margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.5; }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .container { grid-template-columns: 1fr; }
+            .sidebar { position: static; }
+            .hero h1 { font-size: 2.2rem; }
+        }
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 1.8rem; }
+            .hero p { font-size: 1rem; }
+            .header-nav { display: none; }
+            .section { padding: 1.5rem; }
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--lighter); }
+        ::-webkit-scrollbar-thumb { background: var(--gray-light); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gray); }
+
+        /* BACK TO TOP */
+        .back-to-top { position: fixed; bottom: 2rem; right: 2rem; width: 50px; height: 50px; background: var(--gradient-solar); color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg); transition: var(--transition); z-index: 999; opacity: 0; pointer-events: none; }
+        .back-to-top.visible { opacity: 1; pointer-events: all; }
+        .back-to-top:hover { transform: translateY(-3px) scale(1.1); }
+
+        /* COPY BUTTON */
+        .copy-btn { position: absolute; top: 0.5rem; right: 3.5rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; padding: 0.3rem 0.6rem; border-radius: var(--radius-xs); cursor: pointer; font-size: 0.7rem; font-family: 'Inter', sans-serif; transition: var(--transition); }
+        .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-solar-panel"></i></div>
+                <div class="logo-text">
+                    <h1>pvSolar</h1>
+                    <span>Guia Completo de Instalacao v1.0.0</span>
+                </div>
+            </div>
+            <nav class="header-nav">
+                <a href="#visao-geral"><i class="fas fa-eye"></i> Visao Geral</a>
+                <a href="#requisitos"><i class="fas fa-check-circle"></i> Requisitos</a>
+                <a href="#passo1"><i class="fas fa-download"></i> Instalacao</a>
+                <a href="#passo3"><i class="fas fa-cog"></i> Config</a>
+                <a href="#passo4"><i class="fas fa-play"></i> Executar</a>
+                <a href="#pvbrowser"><i class="fas fa-desktop"></i> pvBrowser</a>
+                <a href="#portas"><i class="fas fa-network-wired"></i> Portas</a>
+                <a href="#docker"><i class="fab fa-docker"></i> Docker</a>
+                <a href="#problemas"><i class="fas fa-wrench"></i> Problemas</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1><i class="fas fa-solar-panel"></i> Guia Completo de Instalacao</h1>
+        <p>Passo a passo detalhado para instalar e configurar todo o ecossistema pvSolar. Do zero ao dashboard completo, incluso para完全 leigos.</p>
+        <div class="hero-badges">
+            <div class="badge"><i class="fas fa-box"></i> 12 Projetos</div>
+            <div class="badge"><i class="fas fa-check-double"></i> 955 Testes</div>
+            <div class="badge"><i class="fas fa-server"></i> 13 Portas</div>
+            <div class="badge"><i class="fas fa-desktop"></i> pvBrowser Integrado</div>
+            <div class="badge"><i class="fab fa-docker"></i> Docker Ready</div>
+            <div class="badge"><i class="fas fa-book"></i> Para Leigos</div>
+        </div>
+    </section>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-title">Sumario</div>
+            <ul class="sidebar-nav">
+                <li><a href="#visao-geral"><i class="fas fa-eye"></i> Visao Geral</a></li>
+                <li><a href="#arquitetura"><i class="fas fa-project-diagram"></i> Arquitetura</a></li>
+                <li><a href="#requisitos"><i class="fas fa-check-circle"></i> Requisitos</a></li>
+            </ul>
+            <div class="sidebar-section">Instalacao</div>
+            <ul class="sidebar-nav">
+                <li><a href="#passo1"><i class="fas fa-folder-plus"></i> Passo 1 - Estrutura</a></li>
+                <li><a href="#passo2"><i class="fas fa-vial"></i> Passo 2 - Testes</a></li>
+                <li><a href="#passo3"><i class="fas fa-cog"></i> Passo 3 - Config</a></li>
+                <li><a href="#postgresql"><i class="fas fa-database"></i> PostgreSQL</a></li>
+                <li><a href="#passo4"><i class="fas fa-play-circle"></i> Passo 4 - Executar</a></li>
+                <li><a href="#passo5"><i class="fas fa-globe"></i> Passo 5 - Acessar</a></li>
+            </ul>
+            <div class="sidebar-section">Integracao</div>
+            <ul class="sidebar-nav">
+                <li><a href="#pvbrowser"><i class="fas fa-desktop"></i> pvBrowser/SCADA</a></li>
+                <li><a href="#interligacao"><i class="fas fa-link"></i> Interligacao</a></li>
+                <li><a href="#portas"><i class="fas fa-network-wired"></i> Portas</a></li>
+                <li><a href="#script"><i class="fas fa-terminal"></i> Script Auto</a></li>
+            </ul>
+            <div class="sidebar-section">Producao</div>
+            <ul class="sidebar-nav">
+                <li><a href="#docker"><i class="fab fa-docker"></i> Docker / VPS</a></li>
+                <li><a href="#grafana"><i class="fas fa-tachometer-alt"></i> Grafana</a></li>
+                <li><a href="#problemas"><i class="fas fa-wrench"></i> Problemas</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+
+            <!-- VISAO GERAL -->
+            <section class="section" id="visao-geral">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-eye"></i></div>
+                    <div>
+                        <div class="section-title">Visao Geral do Ecossistema</div>
+                        <div class="section-subtitle">O que cada projeto faz e como se conectam</div>
+                    </div>
+                </div>
+
+                <p>Imagine um <strong>painel solar</strong> que envia dados para um <strong>computador</strong>. Esse computador e o <strong>Gateway</strong>. Todos os outros projetos leem os dados do Gateway e fazem coisas diferentes com eles.</p>
+
+                <div class="service-cards">
+                    <div class="service-card">
+                        <div class="service-icon" style="background: var(--gradient-gateway)"><i class="fas fa-satellite-dish"></i></div>
+                        <div class="service-info">
+                            <div class="service-name">pvSolar Gateway</div>
+                            <div class="service-desc">Recebe dados dos inversores via MQTT/TCP</div>
+                        </div>
+                        <div class="service-port">:8000</div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon" style="background: var(--gradient-analytics)"><i class="fas fa-brain"></i></div>
+                        <div class="service-info">
+                            <div class="service-name">pvSolar Analytics</div>
+                            <div class="service-desc">Machine Learning preditivo</div>
+                        </div>
+                        <div class="service-port">:8001</div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon" style="background: var(--gradient-scada)"><i class="fas fa-desktop"></i></div>
+                        <div class="service-info">
+                            <div class="service-name">pvSolar SCADA</div>
+                            <div class="service-desc">Telas HMI com pvBrowser</div>
+                        </div>
+                        <div class="service-port">:5000</div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon" style="background: var(--gradient-reports)"><i class="fas fa-file-pdf"></i></div>
+                        <div class="service-info">
+                            <div class="service-name">pvSolar Reports</div>
+                            <div class="service-desc">Relatorios PDF e Excel</div>
+                        </div>
+                        <div class="service-port">:8002</div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon" style="background: var(--gradient-fleet)"><i class="fas fa-solar-panel"></i></div>
+                        <div class="service-info">
+                            <div class="service-name">pvSolar Fleet</div>
+                            <div class="service-desc">Gestao multiplas usinas</div>
+                        </div>
+                        <div class="service-port">:8003</div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon" style="background: var(--gradient-alert)"><i class="fas fa-bell"></i></div>
+                        <div class="service-info">
+                            <div class="service-name">pvSolar Alert</div>
+                            <div class="service-desc">Notificacoes multi-canal</div>
+                        </div>
+                        <div class="service-port">:8004</div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon" style="background: var(--gradient-grid)"><i class="fas fa-plug"></i></div>
+                        <div class="service-info">
+                            <div class="service-name">pvSolar Grid</div>
+                            <div class="service-desc">Compliance PRODIST/ANEEL</div>
+                        </div>
+                        <div class="service-port">:8005</div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon" style="background: var(--gradient-twin)"><i class="fas fa-clone"></i></div>
+                        <div class="service-info">
+                            <div class="service-name">pvSolar Digital Twin</div>
+                            <div class="service-desc">Simulacao e otimizacao</div>
+                        </div>
+                        <div class="service-port">:8006</div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon" style="background: var(--gradient-auth)"><i class="fas fa-shield-alt"></i></div>
+                        <div class="service-info">
+                            <div class="service-name">pvSolar Auth</div>
+                            <div class="service-desc">Autenticacao e RBAC</div>
+                        </div>
+                        <div class="service-port">:8007</div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon" style="background: var(--gradient-web)"><i class="fas fa-globe"></i></div>
+                        <div class="service-info">
+                            <div class="service-name">pvSolar Web</div>
+                            <div class="service-desc">Dashboard principal (Next.js)</div>
+                        </div>
+                        <div class="service-port">:3001</div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon" style="background: var(--gradient-backup)"><i class="fas fa-database"></i></div>
+                        <div class="service-info">
+                            <div class="service-name">pvSolar Backup</div>
+                            <div class="service-desc">Backup automatizado</div>
+                        </div>
+                        <div class="service-port">:8008</div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon" style="background: var(--gradient-scheduler)"><i class="fas fa-clock"></i></div>
+                        <div class="service-info">
+                            <div class="service-name">pvSolar Scheduler</div>
+                            <div class="service-desc">Agendamento de tarefas</div>
+                        </div>
+                        <div class="service-port">:8009</div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon" style="background: var(--gradient-exporter)"><i class="fas fa-chart-line"></i></div>
+                        <div class="service-info">
+                            <div class="service-name">pvSolar Exporter</div>
+                            <div class="service-desc">Metricas Prometheus/Grafana</div>
+                        </div>
+                        <div class="service-port">:8010</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ARQUITETURA -->
+            <section class="section" id="arquitetura">
+                <div class="section-header">
+                    <div class="section-icon" style="background: var(--gradient-gateway)"><i class="fas fa-project-diagram"></i></div>
+                    <div>
+                        <div class="section-title">Arquitetura do Sistema</div>
+                        <div class="section-subtitle">Como todos os projetos se interligam</div>
+                    </div>
+                </div>
+                <div class="arch-diagram"><code>
+    ┌─────────────────────────────────────────────────────────────────┐
+    │                    Paineis Solares / Inversores                 │
+    │                    (Modbus TCP / SunSpec)                       │
+    └───────────────────────────┬─────────────────────────────────────┘
+                                │
+                    ┌───────────▼───────────┐
+                    │    pvSolar Gateway    │
+                    │    :8000 (MQTT/TCP)   │
+                    └───────────┬───────────┘
+                                │
+        ┌───────────────────────┼───────────────────────────┐
+        │           │           │           │                │
+   ┌────▼───┐ ┌────▼───┐ ┌────▼───┐ ┌────▼────┐     ┌────▼────┐
+   │Analyti-│ │ SCADA/ │ │Reports │ │ Fleet   │     │  Alert  │
+   │  cs    │ │  HMI   │ │        │ │         │     │         │
+   │ :8001  │ │ :5000  │ │ :8002  │ │ :8003   │     │ :8004   │
+   │  (ML)  │ │(pvBrow)│ │ (PDF)  │ │(Multi)  │     │(Email/SMS│
+   └────┬───┘ └────┬───┘ └────┬───┘ └────┬────┘     └────┬────┘
+        │           │          │          │                │
+        └───────────┴──────────┴──────────┴────────────────┘
+                                │
+        ┌───────────────────────┼───────────────────────────┐
+        │           │           │           │                │
+   ┌────▼───┐ ┌────▼───┐ ┌────▼───┐ ┌────▼────┐     ┌────▼────┐
+   │  Grid  │ │ Digital│ │  Auth  │ │  Web    │     │ Backup  │
+   │Complian│ │  Twin  │ │  RBAC  │ │Dashboard│     │         │
+   │ :8005  │ │ :8006  │ │ :8007  │ │ :3001   │     │ :8008   │
+   │(PRODIST│ │(Simula)│ │(JWT)   │ │(Next.js)│     │(Auto)   │
+   └────────┘ └────────┘ └────────┘ └─────────┘     └─────────┘
+                                │
+                    ┌───────────┼───────────┐
+                    │           │           │
+               ┌────▼───┐ ┌────▼───┐ ┌────▼───┐
+               │Schedulr│ │Exporte │ │  All   │
+               │        │ │(Promet)│ │ APIs   │
+               │ :8009  │ │ :8010  │ │/docs   │
+               └────────┘ └────────┘ └────────┘
+                </code></div>
+            </section>
+
+            <!-- REQUISITOS -->
+            <section class="section" id="requisitos">
+                <div class="section-header">
+                    <div class="section-icon" style="background: var(--gradient-analytics)"><i class="fas fa-check-circle"></i></div>
+                    <div>
+                        <div class="section-title">Requisitos Previos</div>
+                        <div class="section-subtitle">O que voce precisa ter instalado</div>
+                    </div>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: var(--gradient-gateway)"><i class="fab fa-python"></i></div>
+                        <div class="feature-title">Python 3.11</div>
+                        <div class="feature-desc">Linguagem principal dos backends. Baixe em python.org. Marque "Add Python to PATH" na instalacao.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: var(--gradient-analytics)"><i class="fab fa-node-js"></i></div>
+                        <div class="feature-title">Node.js 18+</div>
+                        <div class="feature-desc">Necessario apenas para o pvSolar Web (frontend). Baixe em nodejs.org.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: var(--gradient-scada)"><i class="fab fa-git-alt"></i></div>
+                        <div class="feature-title">Git</div>
+                        <div class="feature-desc">Para baixar os codigos. Baixe em git-scm.com.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: var(--gradient-web)"><i class="fab fa-docker"></i></div>
+                        <div class="feature-title">Docker (Opcional)</div>
+                        <div class="feature-desc">Se quiser rodar via container. Baixe em docker.com.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: var(--gradient-scheduler)"><i class="fas fa-database"></i></div>
+                        <div class="feature-title">PostgreSQL (Opcional)</div>
+                        <div class="feature-desc">Para persistir usuarios (Auth) e tarefas (Scheduler) entre reinicios. Sem ele, esses dois servicos rodam apenas em memoria.</div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle alert-icon"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">Como verificar se esta instalado</div>
+                        <div class="alert-text">Abra o Prompt de Comando (Windows) ou Terminal (Mac/Linux) e digite:</div>
+                    </div>
+                </div>
+
+                <div class="code-block" data-lang="bash"><code><span class="comment"># Verificar Python</span>
+python --version
+<span class="comment"># Deve mostrar: Python 3.11.x</span>
+
+<span class="comment"># Verificar Node.js</span>
+node --version
+<span class="comment"># Deve mostrar: v18.x.x ou superior</span>
+
+<span class="comment"># Verificar Git</span>
+git --version
+<span class="comment"># Deve mostrar: git version 2.x.x</span></code></div>
+            </section>
+
+            <!-- PASSO 1 -->
+            <section class="section" id="passo1">
+                <div class="section-header">
+                    <div class="section-icon" style="background: var(--gradient-reports)"><i class="fas fa-folder-plus"></i></div>
+                    <div>
+                        <div class="section-title">Passo 1 - Criar Estrutura</div>
+                        <div class="section-subtitle">Preparar pastas e ambientes virtuais</div>
+                    </div>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Criar pasta principal</div>
+                            <div class="step-desc">Abra o Prompt de Comando e crie a pasta do projeto:</div>
+                            <div class="code-block" data-lang="Windows"><code>mkdir C:\Users\jcc14\Documents\PvBrowser
+cd C:\Users\jcc14\Documents\PvBrowser</code></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Criar ambiente virtual para cada projeto</div>
+                            <div class="step-desc">Cada projeto precisa do seu proprio "ambiente isolado" para nao conflitar bibliotecas. Execute para CADA projeto:</div>
+                            <div class="code-block" data-lang="Windows"><code><span class="comment"># Para cada projeto (repita para todos):</span>
+
+cd pvsolar-gateway
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+cd ..
+
+cd pvsolar-analytics
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+cd ..
+
+<span class="comment"># ... repita para TODOS os 12 projetos Python</span></code></div>
+
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle alert-icon"></i>
+                                <div class="alert-content">
+                                    <div class="alert-title">Atencao</div>
+                                    <div class="alert-text">O ambiente virtual deve ser ativado ANTES de instalar dependencias. O comando <code>venv\Scripts\activate</code> e essencial.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Para o pvSolar Web (frontend), o comando e diferente</div>
+                            <div class="step-desc">O projeto Web usa Node.js em vez de Python:</div>
+                            <div class="code-block" data-lang="Windows"><code>cd pvsolar-web
+npm install
+cd ..</code></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PASSO 2 -->
+            <section class="section" id="passo2">
+                <div class="section-header">
+                    <div class="section-icon" style="background: var(--gradient-fleet)"><i class="fas fa-vial"></i></div>
+                    <div>
+                        <div class="section-title">Passo 2 - Executar Testes</div>
+                        <div class="section-subtitle">Verificar se tudo esta funcionando</div>
+                    </div>
+                </div>
+
+                <p>Antes de configurar, verifique se todos os testes passam. Isso garante que o codigo esta correto.</p>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Testar cada projeto Python</div>
+                            <div class="step-desc">Entre na pasta, ative o ambiente virtual e rode os testes:</div>
+                            <div class="code-block" data-lang="Windows"><code><span class="comment"># Exemplo para o Gateway (repita para todos):</span>
+
+cd pvsolar-gateway
+venv\Scripts\activate
+python -m pytest tests/ -v
+cd ..</code></div>
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle alert-icon"></i>
+                                <div class="alert-content">
+                                    <div class="alert-title">Resultado esperado</div>
+                                    <div class="alert-text">Todos devem mostrar <code>X passed</code> sem erros. Ex: "68 passed" para o Gateway.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Testar o pvSolar Web</div>
+                            <div class="code-block" data-lang="Windows"><code>cd pvsolar-web
+npm test
+cd ..</code></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Projeto</th><th>Testes</th><th>Esperado</th></tr></thead>
+                        <tbody>
+                            <tr><td>pvSolar Gateway</td><td><code>python -m pytest tests/ -v</code></td><td>68 passed</td></tr>
+                            <tr><td>pvSolar Analytics</td><td><code>python -m pytest tests/ -v</code></td><td>151 passed</td></tr>
+                            <tr><td>pvSolar SCADA</td><td><code>python -m pytest tests/ -v</code></td><td>77 passed</td></tr>
+                            <tr><td>pvSolar Reports</td><td><code>python -m pytest tests/ -v</code></td><td>57 passed</td></tr>
+                            <tr><td>pvSolar Fleet</td><td><code>python -m pytest tests/ -v</code></td><td>83 passed</td></tr>
+                            <tr><td>pvSolar Alert</td><td><code>python -m pytest tests/ -v</code></td><td>120 passed</td></tr>
+                            <tr><td>pvSolar Grid</td><td><code>python -m pytest tests/ -v</code></td><td>120 passed</td></tr>
+                            <tr><td>pvSolar Digital Twin</td><td><code>python -m pytest tests/ -v</code></td><td>90 passed</td></tr>
+                            <tr><td>pvSolar Auth</td><td><code>python -m pytest tests/ -v</code></td><td>137 passed</td></tr>
+                            <tr><td>pvSolar Backup</td><td><code>python -m pytest tests/ -v</code></td><td>55 passed</td></tr>
+                            <tr><td>pvSolar Scheduler</td><td><code>python -m pytest tests/ -v</code></td><td>67 passed</td></tr>
+                            <tr><td>pvSolar Exporter</td><td><code>python -m pytest tests/ -v</code></td><td>55 passed</td></tr>
+                            <tr><td>pvSolar Web</td><td><code>npm test</code></td><td>23 passed</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- PASSO 3 -->
+            <section class="section" id="passo3">
+                <div class="section-header">
+                    <div class="section-icon" style="background: var(--gradient-alert)"><i class="fas fa-cog"></i></div>
+                    <div>
+                        <div class="section-title">Passo 3 - Configurar</div>
+                        <div class="section-subtitle">Criar e editar arquivos de configuracao</div>
+                    </div>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Copiar arquivos de configuracao</div>
+                            <div class="step-desc">Cada projeto tem um arquivo exemplo. Copie para o nome final:</div>
+                            <div class="code-block" data-lang="Windows"><code><span class="comment"># Execute na pasta PvBrowser:</span>
+
+copy pvsolar-gateway\config\gateway.example.yaml pvsolar-gateway\config\gateway.yaml
+copy pvsolar-analytics\config\analytics.example.yaml pvsolar-analytics\config\analytics.yaml
+copy pvsolar-scada\config\scada.example.yaml pvsolar-scada\config\scada.yaml
+copy pvsolar-reports\config\reports.example.yaml pvsolar-reports\config\reports.yaml
+copy pvsolar-fleet\config\fleet.example.yaml pvsolar-fleet\config\fleet.yaml
+copy pvsolar-alert\config\alert.example.yaml pvsolar-alert\config\alert.yaml
+copy pvsolar-grid\config\grid.example.yaml pvsolar-grid\config\grid.yaml
+copy pvsolar-twin\config\twin.example.yaml pvsolar-twin\config\twin.yaml
+copy pvsolar-auth\config\auth.example.yaml pvsolar-auth\config\auth.yaml
+copy pvsolar-backup\config\backup.example.yaml pvsolar-backup\config\backup.yaml
+copy pvsolar-scheduler\config\scheduler.example.yaml pvsolar-scheduler\config\scheduler.yaml
+copy pvsolar-exporter\config\exporter.example.yaml pvsolar-exporter\config\exporter.yaml
+copy pvsolar-web\config\web.example.yaml pvsolar-web\config\web.yaml</code></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Editar cada arquivo .yaml</div>
+                            <div class="step-desc">Abra cada arquivo com o Bloco de Notas e edite conforme necessario:</div>
+
+                            <h3>Gateway — Configure os inversores</h3>
+                            <div class="code-block" data-lang="YAML"><code><span class="comment"># pvsolar-gateway/config/gateway.yaml</span>
+
+inverters:
+  - id: <span class="string">"inv1"</span>
+    name: <span class="string">"Inversor Principal"</span>
+    driver: <span class="string">"sunspec"</span>
+    host: <span class="string">"192.168.1.100"</span>    <span class="comment"># IP do seu inversor</span>
+    port: <span class="number">502</span>
+    protocol: <span class="string">"modbus"</span>
+
+mqtt:
+  broker: <span class="string">"localhost"</span>         <span class="comment"># ou IP do broker MQTT</span>
+  port: <span class="number">1883</span></code></div>
+
+                            <h3>Auth — Configure os usuarios</h3>
+                            <div class="code-block" data-lang="YAML"><code><span class="comment"># pvsolar-auth/config/auth.yaml</span>
+
+jwt:
+  secret: <span class="string">"MINHA-CHAVE-SECRETA-MUITO-SEGURA"</span>
+  algorithm: <span class="string">"HS256"</span>
+  expiration_hours: <span class="number">24</span>
+
+users:
+  - username: <span class="string">"admin"</span>
+    password: <span class="string">"admin123"</span>
+    role: <span class="string">"admin"</span></code></div>
+
+                            <h3>Web — Configure as URLs dos backends</h3>
+                            <div class="code-block" data-lang="YAML"><code><span class="comment"># pvsolar-web/config/web.yaml</span>
+
+api:
+  gateway: <span class="string">"http://localhost:8000"</span>
+  analytics: <span class="string">"http://localhost:8001"</span>
+  scada: <span class="string">"http://localhost:5000"</span>
+  reports: <span class="string">"http://localhost:8002"</span>
+  fleet: <span class="string">"http://localhost:8003"</span>
+  alert: <span class="string">"http://localhost:8004"</span>
+  grid: <span class="string">"http://localhost:8005"</span>
+  twin: <span class="string">"http://localhost:8006"</span>
+  auth: <span class="string">"http://localhost:8007"</span></code></div>
+
+                            <h3>Exporter — Configure as URLs de todos</h3>
+                            <div class="code-block" data-lang="YAML"><code><span class="comment"># pvsolar-exporter/config/exporter.yaml</span>
+
+namespace: <span class="string">"pvsolar"</span>
+scrape_interval_seconds: <span class="number">15</span>
+
+collectors:
+  gateway:
+    url: <span class="string">"http://localhost:8000"</span>
+  analytics:
+    url: <span class="string">"http://localhost:8001"</span>
+  scada:
+    url: <span class="string">"http://localhost:5000"</span>
+  <span class="comment"># ... repita para cada servico</span></code></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- POSTGRESQL -->
+            <section class="section" id="postgresql">
+                <div class="section-header">
+                    <div class="section-icon" style="background: var(--gradient-scheduler)"><i class="fas fa-database"></i></div>
+                    <div>
+                        <div class="section-title">PostgreSQL - Persistencia</div>
+                        <div class="section-subtitle">Opcional: dados que sobrevivem a reinicios</div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle alert-icon"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">Faca antes do Passo 4</div>
+                        <div class="alert-text">O <strong>pvSolar Auth</strong> (usuarios, tenantes, chaves de API) e o <strong>pvSolar Scheduler</strong> (tarefas e historico) persistem em PostgreSQL. Sem configurar o banco eles funcionam normalmente em memoria, mas os dados se perdem ao reiniciar.</div>
+                    </div>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">1. Ter um PostgreSQL rodando</div>
+                            <div class="code-block" data-lang="bash"><code><span class="comment"># Verificar se ja existe um servico local</span>
+pg_isready
+
+<span class="comment"># Em duvida? Instale em postgresql.org/download/windows ou use Docker:</span>
+docker run -d --name pvsolar-pg -p 5432:5432 -e POSTGRES_PASSWORD=pvsolar_dev postgres:17</code></div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">2. Configurar a URL de conexao</div>
+                            <div class="code-block" data-lang="YAML"><code><span class="comment"># pvsolar-auth/config/auth.yaml (e o mesmo bloco em pvsolar-scheduler)</span>
+<span class="comment"># O arquivo YAML e lido automaticamente no start do servico.</span>
+database:
+  enabled: true
+  url: <span class="string">"postgresql+asyncpg://postgres:senha@localhost:5432/pvsolar_auth"</span>
+
+<span class="comment"># Alternativa via variavel de ambiente (tem prioridade sobre o YAML):</span>
+set PVSOLAR_DATABASE_URL=postgresql+asyncpg://postgres:senha@localhost:5432/pvsolar_auth</code></div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">3. Criar os bancos (uma unica vez)</div>
+                            <div class="code-block" data-lang="bash"><code>cd pvsolar-auth
+venv\Scripts\activate
+python scripts\create_databases.py
+
+cd ..\pvsolar-scheduler
+python scripts\create_databases.py
+<span class="comment"># Cria: pvsolar_auth + pvsolar_auth_test
+#        pvsolar_scheduler + pvsolar_scheduler_test</span></code></div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">4. Pronto - inicie os servicos normalmente</div>
+                            <div class="code-block" data-lang="bash"><code><span class="comment"># O schema e criado sozinho no primeiro start (create_tables: true).
+# O usuario inicial admin/admin123 so e criado se o banco estiver vazio
+# (nunca duplica, mesmo reiniciando varias vezes).</span></code></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle alert-icon"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">Bancos _test sao recriados a cada execucao dos testes</div>
+                        <div class="alert-text">Os testes de persistencia dropam e recriam o schema. Por isso o script cria o banco <code>*_test</code> junto: aponte <code>PVSOLAR_TEST_DB_URL</code> apenas para ele e <strong>nunca</strong> para o banco de producao.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PASSO 4 -->
+            <section class="section" id="passo4">
+                <div class="section-header">
+                    <div class="section-icon" style="background: var(--gradient-grid)"><i class="fas fa-play-circle"></i></div>
+                    <div>
+                        <div class="section-title">Passo 4 - Iniciar os Projetos</div>
+                        <div class="section-subtitle">Na ordem correta!</div>
+                    </div>
+                </div>
+
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle alert-icon"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">Ordem importa!</div>
+                        <div class="alert-text">O <strong>Gateway</strong> (porta 8000) deve iniciar PRIMEIRO porque todos os outros dependem dele. Abra um terminal diferente para cada projeto.</div>
+                    </div>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Terminal 1 — Gateway (o mais importante!)</div>
+                            <div class="code-block" data-lang="Terminal 1"><code>cd C:\Users\jcc14\Documents\PvBrowser\pvsolar-gateway
+venv\Scripts\activate
+<span class="comment">REM requer Mosquitto em localhost:1883 (veja a secao Docker/VPS)</span>
+set PYTHONPATH=src
+python -m core.gateway -c config/gateway.yaml</code></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Terminal 2 — Analytics</div>
+                            <div class="code-block" data-lang="Terminal 2"><code>cd C:\Users\jcc14\Documents\PvBrowser\pvsolar-analytics
+venv\Scripts\activate
+python -m src.core.app -c config/analytics.yaml --host 0.0.0.0 --port 8001</code></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Terminal 3 — SCADA (pvBrowser)</div>
+                            <div class="code-block" data-lang="Terminal 3"><code>cd C:\Users\jcc14\Documents\PvBrowser\pvsolar-scada
+venv\Scripts\activate
+python -m src.app -c config/scada.yaml</code></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Terminal 4 a 12 — Restantes</div>
+                            <div class="step-desc">Repita o mesmo padrao para cada projeto, mudando a porta:</div>
+                            <div class="code-block" data-lang="Terminais 4-12"><code><span class="comment"># Terminal 4 - Reports</span>
+uvicorn src.api.app:app --host 0.0.0.0 --port 8002
+
+<span class="comment"># Terminal 5 - Fleet</span>
+uvicorn src.api.app:app --host 0.0.0.0 --port 8003
+
+<span class="comment"># Terminal 6 - Alert</span>
+uvicorn src.app:app --host 0.0.0.0 --port 8004
+
+<span class="comment"># Terminal 7 - Grid</span>
+uvicorn src.app:app --host 0.0.0.0 --port 8005
+
+<span class="comment"># Terminal 8 - Digital Twin</span>
+uvicorn src.app:app --host 0.0.0.0 --port 8006
+
+<span class="comment"># Terminal 9 - Auth</span>
+uvicorn src.api.app:app --host 0.0.0.0 --port 8007
+
+<span class="comment"># Terminal 10 - Backup</span>
+uvicorn src.api.app:app --host 0.0.0.0 --port 8008
+
+<span class="comment"># Terminal 11 - Scheduler</span>
+uvicorn src.api.app:app --host 0.0.0.0 --port 8009
+
+<span class="comment"># Terminal 12 - Exporter</span>
+uvicorn src.api.app:app --host 0.0.0.0 --port 8010</code></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Terminal 13 — Web (Frontend)</div>
+                            <div class="code-block" data-lang="Terminal 13"><code>cd C:\Users\jcc14\Documents\PvBrowser\pvsolar-web
+npm run dev</code></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PASSO 5 -->
+            <section class="section" id="passo5">
+                <div class="section-header">
+                    <div class="section-icon" style="background: var(--gradient-twin)"><i class="fas fa-globe"></i></div>
+                    <div>
+                        <div class="section-title">Passo 5 - Acessar no Navegador</div>
+                        <div class="section-subtitle">Abrir cada interface</div>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Projeto</th><th>URL</th><th>O que voce ve</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Web Dashboard</strong></td><td><code>http://localhost:3001</code></td><td>Painel principal com todos os dados</td></tr>
+                            <tr><td><strong>SCADA/HMI</strong></td><td><code>http://localhost:5000</code></td><td>Tela SCADA com screens e widgets (pvBrowser)</td></tr>
+                            <tr><td><strong>Gateway API</strong></td><td><code>http://localhost:8000/docs</code></td><td>Documentacao Swagger da API</td></tr>
+                            <tr><td><strong>Analytics API</strong></td><td><code>http://localhost:8001/docs</code></td><td>Documentacao do ML</td></tr>
+                            <tr><td><strong>Reports API</strong></td><td><code>http://localhost:8002/docs</code></td><td>API de relatorios</td></tr>
+                            <tr><td><strong>Fleet API</strong></td><td><code>http://localhost:8003/docs</code></td><td>Gestao de sites</td></tr>
+                            <tr><td><strong>Alert API</strong></td><td><code>http://localhost:8004/docs</code></td><td>Notificacoes</td></tr>
+                            <tr><td><strong>Grid API</strong></td><td><code>http://localhost:8005/docs</code></td><td>Compliance PRODIST</td></tr>
+                            <tr><td><strong>Twin API</strong></td><td><code>http://localhost:8006/docs</code></td><td>Digital Twin</td></tr>
+                            <tr><td><strong>Auth API</strong></td><td><code>http://localhost:8007/docs</code></td><td>Login/RBAC</td></tr>
+                            <tr><td><strong>Backup API</strong></td><td><code>http://localhost:8008/docs</code></td><td>Backup</td></tr>
+                            <tr><td><strong>Scheduler API</strong></td><td><code>http://localhost:8009/docs</code></td><td>Agendamento</td></tr>
+                            <tr><td><strong>Exporter</strong></td><td><code>http://localhost:8010/metrics</code></td><td>Metricas Prometheus</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- PVBROWSER -->
+            <section class="section" id="pvbrowser">
+                <div class="section-header">
+                    <div class="section-icon" style="background: var(--gradient-scada)"><i class="fas fa-desktop"></i></div>
+                    <div>
+                        <div class="section-title">Onde entra o pvBrowser?</div>
+                        <div class="section-subtitle">Explicacao completa sobre o pvBrowser</div>
+                    </div>
+                </div>
+
+                <h3>O que e o pvBrowser?</h3>
+                <p>O <strong>pvBrowser</strong> e uma <strong>biblioteca/protocolo</strong> para criar telas SCADA/HMI. Pense nele como um "Google Forms" mas para paineis de controle industriais. Ele permite criar telas visuais que mostram dados em tempo real de uma planta solar.</p>
+
+                <div class="alert alert-success">
+                    <i class="fas fa-info-circle alert-icon"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">Nao e necessario instalar pvBrowser separadamente!</div>
+                        <div class="alert-text">O pvBrowser ja esta integrado dentro do pvSolar SCADA. Quando voce instala e roda o pvSolar SCADA (porta 5000), o pvBrowser ja vem junto.</div>
+                    </div>
+                </div>
+
+                <h3>Como ele se conecta ao ecossistema</h3>
+                <div class="arch-diagram"><code>
+    pvBrowser (protocolo TCP)
+          │
+          ▼
+    pvSolar SCADA (porta 5000)
+          │
+          ├──── Le dados do Gateway via API (porta 8000)
+          ├──── Le dados do Analytics via API (porta 8001)
+          └──── Le dados do Auth via API (porta 8007)
+                </code></div>
+
+                <h3>O que o pvSolar SCADA oferece</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: var(--gradient-scada)"><i class="fas fa-tv"></i></div>
+                        <div class="feature-title">6 Telas Prontas</div>
+                        <div class="feature-desc">Dashboard, Inversores, Clima, Alarmes, Performance e Sistema.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: var(--gradient-analytics)"><i class="fas fa-th-large"></i></div>
+                        <div class="feature-title">14 Tipos de Widgets</div>
+                        <div class="feature-desc">Botoes, graficos, medidores, indicadores, tabelas e mais.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: var(--gradient-gateway)"><i class="fas fa-plug"></i></div>
+                        <div class="feature-title">Protocolo TCP</div>
+                        <div class="feature-desc">Comunicacao via protocolo pvBrowser na porta 5000.</div>
+                    </div>
+                </div>
+
+                <h3>Como criar telas customizadas</h3>
+                <p>Para criar telas novas, edite o arquivo de configuracao do SCADA:</p>
+                <div class="code-block" data-lang="YAML"><code><span class="comment"># pvsolar-scada/config/scada.yaml</span>
+
+screens:
+  - id: <span class="string">"minha_tela"</span>
+    name: <span class="string">"Minha Planta Solar"</span>
+    widgets:
+      - type: <span class="string">"gauge"</span>
+        label: <span class="string">"Potencia Atual"</span>
+        source: <span class="string">"gateway.inverter.power_watts"</span>
+      - type: <span class="string">"chart"</span>
+        label: <span class="string">"Historico"</span>
+        source: <span class="string">"analytics.energy_history"</span></code></div>
+            </section>
+
+            <!-- INTERLIGACAO -->
+            <section class="section" id="interligacao">
+                <div class="section-header">
+                    <div class="section-icon" style="background: var(--gradient-auth)"><i class="fas fa-link"></i></div>
+                    <div>
+                        <div class="section-title">Como os Projetos se Interligam</div>
+                        <div class="section-subtitle">Fluxo de dados completo</div>
+                    </div>
+                </div>
+
+                <p>Cada projeto se comunica com os outros via <strong>APIs REST</strong>. O Gateway e o centro de tudo — todos leem dele.</p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Projeto</th><th>Le dados de</th><th>Envia dados para</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Gateway</strong></td><td>Inversores (Modbus/MQTT)</td><td>Todos os outros projetos</td></tr>
+                            <tr><td><strong>Analytics</strong></td><td>Gateway (:8000)</td><td>Web, Exporter</td></tr>
+                            <tr><td><strong>SCADA</strong></td><td>Gateway, Analytics, Auth</td><td>Web (via TCP)</td></tr>
+                            <tr><td><strong>Reports</strong></td><td>Gateway, Analytics</td><td>Web (PDFs/Excel)</td></tr>
+                            <tr><td><strong>Fleet</strong></td><td>Varios Gateways</td><td>Web, Exporter</td></tr>
+                            <tr><td><strong>Alert</strong></td><td>Gateway, Grid</td><td>Email, SMS, Telegram</td></tr>
+                            <tr><td><strong>Grid</strong></td><td>Gateway</td><td>Alert, Web</td></tr>
+                            <tr><td><strong>Twin</strong></td><td>Gateway, Analytics</td><td>Web</td></tr>
+                            <tr><td><strong>Auth</strong></td><td>Usuarios locais</td><td>Todos (JWT tokens)</td></tr>
+                            <tr><td><strong>Web</strong></td><td>Todos via API</td><td>Navegador do usuario</td></tr>
+                            <tr><td><strong>Backup</strong></td><td>Banco de dados</td><td>Storage local/nuvem</td></tr>
+                            <tr><td><strong>Scheduler</strong></td><td>Todos via API</td><td>Executa tarefas agendadas</td></tr>
+                            <tr><td><strong>Exporter</strong></td><td>Todos via API</td><td>Prometheus/Grafana</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- PORTAS -->
+            <section class="section" id="portas">
+                <div class="section-header">
+                    <div class="section-icon" style="background: var(--gradient-web)"><i class="fas fa-network-wired"></i></div>
+                    <div>
+                        <div class="section-title">Todas as Portas</div>
+                        <div class="section-subtitle">Resumo das portas de cada servico</div>
+                    </div>
+                </div>
+
+                <div class="port-grid">
+                    <div class="port-item">
+                        <div class="port-number">3001</div>
+                        <div class="port-service">pvSolar Web</div>
+                        <div class="port-desc">Dashboard navegador</div>
+                    </div>
+                    <div class="port-item">
+                        <div class="port-number">5000</div>
+                        <div class="port-service">pvSolar SCADA</div>
+                        <div class="port-desc">Telas HMI (pvBrowser)</div>
+                    </div>
+                    <div class="port-item">
+                        <div class="port-number">8000</div>
+                        <div class="port-service">pvSolar Gateway</div>
+                        <div class="port-desc">Coleta de dados</div>
+                    </div>
+                    <div class="port-item">
+                        <div class="port-number">8001</div>
+                        <div class="port-service">pvSolar Analytics</div>
+                        <div class="port-desc">Machine Learning</div>
+                    </div>
+                    <div class="port-item">
+                        <div class="port-number">8002</div>
+                        <div class="port-service">pvSolar Reports</div>
+                        <div class="port-desc">PDF / Excel</div>
+                    </div>
+                    <div class="port-item">
+                        <div class="port-number">8003</div>
+                        <div class="port-service">pvSolar Fleet</div>
+                        <div class="port-desc">Multi-site</div>
+                    </div>
+                    <div class="port-item">
+                        <div class="port-number">8004</div>
+                        <div class="port-service">pvSolar Alert</div>
+                        <div class="port-desc">Notificacoes</div>
+                    </div>
+                    <div class="port-item">
+                        <div class="port-number">8005</div>
+                        <div class="port-service">pvSolar Grid</div>
+                        <div class="port-desc">Compliance</div>
+                    </div>
+                    <div class="port-item">
+                        <div class="port-number">8006</div>
+                        <div class="port-service">pvSolar Twin</div>
+                        <div class="port-desc">Simulacao</div>
+                    </div>
+                    <div class="port-item">
+                        <div class="port-number">8007</div>
+                        <div class="port-service">pvSolar Auth</div>
+                        <div class="port-desc">Login / RBAC</div>
+                    </div>
+                    <div class="port-item">
+                        <div class="port-number">8008</div>
+                        <div class="port-service">pvSolar Backup</div>
+                        <div class="port-desc">Backup</div>
+                    </div>
+                    <div class="port-item">
+                        <div class="port-number">8009</div>
+                        <div class="port-service">pvSolar Scheduler</div>
+                        <div class="port-desc">Agendamento</div>
+                    </div>
+                    <div class="port-item">
+                        <div class="port-number">8010</div>
+                        <div class="port-service">pvSolar Exporter</div>
+                        <div class="port-desc">Prometheus</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SCRIPT -->
+            <section class="section" id="script">
+                <div class="section-header">
+                    <div class="section-icon" style="background: var(--gradient-backup)"><i class="fas fa-terminal"></i></div>
+                    <div>
+                        <div class="section-title">Script de Inicializacao Automatica</div>
+                        <div class="section-subtitle">Iniciar tudo com um clique</div>
+                    </div>
+                </div>
+
+                <p>Crie um arquivo <code>iniciar-pvsolar.bat</code> na pasta PvBrowser com o conteudo abaixo. Salve como <strong>"iniciar-pvsolar.bat"</strong> (tipo: Todos os Arquivos) e clique duas vezes para rodar.</p>
+
+                <div class="code-block" data-lang="Windows Batch"><code>@echo off
+echo ========================================
+echo  Iniciando Ecossistema pvSolar...
+echo ========================================
+
+start "Gateway" cmd /k "cd C:\Users\jcc14\Documents\PvBrowser\pvsolar-gateway && venv\Scripts\activate && set PYTHONPATH=src && python -m core.gateway -c config/gateway.yaml"
+timeout /t 3 /nobreak >nul
+
+start "Analytics" cmd /k "cd C:\Users\jcc14\Documents\PvBrowser\pvsolar-analytics && venv\Scripts\activate && python -m src.core.app -c config/analytics.yaml --host 0.0.0.0 --port 8001"
+timeout /t 2 /nobreak >nul
+
+start "SCADA" cmd /k "cd C:\Users\jcc14\Documents\PvBrowser\pvsolar-scada && venv\Scripts\activate && python -m src.app -c config/scada.yaml"
+timeout /t 2 /nobreak >nul
+
+start "Reports" cmd /k "cd C:\Users\jcc14\Documents\PvBrowser\pvsolar-reports && venv\Scripts\activate && uvicorn src.api.app:app --host 0.0.0.0 --port 8002"
+timeout /t 2 /nobreak >nul
+
+start "Fleet" cmd /k "cd C:\Users\jcc14\Documents\PvBrowser\pvsolar-fleet && venv\Scripts\activate && uvicorn src.api.app:app --host 0.0.0.0 --port 8003"
+timeout /t 2 /nobreak >nul
+
+start "Alert" cmd /k "cd C:\Users\jcc14\Documents\PvBrowser\pvsolar-alert && venv\Scripts\activate && uvicorn src.app:app --host 0.0.0.0 --port 8004"
+timeout /t 2 /nobreak >nul
+
+start "Grid" cmd /k "cd C:\Users\jcc14\Documents\PvBrowser\pvsolar-grid && venv\Scripts\activate && uvicorn src.app:app --host 0.0.0.0 --port 8005"
+timeout /t 2 /nobreak >nul
+
+start "Twin" cmd /k "cd C:\Users\jcc14\Documents\PvBrowser\pvsolar-twin && venv\Scripts\activate && uvicorn src.app:app --host 0.0.0.0 --port 8006"
+timeout /t 2 /nobreak >nul
+
+start "Auth" cmd /k "cd C:\Users\jcc14\Documents\PvBrowser\pvsolar-auth && venv\Scripts\activate && uvicorn src.api.app:app --host 0.0.0.0 --port 8007"
+timeout /t 2 /nobreak >nul
+
+start "Backup" cmd /k "cd C:\Users\jcc14\Documents\PvBrowser\pvsolar-backup && venv\Scripts\activate && uvicorn src.api.app:app --host 0.0.0.0 --port 8008"
+timeout /t 2 /nobreak >nul
+
+start "Scheduler" cmd /k "cd C:\Users\jcc14\Documents\PvBrowser\pvsolar-scheduler && venv\Scripts\activate && uvicorn src.api.app:app --host 0.0.0.0 --port 8009"
+timeout /t 2 /nobreak >nul
+
+start "Exporter" cmd /k "cd C:\Users\jcc14\Documents\PvBrowser\pvsolar-exporter && venv\Scripts\activate && uvicorn src.api.app:app --host 0.0.0.0 --port 8010"
+timeout /t 2 /nobreak >nul
+
+start "Web" cmd /k "cd C:\Users\jcc14\Documents\PvBrowser\pvsolar-web && npm run dev"
+
+echo.
+echo ========================================
+echo  Todos os servicos iniciados!
+echo  Acesse: http://localhost:3001
+echo ========================================
+pause</code></div>
+            </section>
+
+            <!-- DOCKER -->
+            <section class="section" id="docker">
+                <div class="section-header">
+                    <div class="section-icon" style="background: var(--gradient-fleet)"><i class="fab fa-docker"></i></div>
+                    <div>
+                        <div class="section-title">Docker / VPS</div>
+                        <div class="section-subtitle">Stack completa: 13 servicos + PostgreSQL + Mosquitto + Caddy</div>
+                    </div>
+                </div>
+
+                <p>O <strong>docker-compose.yml da raiz</strong> e o ponto de entrada unico do ecossistema. Ele sobe os 13 servicos (cada um com seu <code>docker/Dockerfile</code>), o PostgreSQL com os bancos ja criados, o broker MQTT e o Caddy como porta unica de entrada.</p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Arquivo</th><th>Papel</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>docker-compose.yml</code></td><td>Stack completa (16 servicos): healthchecks, volumes, dependencias, binds de config</td></tr>
+                            <tr><td><code>docker/initdb/01-databases.sql</code></td><td>Cria os 4 bancos (auth/scheduler + pares *_test) e o pvsolar_analytics na primeira subida</td></tr>
+                            <tr><td><code>docker/Caddyfile</code></td><td>Roteamento por caminho: <code>/auth/*</code>, <code>/gateway/*</code>, ... e o Web em <code>/</code></td></tr>
+                            <tr><td><code>docker/mosquitto.conf</code></td><td>Broker MQTT na 1883 (anonimo - trocar por senha/TLS antes de expor)</td></tr>
+                            <tr><td><code>docker/config/*.yaml</code></td><td>7 variantes de config com URLs da rede interna (<code>broker: mosquitto</code>, <code>http://gateway:8000</code>, ...)</td></tr>
+                            <tr><td><code>.env.example</code></td><td>Variaveis: DOMAIN, senha do Postgres, TZ, URLs do Web</td></tr>
+                            <tr><td><code>docker/validate_compose.py</code></td><td>Valida YAML, builds, volumes, portas e initdb (<code>python docker\validate_compose.py</code>)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert alert-info">
+                    <div class="alert-content">
+                        <div class="alert-title">Mesma origem, zero CORS</div>
+                        <div class="alert-text">O Web e construido com URLs relativas (<code>/auth</code>, <code>/gateway</code>, ...) e servido pelo Caddy em <code>http://localhost</code> - todas as chamadas ficam na mesma origem e nenhum CORS e disparado. As portas dos servicos ficam publicadas apenas em <code>127.0.0.1</code> para debug local.</div>
+                    </div>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Passo 1 — Arquivo .env (opcional)</div>
+                            <div class="step-desc">Todos os valores tem default no compose; copie apenas para customizar.</div>
+                            <div class="code-block" data-lang="bash"><code>cd C:\Users\jcc14\Documents\PvBrowser
+copy .env.example .env</code></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Passo 2 — Subir tudo</div>
+                            <div class="code-block" data-lang="bash"><code><span class="comment"># Primeira vez: build das 14 imagens (~5-10 min)</span>
+docker compose up -d --build
+
+<span class="comment"># Subidas seguintes (build cacheia requirements + codigo)</span>
+docker compose up -d</code></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Passo 3 — Verificar</div>
+                            <div class="code-block" data-lang="bash"><code>docker compose ps
+
+<span class="comment"># 16 containers running (healthcheck healthy quando aplicavel)</span>
+<span class="comment"># Login: admin / admin123 (criado automaticamente no 1o start do Auth)</span>
+<span class="comment"># Logs:  docker compose logs -f auth</span></code></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Passo 4 — Acessar</div>
+                            <div class="code-block" data-lang="bash"><code>http://localhost               <span class="comment"># pvSolar Web (via Caddy)</span>
+http://localhost/auth          <span class="comment"># Auth pelo Caddy (mesma origem)</span>
+http://localhost:8007/health   <span class="comment"># Auth direto (debug)</span>
+http://localhost:8009/health   <span class="comment"># Scheduler direto (debug)</span></code></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Serviço</th><th>Porta no host</th><th>Exposição</th></tr></thead>
+                        <tbody>
+                            <tr><td>Caddy (entrada unica)</td><td>80 / 443</td><td><strong>0.0.0.0</strong> (HTTP/HTTPS)</td></tr>
+                            <tr><td>SCADA (TCP pvBrowser)</td><td>5000</td><td><strong>0.0.0.0</strong> (cliente pvBrowser desktop)</td></tr>
+                            <tr><td>Web (direto)</td><td>3001</td><td>127.0.0.1</td></tr>
+                            <tr><td>Gateway (+ Prometheus 9090)</td><td>8000 / 9090</td><td>127.0.0.1</td></tr>
+                            <tr><td>Analytics, Reports, Fleet</td><td>8001 / 8002 / 8003</td><td>127.0.0.1</td></tr>
+                            <tr><td>Alert, Grid, Twin, Auth</td><td>8004 / 8005 / 8006 / 8007</td><td>127.0.0.1</td></tr>
+                            <tr><td>Backup, Scheduler, Exporter</td><td>8008 / 8009 / 8010</td><td>127.0.0.1</td></tr>
+                            <tr><td>PostgreSQL / Mosquitto</td><td>5432 / 1883</td><td>127.0.0.1</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">VPS 1 — Instalar Docker (Ubuntu/Debian)</div>
+                            <div class="code-block" data-lang="bash"><code>curl -fsSL https://get.docker.com | sh</code></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">VPS 2 — .env com o dominio</div>
+                            <div class="code-block" data-lang="bash"><code><span class="comment"># .env</span>
+DOMAIN=seu-dominio.com     <span class="comment"># Let's Encrypt automatico (443 aberto)</span>
+<span class="comment"># Sem dominio? use DOMAIN=:80 e acesse por IP</span>
+POSTGRES_PASSWORD=troque-esteaqui</code></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">VPS 3 — Firewall</div>
+                            <div class="code-block" data-lang="bash"><code>sudo ufw allow 22/tcp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw allow 5000/tcp   <span class="comment"># opcional: pvBrowser HMI remoto</span>
+sudo ufw enable</code></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">VPS 4 — Subir a stack</div>
+                            <div class="code-block" data-lang="bash"><code>docker compose up -d --build
+docker compose ps
+<span class="comment"># HTTPS emitido automaticamente na primeira subida (DOMAIN com dominio)</span></code></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning">
+                    <div class="alert-content">
+                        <div class="alert-title">Volumes e backup</div>
+                        <div class="alert-text">Os dados vivem nos volumes <code>pgdata</code>, <code>caddy_data</code>, <code>caddy_config</code>, <code>reports-output</code> e <code>backup-data</code>. <code>docker compose down</code> preserva tudo; <code>docker compose down -v</code> <strong>apaga o Postgres</strong>. Faça dump antes:</div>
+                    </div>
+                </div>
+                <div class="code-block" data-lang="bash"><code><span class="comment"># Dump dos bancos do ecossistema</span>
+docker compose exec postgres pg_dump -U postgres pvsolar_auth > backup_auth.sql
+docker compose exec postgres pg_dump -U postgres pvsolar_scheduler > backup_scheduler.sql
+
+<span class="comment"># Comandos do dia a dia</span>
+docker compose logs -f auth                <span class="comment"># logs de um servico</span>
+docker compose restart scheduler           <span class="comment"># reiniciar um servico</span>
+docker compose up -d --build web           <span class="comment"># rebuild do Web (mudou NEXT_PUBLIC_*)</span>
+docker compose down                        <span class="comment"># parar tudo (volumes mantidos)</span>
+docker compose up -d                       <span class="comment"># subir de novo</span></code></div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Aspecto</th><th>Windows local (Passos 1-5)</th><th>Docker / VPS</th></tr></thead>
+                        <tbody>
+                            <tr><td>Subir</td><td>venv + uvicorn por terminal</td><td><code>docker compose up -d --build</code></td></tr>
+                            <tr><td>Configs</td><td><code>config/*.yaml</code> de cada projeto</td><td><code>docker/config/*.yaml</code> montadas no container</td></tr>
+                            <tr><td>PostgreSQL</td><td>instalado local (5432)</td><td><code>postgres:17-alpine</code> + volume <code>pgdata</code></td></tr>
+                            <tr><td>MQTT</td><td>exige Mosquitto local (1883)</td><td><code>mosquitto</code> no compose</td></tr>
+                            <tr><td>Web</td><td><code>npm run dev</code> (3001)</td><td>build standalone + Caddy</td></tr>
+                            <tr><td>Acesso</td><td><code>localhost:800X</code> / <code>:3001</code></td><td><code>http://localhost</code> (Caddy, mesma origem)</td></tr>
+                            <tr><td>HTTPS</td><td>—</td><td>automatico com <code>DOMAIN=dominio.com</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert alert-info">
+                    <div class="alert-content">
+                        <div class="alert-title">SCADA fica fora do Caddy</div>
+                        <div class="alert-text">O SCADA fala o protocolo <strong>TCP do pvBrowser</strong> (nao HTTP) e nao passa pelo proxy: conecte o cliente pvBrowser direto na porta 5000 do host. O Web, por sua vez, nao consome o SCADA por HTTP.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- GRAFANA -->
+            <section class="section" id="grafana">
+                <div class="section-header">
+                    <div class="section-icon" style="background: var(--gradient-exporter)"><i class="fas fa-tachometer-alt"></i></div>
+                    <div>
+                        <div class="section-title">Integracao com Grafana</div>
+                        <div class="section-subtitle">Dashboards profissionais de monitoramento</div>
+                    </div>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Instalar Prometheus</div>
+                            <div class="step-desc">Baixe em prometheus.io e configure para scraping:</div>
+                            <div class="code-block" data-lang="YAML"><code><span class="comment"># prometheus.yml</span>
+
+scrape_configs:
+  - job_name: <span class="string">'pvsolar'</span>
+    scrape_interval: <span class="number">15s</span>
+    static_configs:
+      - targets: [<span class="string">'localhost:8010'</span>]
+    metrics_path: <span class="string">'/metrics'</span></code></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Instalar Grafana</div>
+                            <div class="step-desc">Baixe em grafana.com. Adicione o Prometheus como Data Source:</div>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle alert-icon"></i>
+                                <div class="alert-content">
+                                    <div class="alert-title">Configuracao</div>
+                                    <div class="alert-text">Settings > Data Sources > Add > Prometheus > URL: <code>http://localhost:9090</code></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Criar painel Grafana</div>
+                            <div class="step-desc">Use o namespace <code>pvsolar_</code> para queries:</div>
+                            <div class="code-block" data-lang="PromQL"><code><span class="comment"># Energia total dos inversores</span>
+sum(pvsolar_gateway_messages_received)
+
+<span class="comment"># Inversores online</span>
+pvsolar_gateway_inverter_count
+
+<span class="comment"># Uptime do sistema</span>
+pvsolar_gateway_uptime_seconds
+
+<span class="comment"># Anomalias detectadas</span>
+pvsolar_analytics_anomalies_detected
+
+<span class="comment"># Alertas ativos</span>
+pvsolar_alert_active_alerts</code></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PROBLEMAS -->
+            <section class="section" id="problemas">
+                <div class="section-header">
+                    <div class="section-icon" style="background: var(--gradient-scheduler)"><i class="fas fa-wrench"></i></div>
+                    <div>
+                        <div class="section-title">Problemas Comuns e Solucoes</div>
+                        <div class="section-subtitle">Duvidas frequentes</div>
+                    </div>
+                </div>
+
+                <div class="troubleshoot-item">
+                    <div class="troubleshoot-problem"><i class="fas fa-times-circle"></i> "Port is already in use" / "Porta em uso"</div>
+                    <div class="troubleshoot-solution">
+                        <strong>Solucao:</strong> Outro programa esta usando a porta. Feche o programa ou mude a porta no arquivo <code>.yaml</code> do projeto.
+                    </div>
+                </div>
+
+                <div class="troubleshoot-item">
+                    <div class="troubleshoot-problem"><i class="fas fa-times-circle"></i> "ModuleNotFoundError" / "Modulo nao encontrado"</div>
+                    <div class="troubleshoot-solution">
+                        <strong>Solucao:</strong> O ambiente virtual nao esta ativo. Execute: <code>venv\Scripts\activate</code> antes de rodar qualquer comando.
+                    </div>
+                </div>
+
+                <div class="troubleshoot-item">
+                    <div class="troubleshoot-problem"><i class="fas fa-times-circle"></i> "Connection refused" / "Conexao recusada"</div>
+                    <div class="troubleshoot-solution">
+                        <strong>Solucao:</strong> Verifique se o Gateway (porta 8000) esta rodando. Todos os outros projetos dependem dele.
+                    </div>
+                </div>
+
+                <div class="troubleshoot-item">
+                    <div class="troubleshoot-problem"><i class="fas fa-times-circle"></i> "Syntax error" / "Erro de sintaxe"</div>
+                    <div class="troubleshoot-solution">
+                        <strong>Solucao:</strong> Verifique se esta usando Python 3.11 ou superior. Execute: <code>python --version</code>
+                    </div>
+                </div>
+
+                <div class="troubleshoot-item">
+                    <div class="troubleshoot-problem"><i class="fas fa-times-circle"></i> "npm not found" / "npm nao encontrado"</div>
+                    <div class="troubleshoot-solution">
+                        <strong>Solucao:</strong> Instale o Node.js em nodejs.org. O npm vem junto.
+                    </div>
+                </div>
+
+                <div class="troubleshoot-item">
+                    <div class="troubleshoot-problem"><i class="fas fa-times-circle"></i> SCADA sem dados / telas vazias</div>
+                    <div class="troubleshoot-solution">
+                        <strong>Solucao:</strong> Verifique se o Gateway esta rodando e conectado aos inversores. Confirme o IP no arquivo <code>gateway.yaml</code>.
+                    </div>
+                </div>
+
+                <div class="troubleshoot-item">
+                    <div class="troubleshoot-problem"><i class="fas fa-times-circle"></i> Web Dashboard nao carrega</div>
+                    <div class="troubleshoot-solution">
+                        <strong>Solucao:</strong> Verifique se todos os backends estao rodando. O Web precisa de pelo menos Auth e Gateway funcionando.
+                    </div>
+                </div>
+
+                <div class="troubleshoot-item">
+                    <div class="troubleshoot-problem"><i class="fas fa-times-circle"></i> Erro "No label names were set"</div>
+                    <div class="troubleshoot-solution">
+                        <strong>Solucao:</strong> Erro do Prometheus Client. Verifique se o Exporter esta configurado corretamente no <code>exporter.yaml</code>.
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#visao-geral">Visao Geral</a>
+            <a href="#arquitetura">Arquitetura</a>
+            <a href="#requisitos">Requisitos</a>
+            <a href="#passo1">Instalacao</a>
+            <a href="#pvbrowser">pvBrowser</a>
+            <a href="#portas">Portas</a>
+            <a href="#docker">Docker</a>
+            <a href="#problemas">Problemas</a>
+        </div>
+        <p class="footer-text">pvSolar Ecosystem v1.0.0 — Guia Completo de Instalacao</p>
+        <p class="footer-copyright">12 Projetos | 955 Testes | GPLv3 | Para usinas solares brasileiras</p>
+    </footer>
+
+    <button class="back-to-top" id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Back to top button
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('backToTop');
+            if (window.scrollY > 500) {
+                btn.classList.add('visible');
+            } else {
+                btn.classList.remove('visible');
+            }
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Copy code button
+        document.querySelectorAll('.code-block').forEach(block => {
+            const btn = document.createElement('button');
+            btn.className = 'copy-btn';
+            btn.textContent = 'Copiar';
+            btn.onclick = () => {
+                const code = block.querySelector('code').textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    btn.textContent = 'Copiado!';
+                    setTimeout(() => btn.textContent = 'Copiar', 2000);
+                });
+            };
+            block.style.position = 'relative';
+            block.appendChild(btn);
+        });
+    </script>
+</body>
+</html>

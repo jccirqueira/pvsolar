@@ -1,0 +1,32 @@
+# Mosquitto ACL Configuration for pvSolar Gateway
+# ================================================
+# Topic-level access control for industrial security
+
+# Pattern explanations:
+# %c = Client ID of the connecting client
+# %u = Username of the connecting client
+
+# pvSolar Gateways - Publish telemetry, subscribe to commands
+pattern readwrite pvsolar/+/telemetry
+pattern readwrite pvsolar/+/status
+pattern readwrite pvsolar/+/alert
+pattern read pvsolar/+/command
+
+# Dashboard clients - Read only telemetry and status
+user dashboard
+topic read pvsolar/+/telemetry
+topic read pvsolar/+/status
+topic read pvsolar/+/alert
+
+# pvbrowser clients - Read telemetry and status
+user pvbrowser
+topic read pvsolar/+/telemetry
+topic read pvsolar/+/status
+
+# Telegraf - Read all for metrics collection
+user telegraf
+topic read pvsolar/#
+
+# Grafana - Read all for dashboards
+user grafana
+topic read pvsolar/#

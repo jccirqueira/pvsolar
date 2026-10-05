@@ -1,0 +1,172 @@
+# pvSolar Gateway Configuration
+# =============================
+
+# Gateway Core Settings
+gateway:
+  name: "solar-site-001"           # Unique gateway identifier
+  location: "São Paulo, Brazil"   # Physical location
+  timezone: "America/Sao_Paulo"   # Timezone (IANA format)
+  instance_id: null                # Auto-generated if null
+
+# MQTT Configuration
+mqtt:
+  broker: "mqtt.example.com"       # MQTT broker hostname
+  port: 8883                       # MQTT port (8883 for TLS)
+  use_tls: true                    # Enable TLS encryption
+  tls:
+    enabled: true
+    ca_cert: "/etc/pvsolar/certs/ca.crt"
+    client_cert: "/etc/pvsolar/certs/client.crt"
+    client_key: "/etc/pvsolar/certs/client.key"
+    tls_version: "1.3"             # TLS version (1.2 or 1.3)
+    verify_certificate: true
+  client_id: "pvsolar-gateway-001"
+  username: null                   # MQTT username (if required)
+  password: null                   # MQTT password (if required)
+  topics:
+    publish: "pvsolar/{site_id}/telemetry"
+    command: "pvsolar/{site_id}/command"
+    status: "pvsolar/{site_id}/status"
+    alert: "pvsolar/{site_id}/alert"
+  qos: 1                           # QoS level (0, 1, or 2)
+  retain: true                     # Retain messages
+  heartbeat_interval: 30           # Heartbeat interval in seconds
+  reconnect_delay: 5               # Initial reconnect delay
+  max_inflight: 20
+  max_queued: 1000
+
+# Inverters Configuration
+inverters:
+  # Fronius GEN24 Example
+  - id: "fronius-001"
+    name: "Fronius GEN24 Plus 8.0"
+    driver: "fronius"
+    connection:
+      type: "modbus_tcp"
+      host: "192.168.1.100"
+      port: 502
+      unit_id: 1
+      timeout: 3.0
+      retries: 3
+    polling_interval: 5.0
+    registers:
+      - name: "ac_power"
+        address: 40083
+        type: "uint32"
+        scale: 0.001
+        unit: "kW"
+        description: "AC output power"
+
+  # Growatt MIN Example
+  - id: "growatt-001"
+    name: "Growatt MIN 5000TL-X"
+    driver: "growatt"
+    connection:
+      type: "modbus_tcp"
+      host: "192.168.1.101"
+      port: 502
+      unit_id: 1
+    polling_interval: 5.0
+
+  # SunSpec Generic Example (works with most inverters)
+  - id: "sunspec-001"
+    name: "Generic SunSpec Inverter"
+    driver: "sunspec"
+    connection:
+      type: "modbus_tcp"
+      host: "192.168.1.102"
+      port: 502
+      unit_id: 1
+    polling_interval: 5.0
+
+  # Huawei SUN2000 Example
+  - id: "huawei-001"
+    name: "Huawei SUN2000-5KTL"
+    driver: "huawei"
+    connection:
+      type: "modbus_tcp"
+      host: "192.168.1.103"
+      port: 502
+      unit_id: 1
+    polling_interval: 5.0
+
+# Cloud Integration
+cloud:
+  aws_iot:
+    enabled: false
+    endpoint: "xxxxxxxxxxxxxx.iot.us-east-1.amazonaws.com"
+    cert_path: "/etc/pvsolar/certs/aws/"
+    thing_name: "pvsolar-gateway-001"
+    region: "us-east-1"
+
+  azure_iot:
+    enabled: false
+    connection_string: "HostName=xxx.azure-devices.net;DeviceId=xxx;SharedAccessKey=xxx"
+    device_id: "pvsolar-gateway-001"
+
+  mqtt_local:
+    enabled: true
+    broker: "localhost"
+    port: 1883
+
+# Edge Computing
+edge:
+  store_and_forward:
+    enabled: true
+    database: "/var/lib/pvsolar/edge.db"
+    max_buffer_hours: 72
+    sync_interval: 30
+    max_records: 100000
+
+  processing:
+    enabled: true
+    aggregation: "1min"
+    calculators:
+      - "performance_ratio"
+      - "availability"
+      - "energy_forecast"
+
+# pvbrowser Integration
+pvbrowser:
+  enabled: true
+  socket_port: 5050
+  shared_memory: true
+  update_interval: 1.0
+
+# Web Dashboard
+web:
+  enabled: true
+  port: 5000
+  host: "0.0.0.0"
+  auth:
+    enabled: true
+    username: "admin"
+    password_hash: ""               # Generate with: python -c "import bcrypt; print(bcrypt.hashpw(b'password', bcrypt.gensalt()).decode())"
+    jwt_secret: ""                  # Generate with: python -c "import secrets; print(secrets.token_hex(32))"
+    jwt_expiry_hours: 24
+
+# Alerts (Premium)
+alerts:
+  enabled: false
+  channels:
+    telegram:
+      enabled: false
+      bot_token: ""
+      chat_id: ""
+    whatsapp:
+      enabled: false
+    sms:
+      enabled: false
+
+# Logging
+logging:
+  level: "INFO"
+  file: "/var/log/pvsolar/gateway.log"
+  max_size_mb: 100
+  backup_count: 10
+  format: "json"
+
+# Prometheus Metrics
+metrics:
+  enabled: true
+  port: 9090

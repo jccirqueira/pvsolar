@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  pvsolar-scada:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: pvsolar-scada
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - ../config:/app/config:ro
+      - scada-data:/app/data
+    environment:
+      - PVSCADA_DEBUG=false
+      - MQTT_BROKER=mqtt-broker
+      - MQTT_PORT=1883
+      - GATEWAY_URL=http://pvsolar-gateway:8000
+      - ANALYTICS_URL=http://pvsolar-analytics:8001
+    networks:
+      - pvsolar-net
+    depends_on:
+      - mqtt-broker
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s = socket.socket(); s.connect(('localhost', 5000)); s.close()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  mqtt-broker:
+    image: eclipse-mosquitto:2
+    container_name: mqtt-broker
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-log:/mosquitto/log
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    networks:
+      - pvsolar-net
+
+volumes:
+  scada-data:
+  mosquitto-data:
+  mosquitto-log:
+
+networks:
+  pvsolar-net:
+    driver: bridge

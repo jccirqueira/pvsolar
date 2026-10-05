@@ -1,0 +1,301 @@
+# ============================================================
+# pvSolar - docker-compose.yml (raiz do ecossistema)
+# ------------------------------------------------------------
+# 13 servicos + PostgreSQL + Mosquitto + Caddy.
+#
+#   Uso basico:
+#     cp .env.example .env        # opcional (defaults ja funcionam)
+#     docker compose up -d --build
+#     abrir http://localhost       -> pvSolar Web (via Caddy)
+#
+#   Debug local: todas as portas ficam publicadas em 127.0.0.1
+#   (ex.: http://localhost:8007 = Auth direto). O acesso remoto
+#   passa pelo Caddy (80/443) com URLs relativas - sem CORS.
+#
+#   SCADA (5000) e TCP pvBrowser (nao HTTP): publicado direto,
+#   fora do roteamento do Caddy.
+# ============================================================
+
+name: pvsolar
+
+services:
+  # ==========================================================
+  # Infraestrutura
+  # ==========================================================
+  postgres:
+    image: postgres:17-alpine
+    container_name: pvsolar-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pvsolar_dev}
+      POSTGRES_DB: postgres
+      TZ: ${TZ:-America/Sao_Paulo}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres} -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: pvsolar-mosquitto
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:1883:1883"
+    volumes:
+      - ./docker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+
+  # ==========================================================
+  # Servicos pvSolar
+  # ==========================================================
+  gateway:
+    build:
+      context: ./pvsolar-gateway
+      dockerfile: docker/Dockerfile
+    image: pvsolar/gateway:latest
+    container_name: pvsolar-gateway
+    restart: unless-stopped
+    depends_on:
+      mosquitto:
+        condition: service_started
+    ports:
+      - "127.0.0.1:8000:8000"    # API/Web do gateway
+      - "127.0.0.1:9090:9090"    # Prometheus metrics
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+    volumes:
+      - ./docker/config/gateway.yaml:/app/config/gateway.yaml:ro
+
+  analytics:
+    build:
+      context: ./pvsolar-analytics
+      dockerfile: docker/Dockerfile
+    image: pvsolar/analytics:latest
+    container_name: pvsolar-analytics
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mosquitto:
+        condition: service_started
+    ports:
+      - "127.0.0.1:8001:8001"
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+    volumes:
+      - ./docker/config/analytics.yaml:/app/config/analytics.yaml:ro
+
+  reports:
+    build:
+      context: ./pvsolar-reports
+      dockerfile: docker/Dockerfile
+    image: pvsolar/reports:latest
+    container_name: pvsolar-reports
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8002:8002"
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+    volumes:
+      - ./docker/config/reports.yaml:/app/config/reports.yaml:ro
+      - reports-output:/app/output
+
+  fleet:
+    build:
+      context: ./pvsolar-fleet
+      dockerfile: docker/Dockerfile
+    image: pvsolar/fleet:latest
+    container_name: pvsolar-fleet
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8003:8003"
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+    volumes:
+      - ./docker/config/fleet.yaml:/app/config/fleet.yaml:ro
+
+  alert:
+    build:
+      context: ./pvsolar-alert
+      dockerfile: docker/Dockerfile
+    image: pvsolar/alert:latest
+    container_name: pvsolar-alert
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8004:8004"
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+
+  grid:
+    build:
+      context: ./pvsolar-grid
+      dockerfile: docker/Dockerfile
+    image: pvsolar/grid:latest
+    container_name: pvsolar-grid
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8005:8005"
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+
+  twin:
+    build:
+      context: ./pvsolar-twin
+      dockerfile: docker/Dockerfile
+    image: pvsolar/twin:latest
+    container_name: pvsolar-twin
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8006:8006"
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+
+  auth:
+    build:
+      context: ./pvsolar-auth
+      dockerfile: docker/Dockerfile
+    image: pvsolar/auth:latest
+    container_name: pvsolar-auth
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8007:8007"
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+      # Env > config: aponta o Auth para o PostgreSQL do compose
+      PVSOLAR_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-pvsolar_dev}@postgres:5432/pvsolar_auth
+      PVSOLAR_DB_ENABLED: "true"
+    volumes:
+      - ./pvsolar-auth/config/auth.yaml:/app/config/auth.yaml:ro
+
+  backup:
+    build:
+      context: ./pvsolar-backup
+      dockerfile: docker/Dockerfile
+    image: pvsolar/backup:latest
+    container_name: pvsolar-backup
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8008:8008"
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+    volumes:
+      - ./docker/config/backup.yaml:/app/config/backup.yaml:ro
+      - backup-data:/app/backups
+
+  scheduler:
+    build:
+      context: ./pvsolar-scheduler
+      dockerfile: docker/Dockerfile
+    image: pvsolar/scheduler:latest
+    container_name: pvsolar-scheduler
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8009:8009"
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+      # Env > config: aponta o Scheduler para o PostgreSQL do compose
+      PVSOLAR_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-pvsolar_dev}@postgres:5432/pvsolar_scheduler
+      PVSOLAR_DB_ENABLED: "true"
+    volumes:
+      - ./pvsolar-scheduler/config/scheduler.yaml:/app/config/scheduler.yaml:ro
+
+  exporter:
+    build:
+      context: ./pvsolar-exporter
+      dockerfile: docker/Dockerfile
+    image: pvsolar/exporter:latest
+    container_name: pvsolar-exporter
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8010:8010"
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+    volumes:
+      - ./docker/config/exporter.yaml:/app/config/exporter.yaml:ro
+
+  scada:
+    build:
+      context: ./pvsolar-scada
+      dockerfile: docker/Dockerfile
+    image: pvsolar/scada:latest
+    container_name: pvsolar-scada
+    restart: unless-stopped
+    depends_on:
+      mosquitto:
+        condition: service_started
+    ports:
+      - "5000:5000"               # pvBrowser TCP (cliente desktop)
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+    volumes:
+      - ./docker/config/scada.yaml:/app/config/scada.yaml:ro
+
+  web:
+    build:
+      context: ./pvsolar-web
+      dockerfile: docker/Dockerfile
+      args:
+        # URLs relativas = mesma origem via Caddy (sem CORS).
+        # Pode ser sobrescritas no .env (ex.: http://localhost:8007).
+        NEXT_PUBLIC_GATEWAY_URL: ${NEXT_PUBLIC_GATEWAY_URL:-/gateway}
+        NEXT_PUBLIC_ANALYTICS_URL: ${NEXT_PUBLIC_ANALYTICS_URL:-/analytics}
+        NEXT_PUBLIC_SCADA_URL: ${NEXT_PUBLIC_SCADA_URL:-http://localhost:5000}
+        NEXT_PUBLIC_REPORTS_URL: ${NEXT_PUBLIC_REPORTS_URL:-/reports}
+        NEXT_PUBLIC_FLEET_URL: ${NEXT_PUBLIC_FLEET_URL:-/fleet}
+        NEXT_PUBLIC_ALERT_URL: ${NEXT_PUBLIC_ALERT_URL:-/alert}
+        NEXT_PUBLIC_GRID_URL: ${NEXT_PUBLIC_GRID_URL:-/grid}
+        NEXT_PUBLIC_TWIN_URL: ${NEXT_PUBLIC_TWIN_URL:-/twin}
+        NEXT_PUBLIC_AUTH_URL: ${NEXT_PUBLIC_AUTH_URL:-/auth}
+    image: pvsolar/web:latest
+    container_name: pvsolar-web
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3001:3001"
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+
+  caddy:
+    image: caddy:2
+    container_name: pvsolar-caddy
+    restart: unless-stopped
+    depends_on:
+      - gateway
+      - analytics
+      - reports
+      - fleet
+      - alert
+      - grid
+      - twin
+      - auth
+      - backup
+      - scheduler
+      - exporter
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:
+  reports-output:
+  backup-data:

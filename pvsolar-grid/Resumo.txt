@@ -1,0 +1,247 @@
+================================================================================
+ pvSolar Grid v1.0.0
+ Conformidade com Grid Code Brasileiro (PRODIST/ANEEL)
+================================================================================
+
+Autor: pvSolar Team
+Licença: GPLv3
+Data: Setembro 2026
+Plataforma: Windows / Linux / Docker
+
+================================================================================
+1. CONTEXTO E OBJETIVO
+================================================================================
+
+O pvSolar Grid é o módulo de conformidade com o grid code brasileiro do
+ecossistema pvSolar. Ele verifica conformidade com PRODIST, ANEEL, INMETRO
+e ONS, garantindo que usinas solares atendam aos padrões de rede.
+
+Objetivos:
+- Verificação de conformidade PRODIST/ANEEL
+- Qualidade de energia (TENS/REAT)
+- Gravação de eventos FRT/LVRT/HVRT
+- Relatórios de compliance automáticos
+- API REST para integração
+
+================================================================================
+2. STACK TECNOLÓGICO
+================================================================================
+
+- Python 3.10+ (servidor de compliance)
+- FastAPI (API REST)
+- aiohttp (chamadas HTTP async)
+- NumPy (cálculos numéricos)
+- Pydantic (configuração type-safe)
+- structlog (logging estruturado)
+- Docker / Docker Compose
+
+================================================================================
+3. ESTRUTURA DO PROJETO
+================================================================================
+
+pvsolar-grid/
+├── pyproject.toml              # Build config
+├── requirements.txt            # Dependências
+├── Resumo.txt                  # Este arquivo
+├── Manual.html                 # Manual profissional HTML
+├── src/
+│   ├── __init__.py
+│   ├── app.py                  # Aplicação principal
+│   ├── core/
+│   │   ├── __init__.py
+│   │   └── config.py           # 12 classes Pydantic + 6 enums
+│   ├── compliance/
+│   │   ├── __init__.py
+│   │   └── compliance_engine.py # Engine de compliance PRODIST
+│   ├── quality/
+│   │   ├── __init__.py
+│   │   └── quality_analyzer.py # Analisador de qualidade
+│   ├── fault_recorder/
+│   │   ├── __init__.py
+│   │   └── fault_recorder.py   # Gravador de eventos FRT
+│   ├── reports/
+│   │   ├── __init__.py
+│   │   └── report_generator.py # Gerador de relatórios
+│   └── api/
+│       ├── __init__.py
+│       └── app.py              # API REST
+├── config/
+│   └── grid.example.yaml       # Config de exemplo
+├── docker/
+│   ├── Dockerfile
+│   └── docker-compose.yml
+└── tests/
+    ├── __init__.py
+    ├── test_config.py          # 35 testes
+    ├── test_compliance.py      # 28 testes
+    ├── test_quality.py         # 26 testes
+    ├── test_fault_recorder.py  # 18 testes
+    └── test_reports.py         # 13 testes
+
+================================================================================
+4. MÓDULOS
+================================================================================
+
+4.1 CONFIG.PY (12 classes Pydantic + 6 enums)
+----------------------------------------------
+- GridStandard: PRODIST, ANEEL, INMETRO, ONS
+- VoltageLevel: LOW, MEDIUM, HIGH, EXTRA_HIGH
+- ComplianceStatus: COMPLIANT, NON_COMPLIANT, WARNING, UNKNOWN
+- FaultType: LVRT, HVRT, FRT, FREQUENCY, CONNECT, DISCONNECT
+- QualityMetric: THD_V, THD_I, PCC_VOLTAGE, POWER_FACTOR, etc.
+- ReportType: DAILY, WEEKLY, MONTHLY, QUARTERLY, ANNUAL, EVENT
+- PRODISTLimits: limites PRODIST para qualidade
+- LVRTCurve/HVRTCurve: curvas de ride-through
+- FRTConfig: config de fault ride through
+- GridConnectionConfig: config de conexão
+- EventRecord: registro de evento
+- QualityMeasurement: medição de qualidade
+
+4.2 COMPLIANCE_ENGINE.PY (PRODIST/ANEEL)
+-----------------------------------------
+- ComplianceCheck: resultado de verificação
+- ComplianceEngine: engine principal
+  - check_voltage: tensão PCC
+  - check_thd_voltage: THD tensão
+  - check_thd_current: THD corrente
+  - check_power_factor: fator de potência
+  - check_frequency: frequência
+  - check_flicker: flicker
+  - check_unbalance: desquilíbrio
+  - run_full_check: verificação completa
+  - generate_report: relatório de compliance
+
+4.3 QUALITY_ANALYZER.PY (Qualidade de Energia)
+----------------------------------------------
+- QualityAnalyzer: analisador conforme PRODIST
+  - analyze_thd_voltage: THD tensão
+  - analyze_thd_current: THD corrente
+  - analyze_voltage: tensão PCC
+  - analyze_power_factor: fator de potência
+  - analyze_frequency: frequência
+  - analyze_flicker: flicker
+  - analyze_unbalance: desquilíbrio
+  - analyze_reactive_power: potência reativa
+  - get_compliance_rate: taxa de compliance
+
+4.4 FAULT_RECORDER.PY (FRT/LVRT/HVRT)
+---------------------------------------
+- FaultRecorder: gravador de eventos
+  - record_event: registra evento
+  - check_lvrt_compliance: verifica LVRT
+  - check_hvrt_compliance: verifica HVRT
+  - interpolação de curvas LVRT/HVRT
+  - get_events_by_type: filtra por tipo
+  - get_non_compliant_events: eventos NC
+
+4.5 REPORT_GENERATOR.PY (Relatórios)
+-------------------------------------
+- ReportSection: seção do relatório
+- GridReport: relatório completo
+- ReportGenerator: gerador de relatórios
+  - generate_compliance_report: relatório compliance
+  - generate_quality_report: relatório qualidade
+  - generate_fault_report: relatório falhas
+
+================================================================================
+5. VERIFICAÇÕES PRODIST
+================================================================================
+
+- Tensão PCC: 0.9 - 1.1 p.u.
+- THD Tensão: máximo 8%
+- THD Corrente: máximo 5%
+- Fator de Potência: mínimo 0.925
+- Frequência: 59.5 - 60.5 Hz
+- Flicker PST: máximo 1.0
+- Desequilíbrio: máximo 2%
+
+================================================================================
+6. CURVAS FRT
+================================================================================
+
+LVRT (Low Voltage Ride Through):
+  0ms: 0.0 p.u. → 150ms: 0.0 p.u. → 600ms: 0.9 p.u.
+
+HVRT (High Voltage Ride Through):
+  0ms: 1.3 p.u. → 100ms: 1.2 p.u. → 500ms: 1.1 p.u.
+
+================================================================================
+7. TESTES
+================================================================================
+
+Total: 120 testes — 120 passando (1.07s)
+
+test_config.py:          35 testes (enums, configs, load)
+test_compliance.py:      28 testes (ComplianceEngine)
+test_quality.py:         26 testes (QualityAnalyzer)
+test_fault_recorder.py:  18 testes (FaultRecorder)
+test_reports.py:         13 testes (ReportGenerator)
+
+================================================================================
+8. CONFIGURAÇÃO
+================================================================================
+
+Exemplo (config/grid.yaml):
+
+connection:
+  nominal_voltage_kv: 13.8
+  nominal_frequency: 60.0
+
+prodist:
+  voltage_min_pu: 0.9
+  voltage_max_pu: 1.1
+  thd_v_max: 8.0
+
+rtu:
+  enabled: true
+  lvrt_curve:
+    - time_ms: 0.0
+      voltage_pu: 0.0
+    - time_ms: 600.0
+      voltage_pu: 0.9
+
+Variáveis de ambiente:
+  PVGRID_DEBUG
+  NOMINAL_VOLTAGE, NOMINAL_FREQUENCY
+  PRODIST_VOLTAGE_MIN, PRODIST_VOLTAGE_MAX
+  PRODIST_THD_MAX
+  FRT_ENABLED
+  API_HOST, API_PORT
+
+================================================================================
+9. DOCKER
+================================================================================
+
+Serviços:
+- pvsolar-grid: Python 3.11, porta 8005
+
+Comandos:
+  docker-compose up -d          # Iniciar
+  docker-compose logs -f        # Ver logs
+  docker-compose down           # Parar
+
+================================================================================
+10. INTEGRAÇÃO COM ECOSSISTEMA pvSolar
+================================================================================
+
+pvSolar Gateway (8000)     →  pvSolar Grid (dados de tensão/corrente)
+pvSolar Analytics (8001)   →  pvSolar Grid (métricas ML)
+pvSolar Grid (8005)        →  Compliance/Audit/Relatórios
+
+Fluxo:
+  Gateway coleta dados → Grid verifica compliance → Relatório gerado
+
+================================================================================
+11. NOTAS TÉCNICAS
+================================================================================
+
+- datetime.now(timezone.utc), NÃO timedelta.utc
+- Imports absolutos: from src.core.config import X
+- structlog: usar event_type=, não event=
+- Pydantic: Field(default=...) para todos os campos
+- Pydantic v2: usar model_dump() para serialização
+- NumPy: para interpolação de curvas FRT
+
+================================================================================
+ FIM DO RESUMO
+================================================================================

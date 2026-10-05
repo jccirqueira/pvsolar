@@ -1,0 +1,2067 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pvSolar Gateway - Manual Profissional</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-dark: #059669;
+            --primary-light: #34D399;
+            --secondary: #3B82F6;
+            --accent: #F59E0B;
+            --danger: #EF4444;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --info: #3B82F6;
+            --dark: #1F2937;
+            --darker: #111827;
+            --light: #F3F4F6;
+            --lighter: #F9FAFB;
+            --gray: #6B7280;
+            --gray-light: #E5E7EB;
+            --gradient-solar: linear-gradient(135deg, #10B981 0%, #3B82F6 100%);
+            --gradient-energy: linear-gradient(135deg, #F59E0B 0%, #EF4444 100%);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--lighter);
+            color: var(--dark);
+            line-height: 1.7;
+        }
+
+        /* Header */
+        .header {
+            background: var(--gradient-solar);
+            color: white;
+            padding: 2rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.2);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .header-nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-nav a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: var(--gradient-solar);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .hero-badges {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--gray-light);
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--dark);
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .sidebar-nav a:hover {
+            background: var(--light);
+            color: var(--primary);
+        }
+
+        .sidebar-nav a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .sidebar-nav i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            min-width: 0;
+        }
+
+        /* Section */
+        .section {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-light);
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-solar);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .section-subtitle {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        /* Typography */
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 2rem 0 1rem;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #374151;
+        }
+
+        /* Feature Cards */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .feature-card {
+            background: var(--lighter);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid var(--gray-light);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--gradient-solar);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .feature-desc {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        /* Code Block */
+        .code-block {
+            background: #1F2937;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: attr(data-lang);
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 0 var(--radius) 0 var(--radius-sm);
+        }
+
+        .code-block code {
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            color: #E5E7EB;
+            line-height: 1.6;
+        }
+
+        .code-block .comment {
+            color: #6B7280;
+        }
+
+        .code-block .string {
+            color: #34D399;
+        }
+
+        .code-block .keyword {
+            color: #60A5FA;
+        }
+
+        /* Alert Boxes */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-sm);
+            margin: 1rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .alert-icon {
+            font-size: 1.2rem;
+            margin-top: 0.25rem;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-info {
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            color: #1E40AF;
+        }
+
+        .alert-success {
+            background: #F0FDF4;
+            border: 1px solid #BBF7D0;
+            color: #166534;
+        }
+
+        .alert-warning {
+            background: #FFFBEB;
+            border: 1px solid #FDE68A;
+            color: #92400E;
+        }
+
+        .alert-danger {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            color: #991B1B;
+        }
+
+        /* Tables */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background: var(--gradient-solar);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        tr:hover td {
+            background: var(--lighter);
+        }
+
+        /* Steps */
+        .steps {
+            counter-reset: step-counter;
+            margin: 1.5rem 0;
+        }
+
+        .step {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .step:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 45px;
+            bottom: -15px;
+            width: 2px;
+            background: var(--gray-light);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-solar);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+            background: var(--lighter);
+            border-radius: var(--radius-sm);
+            padding: 1.25rem;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Architecture Diagram */
+        .architecture {
+            background: var(--lighter);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        .arch-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .arch-box {
+            background: white;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.5rem;
+            min-width: 140px;
+            transition: var(--transition);
+        }
+
+        .arch-box:hover {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .arch-box i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .arch-box-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+
+        .arch-box-desc {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        .arch-arrow {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        /* Troubleshooting Accordion */
+        .accordion {
+            margin: 1rem 0;
+        }
+
+        .accordion-item {
+            border: 1px solid var(--gray-light);
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            background: var(--lighter);
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .accordion-header:hover {
+            background: var(--light);
+        }
+
+        .accordion-header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .accordion-header i {
+            color: var(--primary);
+        }
+
+        .accordion-title {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .accordion-icon {
+            transition: var(--transition);
+        }
+
+        .accordion-item.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            padding: 0 1.25rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .accordion-item.active .accordion-content {
+            padding: 1rem 1.25rem;
+            max-height: 1000px;
+        }
+
+        /* Inline Code */
+        code:not(.code-block code) {
+            background: var(--light);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--primary-dark);
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Grid Layout */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        /* Status Indicator */
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-success {
+            background: #F0FDF4;
+            color: #166534;
+        }
+
+        .status-success .status-dot {
+            background: #10B981;
+        }
+
+        .status-warning {
+            background: #FFFBEB;
+            color: #92400E;
+        }
+
+        .status-warning .status-dot {
+            background: #F59E0B;
+        }
+
+        .status-error {
+            background: #FEF2F2;
+            color: #991B1B;
+        }
+
+        .status-error .status-dot {
+            background: #EF4444;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--darker);
+            color: white;
+            padding: 3rem 2rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary-light);
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: #9CA3AF;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary-light);
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 2rem auto 0;
+            padding-top: 2rem;
+            border-top: 1px solid #374151;
+            text-align: center;
+            color: #6B7280;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+                order: -1;
+            }
+
+            .header-nav {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero-badges {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .arch-flow {
+                flex-direction: column;
+            }
+
+            .arch-arrow {
+                transform: rotate(90deg);
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Print Styles */
+        @media print {
+            .header, .sidebar, .footer {
+                display: none;
+            }
+
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid var(--gray-light);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-solar-panel"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>pvSolar Gateway</h1>
+                    <span>v1.0.0 - Manual Profissional</span>
+                </div>
+            </div>
+            <nav class="header-nav">
+                <a href="#introducao"><i class="fas fa-book"></i> Manual</a>
+                <a href="#instalacao"><i class="fas fa-download"></i> Instalação</a>
+                <a href="#configuracao"><i class="fas fa-cog"></i> Configuração</a>
+                <a href="#troubleshooting"><i class="fas fa-life-ring"></i> Suporte</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1><i class="fas fa-bolt"></i> pvSolar Gateway</h1>
+        <p>Gateway profissional de monitoramento de inversores solares com integração MQTT, edge computing e suporte a múltiplos fabricantes.</p>
+        <div class="hero-badges">
+            <span class="badge"><i class="fas fa-shield-alt"></i> TLS 1.3 / mTLS</span>
+            <span class="badge"><i class="fas fa-solar-panel"></i> SunSpec IEEE 1547</span>
+            <span class="badge"><i class="fas fa-cloud"></i> AWS IoT / Azure</span>
+            <span class="badge"><i class="fas fa-database"></i> Edge Store</span>
+            <span class="badge"><i class="fas fa-chart-line"></i> Prometheus Metrics</span>
+        </div>
+    </section>
+
+    <!-- Main Container -->
+    <div class="container">
+        
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-title">Sumário</div>
+            <ul class="sidebar-nav">
+                <li><a href="#introducao" class="active"><i class="fas fa-home"></i> Introdução</a></li>
+                <li><a href="#arquitetura"><i class="fas fa-project-diagram"></i> Arquitetura</a></li>
+                <li><a href="#funcionalidades"><i class="fas fa-star"></i> Funcionalidades</a></li>
+                <li><a href="#instalacao"><i class="fas fa-download"></i> Instalação</a></li>
+                <li><a href="#configuracao"><i class="fas fa-cog"></i> Configuração</a></li>
+                <li><a href="#drivers"><i class="fas fa-microchip"></i> Drivers</a></li>
+                <li><a href="#mqtt"><i class="fas fa-exchange-alt"></i> MQTT</a></li>
+                <li><a href="#pvbrowser"><i class="fas fa-desktop"></i> pvbrowser</a></li>
+                <li><a href="#docker"><i class="fab fa-docker"></i> Docker</a></li>
+                <li><a href="#api"><i class="fas fa-code"></i> API</a></li>
+                <li><a href="#troubleshooting"><i class="fas fa-wrench"></i> Solução de Problemas</a></li>
+                <li><a href="#faq"><i class="fas fa-question-circle"></i> FAQ</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Introdução -->
+            <section id="introducao" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-home"></i></div>
+                    <div>
+                        <h2 class="section-title">Introdução</h2>
+                        <p class="section-subtitle">Conhecendo o pvSolar Gateway</p>
+                    </div>
+                </div>
+
+                <p>O <strong>pvSolar Gateway</strong> é uma solução profissional de monitoramento de inversores solares projetada para ambientes industriais. Ele atua como um gateway inteligente que coleta dados de inversores solares via Modbus TCP/RTU e os publica em brokers MQTT com segurança de nível militar (TLS 1.3, mTLS).</p>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                        <h3 class="feature-title">Segurança Empresarial</h3>
+                        <p class="feature-desc">TLS 1.3, mTLS com certificados X.509, ACLs por tópico e autenticação por dispositivo.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-solar-panel"></i></div>
+                        <h3 class="feature-title">Multi-Fabricante</h3>
+                        <p class="feature-desc">Suporte nativo a Fronius, Growatt, SMA, Huawei via SunSpec Modbus (IEEE 1547-2018).</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-database"></i></div>
+                        <h3 class="feature-title">Edge Computing</h3>
+                        <p class="feature-desc">Armazenamento local SQLite com store-and-forward para até 72 horas de dados.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-cloud"></i></div>
+                        <h3 class="feature-title">Cloud Ready</h3>
+                        <p class="feature-desc">Integração nativa com AWS IoT Core e Azure IoT Hub via MQTT seguro.</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle alert-icon"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">Licenciamento Open Core</div>
+                        <p>O core do gateway é open source (GPLv3). Funcionalidades premium como AWS IoT, Azure IoT Hub e relatórios avançados estão disponíveis sob licença comercial.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Arquitetura -->
+            <section id="arquitetura" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-project-diagram"></i></div>
+                    <div>
+                        <h2 class="section-title">Arquitetura do Sistema</h2>
+                        <p class="section-subtitle">Visão geral da arquitetura client-server</p>
+                    </div>
+                </div>
+
+                <div class="architecture">
+                    <div class="arch-flow">
+                        <div class="arch-box">
+                            <i class="fas fa-solar-panel"></i>
+                            <div class="arch-box-title">Inversores</div>
+                            <div class="arch-box-desc">Fronius, Growatt, SMA, Huawei</div>
+                        </div>
+                        <i class="fas fa-arrow-right arch-arrow"></i>
+                        <div class="arch-box">
+                            <i class="fas fa-microchip"></i>
+                            <div class="arch-box-title">Drivers</div>
+                            <div class="arch-box-desc">SunSpec Modbus TCP/RTU</div>
+                        </div>
+                        <i class="fas fa-arrow-right arch-arrow"></i>
+                        <div class="arch-box">
+                            <i class="fas fa-cogs"></i>
+                            <div class="arch-box-title">Gateway Core</div>
+                            <div class="arch-box-desc">Processamento Edge</div>
+                        </div>
+                        <i class="fas fa-arrow-right arch-arrow"></i>
+                        <div class="arch-box">
+                            <i class="fas fa-exchange-alt"></i>
+                            <div class="arch-box-title">MQTT Client</div>
+                            <div class="arch-box-desc">TLS 1.3 / mTLS</div>
+                        </div>
+                        <i class="fas fa-arrow-right arch-arrow"></i>
+                        <div class="arch-box">
+                            <i class="fas fa-cloud"></i>
+                            <div class="arch-box-title">Cloud</div>
+                            <div class="arch-box-desc">AWS / Azure / Local</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Fluxo de Dados</h3>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Coleta de Dados</div>
+                            <p>Os drivers Modbus realizam polling periódico nos inversores solares, lendo registradores SunSpec ou específicos do fabricante.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Normalização</div>
+                            <p>Os dados brutos são convertidos para um padrão unificado (InverterData) com campos padronizados para potência, tensão, corrente, energia e status.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Processamento Edge</div>
+                            <p>Dados são armazenados localmente no SQLite e processados para cálculos de Performance Ratio (PR), eficiência e anomalias.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Publicação MQTT</div>
+                            <p>Dados são publicados em tópicos MQTT estruturados com criptografia TLS 1.3 e autenticação por certificado.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <div class="step-title">Integração Cloud</div>
+                            <p>Dados são sincronizados com AWS IoT Core, Azure IoT Hub ou broker MQTT local para análise e visualização.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Funcionalidades -->
+            <section id="funcionalidades" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-star"></i></div>
+                    <div>
+                        <h2 class="section-title">Funcionalidades</h2>
+                        <p class="section-subtitle">Recursos completos do gateway</p>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div>
+                        <h3><i class="fas fa-check-circle" style="color: var(--success)"></i> Versão Open Source (GPLv3)</h3>
+                        <ul>
+                            <li>Suporte SunSpec Modbus (IEEE 1547-2018)</li>
+                            <li>Drivers: Fronius, Growatt, SMA, Huawei</li>
+                            <li>MQTT com TLS 1.2/1.3</li>
+                            <li>Edge store-and-forward (SQLite)</li>
+                            <li>Dashboard web básico</li>
+                            <li>Integração com pvbrowser</li>
+                            <li>Métricas Prometheus</li>
+                            <li>Configuração via YAML</li>
+                            <li>Docker + Docker Compose</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3><i class="fas fa-lock" style="color: var(--accent)"></i> Versão Premium (Comercial)</h3>
+                        <ul>
+                            <li>Integração AWS IoT Core com mTLS</li>
+                            <li>Integração Azure IoT Hub</li>
+                            <li>Relatórios de Performance Ratio</li>
+                            <li>Suporte a múltiplos sites</li>
+                            <li>Alertas via Telegram/WhatsApp/SMS</li>
+                            <li>Suporte técnico 24/7</li>
+                            <li>Certificação de conformidade</li>
+                            <li>Backup automático de configurações</li>
+                            <li>Atualizações OTA seguras</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Instalação -->
+            <section id="instalacao" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-download"></i></div>
+                    <div>
+                        <h2 class="section-title">Instalação</h2>
+                        <p class="section-subtitle">Guia completo de instalação</p>
+                    </div>
+                </div>
+
+                <h3><i class="fab fa-docker" style="color: #2496ED"></i> Instalação com Docker (Recomendado)</h3>
+
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle alert-icon"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">Recomendado para Produção</div>
+                        <p>Docker é a forma mais segura e fácil de implantar o pvSolar Gateway em produção.</p>
+                    </div>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Pré-requisitos</div>
+                            <p>Instale Docker Engine 20.10+ e Docker Compose 2.0+:</p>
+                            <div class="code-block" data-lang="bash">
+                                <code><span class="comment"># Ubuntu/Debian</span>
+sudo apt update
+sudo apt install docker.io docker-compose-plugin
+
+<span class="comment"># Verificar instalação</span>
+docker --version
+docker compose version</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Clonar Repositório</div>
+                            <div class="code-block" data-lang="bash">
+                                <code>git clone https://github.com/your-org/pvsolar-gateway.git
+cd pvsolar-gateway/docker</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Configurar Gateway</div>
+                            <div class="code-block" data-lang="bash">
+                                <code><span class="comment"># Criar diretório de configuração</span>
+mkdir -p config
+
+<span class="comment"># Copiar configuração de exemplo</span>
+cp ../config/gateway.example.yaml config/gateway.yaml
+
+<span class="comment"># Editar configuração</span>
+nano config/gateway.yaml</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Gerar Certificados TLS</div>
+                            <div class="code-block" data-lang="bash">
+                                <code><span class="comment"># Criar diretório de certificados</span>
+mkdir -p certs
+
+<span class="comment"># Gerar CA (Certificate Authority)</span>
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout certs/ca.key -out certs/ca.crt \
+    -subj "/CN=pvSolar CA"
+
+<span class="comment"># Gerar certificado do servidor</span>
+openssl req -nodes -newkey rsa:2048 \
+    -keyout certs/server.key -out certs/server.csr \
+    -subj "/CN=mqtt.pvsolar.local"
+
+openssl x509 -req -in certs/server.csr -CA certs/ca.crt \
+    -CAkey certs/ca.key -CAcreateserial -out certs/server.crt -days 365
+
+<span class="comment"># Gerar certificado do cliente (gateway)</span>
+openssl req -nodes -newkey rsa:2048 \
+    -keyout certs/client.key -out certs/client.csr \
+    -subj "/CN=pvsolar-gateway-001"
+
+openssl x509 -req -in certs/client.csr -CA certs/ca.crt \
+    -CAkey certs/ca.key -CAcreateserial -out certs/client.crt -days 365</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <div class="step-title">Iniciar Stack</div>
+                            <div class="code-block" data-lang="bash">
+                                <code><span class="comment"># Iniciar todos os serviços</span>
+docker compose up -d
+
+<span class="comment"># Verificar status</span>
+docker compose ps
+
+<span class="comment"># Acompanhar logs</span>
+docker compose logs -f pvsolar-gateway</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">6</div>
+                        <div class="step-content">
+                            <div class="step-title">Verificar Instalação</div>
+                            <div class="code-block" data-lang="bash">
+                                <code><span class="comment"># Dashboard Web</span>
+http://localhost:5000
+
+<span class="comment"># Grafana</span>
+http://localhost:3000
+
+<span class="comment"># MQTT Broker</span>
+mosquitto_sub -h localhost -p 1883 -t "pvsolar/#"</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3><i class="fab fa-linux" style="color: #333"></i> Instalação Manual (Linux)</h3>
+
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle alert-icon"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">Requer Conhecimento Técnico</div>
+                        <p>Este método é recomendado apenas para desenvolvedores experientes ou ambientes sem suporte a Docker.</p>
+                    </div>
+                </div>
+
+                <div class="code-block" data-lang="bash">
+                    <code><span class="comment"># Instalar dependências do sistema</span>
+sudo apt update
+sudo apt install python3 python3-pip python3-venv sqlite3
+
+<span class="comment"># Criar usuário dedicado</span>
+sudo useradd -r -s /bin/false pvsolar
+sudo mkdir -p /opt/pvsolar /etc/pvsolar /var/lib/pvsolar /var/log/pvsolar
+
+<span class="comment"># Clonar e instalar</span>
+cd /opt/pvsolar
+git clone https://github.com/your-org/pvsolar-gateway.git .
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+<span class="comment"># Configurar</span>
+sudo cp config/gateway.example.yaml /etc/pvsolar/gateway.yaml
+sudo nano /etc/pvsolar/gateway.yaml
+
+<span class="comment"># Criar serviço systemd</span>
+sudo tee /etc/systemd/system/pvsolar.service << 'EOF'
+[Unit]
+Description=pvSolar Gateway
+After=network.target
+
+[Service]
+Type=simple
+User=pvsolar
+Group=pvsolar
+WorkingDirectory=/opt/pvsolar
+ExecStart=/opt/pvsolar/venv/bin/python -m pvsolar -c /etc/pvsolar/gateway.yaml
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+<span class="comment"># Ativar e iniciar</span>
+sudo systemctl daemon-reload
+sudo systemctl enable pvsolar
+sudo systemctl start pvsolar
+sudo systemctl status pvsolar</code>
+                </div>
+            </section>
+
+            <!-- Configuração -->
+            <section id="configuracao" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-cog"></i></div>
+                    <div>
+                        <h2 class="section-title">Configuração</h2>
+                        <p class="section-subtitle">Arquivo de configuração gateway.yaml</p>
+                    </div>
+                </div>
+
+                <p>O pvSolar Gateway utiliza um arquivo YAML para configuração. Abaixo estão os principais parâmetros:</p>
+
+                <h3>Configuração do Gateway</h3>
+                <div class="code-block" data-lang="yaml">
+                    <code><span class="keyword">gateway</span>:
+  <span class="string">name</span>: <span class="string">"solar-site-001"</span>      <span class="comment"># Identificador único</span>
+  <span class="string">location</span>: <span class="string">"São Paulo, BR"</span>   <span class="comment"># Localização física</span>
+  <span class="string">timezone</span>: <span class="string">"America/Sao_Paulo"</span></code>
+                </div>
+
+                <h3>Configuração MQTT</h3>
+                <div class="code-block" data-lang="yaml">
+                    <code><span class="keyword">mqtt</span>:
+  <span class="string">broker</span>: <span class="string">"mqtt.example.com"</span>
+  <span class="string">port</span>: <span class="string">8883</span>                    <span class="comment"># Porta TLS</span>
+  <span class="string">use_tls</span>: <span class="string">true</span>
+  <span class="string">tls</span>:
+    <span class="string">ca_cert</span>: <span class="string">"/etc/pvsolar/certs/ca.crt"</span>
+    <span class="string">client_cert</span>: <span class="string">"/etc/pvsolar/certs/client.crt"</span>
+    <span class="string">client_key</span>: <span class="string">"/etc/pvsolar/certs/client.key"</span>
+    <span class="string">tls_version</span>: <span class="string">"1.3"</span>
+  <span class="string">client_id</span>: <span class="string">"pvsolar-gateway-001"</span>
+  <span class="string">topics</span>:
+    <span class="string">publish</span>: <span class="string">"pvsolar/{site_id}/telemetry"</span>
+    <span class="string">status</span>: <span class="string">"pvsolar/{site_id}/status"</span></code>
+                </div>
+
+                <h3>Configuração de Inversores</h3>
+                <div class="code-block" data-lang="yaml">
+                    <code><span class="keyword">inverters</span>:
+  - <span class="string">id</span>: <span class="string">"fronius-001"</span>
+    <span class="string">name</span>: <span class="string">"Fronius GEN24 Plus 8.0"</span>
+    <span class="string">driver</span>: <span class="string">"fronius"</span>            <span class="comment"># sunspec|fronius|growatt|sma|huawei</span>
+    <span class="string">connection</span>:
+      <span class="string">host</span>: <span class="string">"192.168.1.100"</span>
+      <span class="string">port</span>: <span class="string">502</span>
+      <span class="string">unit_id</span>: <span class="string">1</span>
+    <span class="string">polling_interval</span>: <span class="string">5.0</span>       <span class="comment"># segundos</span></code>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle alert-icon"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">Configuração Completa</div>
+                        <p>Consulte o arquivo <code>config/gateway.example.yaml</code> para todos os parâmetros disponíveis.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Drivers -->
+            <section id="drivers" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-microchip"></i></div>
+                    <div>
+                        <h2 class="section-title">Drivers de Inversores</h2>
+                        <p class="section-subtitle">Suporte a múltiplos fabricantes</p>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Driver</th>
+                                <th>Protocolo</th>
+                                <th>Fabricantes</th>
+                                <th>Modelos</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>sunspec</strong></td>
+                                <td>SunSpec Modbus</td>
+                                <td>Genérico (IEEE 1547-2018)</td>
+                                <td>Todos os certificados SunSpec</td>
+                                <td><span class="status status-success"><span class="status-dot"></span> Disponível</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>fronius</strong></td>
+                                <td>SunSpec + Extensões</td>
+                                <td>Fronius</td>
+                                <td>GEN24, Tauro, SnapINverter</td>
+                                <td><span class="status status-success"><span class="status-dot"></span> Disponível</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>growatt</strong></td>
+                                <td>Modbus RTU/TCP</td>
+                                <td>Growatt</td>
+                                <td>MIN, MOD, MIX, SPA, SPH</td>
+                                <td><span class="status status-success"><span class="status-dot"></span> Disponível</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>sma</strong></td>
+                                <td>SunSpec + SMA Profile</td>
+                                <td>SMA</td>
+                                <td>Sunny Boy, Tripower, Highpower</td>
+                                <td><span class="status status-success"><span class="status-dot"></span> Disponível</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>huawei</strong></td>
+                                <td>Modbus RTU/TCP</td>
+                                <td>Huawei</td>
+                                <td>SUN2000 (L/M/A/B series)</td>
+                                <td><span class="status status-success"><span class="status-dot"></span> Disponível</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Exemplo: Fronius GEN24</h3>
+                <div class="code-block" data-lang="yaml">
+                    <code><span class="keyword">inverters</span>:
+  - <span class="string">id</span>: <span class="string">"fronius-001"</span>
+    <span class="string">name</span>: <span class="string">"Fronius GEN24 Plus 8.0"</span>
+    <span class="string">driver</span>: <span class="string">"fronius"</span>
+    <span class="string">connection</span>:
+      <span class="string">type</span>: <span class="string">"modbus_tcp"</span>
+      <span class="string">host</span>: <span class="string">"192.168.1.100"</span>
+      <span class="string">port</span>: <span class="string">502</span>
+      <span class="string">unit_id</span>: <span class="string">1</span>
+    <span class="string">polling_interval</span>: <span class="string">5.0</span></code>
+                </div>
+
+                <h3>Exemplo: Growatt (Storage/Hybrid)</h3>
+                <div class="code-block" data-lang="yaml">
+                    <code><span class="keyword">inverters</span>:
+  - <span class="string">id</span>: <span class="string">"growatt-001"</span>
+    <span class="string">name</span>: <span class="string">"Growatt MIN 5000TL-X"</span>
+    <span class="string">driver</span>: <span class="string">"growatt"</span>
+    <span class="string">connection</span>:
+      <span class="string">host</span>: <span class="string">"192.168.1.101"</span>
+      <span class="string">port</span>: <span class="string">502</span>
+      <span class="string">unit_id</span>: <span class="string">1</span></code>
+                </div>
+            </section>
+
+            <!-- MQTT -->
+            <section id="mqtt" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-exchange-alt"></i></div>
+                    <div>
+                        <h2 class="section-title">Configuração MQTT</h2>
+                        <p class="section-subtitle">Comunicação segura com broker MQTT</p>
+                    </div>
+                </div>
+
+                <h3>Estrutura de Tópicos</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tópico</th>
+                                <th>Direção</th>
+                                <th>Descrição</th>
+                                <th>QoS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>pvsolar/{site}/telemetry/{inv}</code></td>
+                                <td><i class="fas fa-arrow-up" style="color: var(--success)"></i> Publish</td>
+                                <td>Dados de telemetria do inversor</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td><code>pvsolar/{site}/status</code></td>
+                                <td><i class="fas fa-arrow-up" style="color: var(--success)"></i> Publish</td>
+                                <td>Status do gateway (online/offline)</td>
+                                <td>1 (retain)</td>
+                            </tr>
+                            <tr>
+                                <td><code>pvsolar/{site}/command</code></td>
+                                <td><i class="fas fa-arrow-down" style="color: var(--info)"></i> Subscribe</td>
+                                <td>Comandos remotos</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td><code>pvsolar/{site}/alert</code></td>
+                                <td><i class="fas fa-arrow-up" style="color: var(--success)"></i> Publish</td>
+                                <td>Alertas e alarmes</td>
+                                <td>2</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Segurança MQTT</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-lock"></i></div>
+                        <h3 class="feature-title">TLS 1.3</h3>
+                        <p class="feature-desc">Criptografia de ponta a ponta com cifras AES-256-GCM eChaCha20-Poly1305.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-user-shield"></i></div>
+                        <h3 class="feature-title">mTLS</h3>
+                        <p class="feature-desc">Autenticação mútua com certificados X.509 por dispositivo.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-list"></i></div>
+                        <h3 class="feature-title">ACLs por Tópico</h3>
+                        <p class="feature-desc">Controle granular de acesso por tópico por dispositivo.</p>
+                    </div>
+                </div>
+
+                <h3>Exemplo: Configuração Mosquitto</h3>
+                <div class="code-block" data-lang="conf">
+                    <code><span class="comment"># /etc/mosquitto/mosquitto.conf</span>
+
+<span class="comment"># Listener TLS na porta 8883</span>
+listener 8883
+cafile /etc/mosquitto/certs/ca.crt
+certfile /etc/mosquitto/certs/server.crt
+keyfile /etc/mosquitto/certs/server.key
+tls_version tlsv1.2
+require_certificate true
+use_identity_as_username true
+
+<span class="comment"># Desabilitar listener plaintext</span>
+<span class="comment"># listener 1883</span>
+<span class="comment"># allow_anonymous false</span></code>
+                </div>
+            </section>
+
+            <!-- pvbrowser -->
+            <section id="pvbrowser" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-desktop"></i></div>
+                    <div>
+                        <h2 class="section-title">Integração com pvbrowser</h2>
+                        <p class="section-subtitle">Bridge para HMI SCADA</p>
+                    </div>
+                </div>
+
+                <p>O pvSolar Gateway inclui um bridge nativo para o <a href="https://pvbrowser.de/" target="_blank">pvbrowser</a>, permitindo visualização em tempo real dos dados solares em interface SCADA profissional.</p>
+
+                <h3>Configuração</h3>
+                <div class="code-block" data-lang="yaml">
+                    <code><span class="keyword">pvbrowser</span>:
+  <span class="string">enabled</span>: <span class="string">true</span>
+  <span class="string">socket_port</span>: <span class="string">5050</span>
+  <span class="string">shared_memory</span>: <span class="string">true</span>
+  <span class="string">update_interval</span>: <span class="string">1.0</span></code>
+                </div>
+
+                <h3>Protocolo de Comunicação</h3>
+                <p>O bridge utiliza um protocolo TCP simples com a seguinte estrutura:</p>
+                <div class="code-block" data-lang="python">
+                    <code><span class="comment"># Header: [protocol_version, msg_type, payload_length]</span>
+header = struct.pack(<span class="string">'!BBH'</span>, protocol_version, msg_type, payload_length)
+payload = json.dumps(data).encode(<span class="string">'utf-8'</span>)
+message = header + payload</code>
+                </div>
+
+                <h3>Exemplo: Python Client</h3>
+                <div class="code-block" data-lang="python">
+                    <code><span class="keyword">import</span> socket
+<span class="keyword">import</span> json
+<span class="keyword">import</span> struct
+
+<span class="keyword">def</span> <span class="function">connect_to_gateway</span>(host=<span class="string">'localhost'</span>, port=<span class="string">5050</span>):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((host, port))
+    
+    <span class="keyword">while</span> <span class="keyword">True</span>:
+        <span class="comment"># Receber header</span>
+        header = sock.recv(4)
+        version, msg_type, length = struct.unpack(<span class="string">'!BBH'</span>, header)
+        
+        <span class="comment"># Receber payload</span>
+        payload = sock.recv(length)
+        data = json.loads(payload)
+        
+        print(f<span class="string">"Inversor: {data['inverter_id']}"</span>)
+        print(f<span class="string">"Potência: {data['data']['power']['ac_power']} W"</span>)</code>
+                </div>
+            </section>
+
+            <!-- Docker -->
+            <section id="docker" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fab fa-docker"></i></div>
+                    <div>
+                        <h2 class="section-title">Docker Stack</h2>
+                        <p class="section-subtitle">Implantação com Docker Compose</p>
+                    </div>
+                </div>
+
+                <p>O pvSolar Gateway inclui uma stack completa Docker com todos os serviços necessários:</p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Serviço</th>
+                                <th>Porta</th>
+                                <th>Descrição</th>
+                                <th>Imagem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>pvsolar-gateway</strong></td>
+                                <td>5000, 5050, 9090</td>
+                                <td>Gateway principal</td>
+                                <td>pvsolar/gateway:latest</td>
+                            </tr>
+                            <tr>
+                                <td><strong>mosquitto</strong></td>
+                                <td>1883, 8883, 9001</td>
+                                <td>Broker MQTT</td>
+                                <td>eclipse-mosquitto:2</td>
+                            </tr>
+                            <tr>
+                                <td><strong>influxdb</strong></td>
+                                <td>8086</td>
+                                <td>Banco de dados time-series</td>
+                                <td>influxdb:2.7</td>
+                            </tr>
+                            <tr>
+                                <td><strong>grafana</strong></td>
+                                <td>3000</td>
+                                <td>Visualização e dashboards</td>
+                                <td>grafana/grafana:latest</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Comandos Úteis</h3>
+                <div class="code-block" data-lang="bash">
+                    <code><span class="comment"># Iniciar stack</span>
+docker compose up -d
+
+<span class="comment"># Parar stack</span>
+docker compose down
+
+<span class="comment"># Reiniciar apenas o gateway</span>
+docker compose restart pvsolar-gateway
+
+<span class="comment"># Ver logs em tempo real</span>
+docker compose logs -f pvsolar-gateway
+
+<span class="comment"># Backup do banco de dados</span>
+docker compose exec influxdb influx backup /tmp/backup
+
+<span class="comment"># Atualizar imagens</span>
+docker compose pull
+docker compose up -d</code>
+                </div>
+            </section>
+
+            <!-- API -->
+            <section id="api" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-code"></i></div>
+                    <div>
+                        <h2 class="section-title">API Reference</h2>
+                        <p class="section-subtitle">Referência da API Python</p>
+                    </div>
+                </div>
+
+                <h3>SolarGateway</h3>
+                <div class="code-block" data-lang="python">
+                    <code><span class="keyword">from</span> pvsolar.core.gateway <span class="keyword">import</span> SolarGateway
+
+<span class="comment"># Criar instância do gateway</span>
+gateway = SolarGateway(<span class="string">'config/gateway.yaml'</span>)
+
+<span class="comment"># Iniciar gateway</span>
+<span class="keyword">await</span> gateway.start()
+
+<span class="comment"># Parar gateway</span>
+<span class="keyword">await</span> gateway.stop()</code>
+                </div>
+
+                <h3>InverterData</h3>
+                <div class="code-block" data-lang="python">
+                    <code><span class="keyword">from</span> pvsolar.drivers.base <span class="keyword">import</span> InverterData
+
+<span class="comment"># Estrutura de dados padronizada</span>
+data = InverterData()
+data.inverter_id = <span class="string">"inv-001"</span>
+data.ac_power = <span class="string">5420.0</span>          <span class="comment"># Watts</span>
+data.ac_voltage = [<span class="string">220.5</span>, <span class="string">221.0</span>, <span class="string">219.8</span>]  <span class="comment"># Volts por fase</span>
+data.dc_inputs = [
+    {<span class="string">'voltage'</span>: <span class="string">380.5</span>, <span class="string">'current'</span>: <span class="string">7.8</span>, <span class="string">'power'</span>: <span class="string">2967.9</span>}
+]
+data.total_energy = <span class="string">15250000</span>    <span class="comment"># Wh</span>
+data.efficiency = <span class="string">96.2</span>          <span class="comment"># %</span></code>
+                </div>
+
+                <h3>Métricas Prometheus</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Métrica</th>
+                                <th>Tipo</th>
+                                <th>Descrição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>pvsolar_inverter_power_watts</code></td>
+                                <td>Gauge</td>
+                                <td>Potência AC atual</td>
+                            </tr>
+                            <tr>
+                                <td><code>pvsolar_inverter_energy_total_wh</code></td>
+                                <td>Counter</td>
+                                <td>Energia total produzida</td>
+                            </tr>
+                            <tr>
+                                <td><code>pvsolar_inverter_efficiency</code></td>
+                                <td>Gauge</td>
+                                <td>Eficiência do inversor</td>
+                            </tr>
+                            <tr>
+                                <td><code>pvsolar_mqtt_messages_sent_total</code></td>
+                                <td>Counter</td>
+                                <td>Total de mensagens MQTT enviadas</td>
+                            </tr>
+                            <tr>
+                                <td><code>pvsolar_edge_buffer_size</code></td>
+                                <td>Gauge</td>
+                                <td>Tamanho do buffer edge</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Troubleshooting -->
+            <section id="troubleshooting" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-wrench"></i></div>
+                    <div>
+                        <h2 class="section-title">Solução de Problemas</h2>
+                        <p class="section-subtitle">Common issues and resolutions</p>
+                    </div>
+                </div>
+
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <div class="accordion-header-left">
+                                <i class="fas fa-exclamation-triangle" style="color: var(--warning)"></i>
+                                <span class="accordion-title">Não consigo conectar ao inversor</span>
+                            </div>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Causas possíveis:</strong></p>
+                            <ul>
+                                <li>Endereço IP incorreto do inversor</li>
+                                <li>Porta Modbus incorreta (padrão: 502)</li>
+                                <li>Unit ID incorreto</li>
+                                <li>Firewall bloqueando conexão</li>
+                                <li>Modbus desabilitado no inversor</li>
+                            </ul>
+                            <p><strong>Solução:</strong></p>
+                            <div class="code-block" data-lang="bash">
+                                <code><span class="comment"># Testar conectividade</span>
+ping 192.168.1.100
+
+<span class="comment"># Testar porta Modbus</span>
+nc -zv 192.168.1.100 502
+
+<span class="comment"># Testar com pymodbus</span>
+python3 -c "
+from pymodbus.client import ModbusTcpClient
+client = ModbusTcpClient('192.168.1.100', port=502)
+result = client.read_holding_registers(0, 10, slave=1)
+print(result)
+"</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <div class="accordion-header-left">
+                                <i class="fas fa-exclamation-triangle" style="color: var(--warning)"></i>
+                                <span class="accordion-title">Falha na conexão MQTT</span>
+                            </div>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Causas possíveis:</strong></p>
+                            <ul>
+                                <li>Certificados TLS inválidos ou expirados</li>
+                                <li>CN (Common Name) do certificado não confere</li>
+                                <li>Porta TLS incorreta (deve ser 8883)</li>
+                                <li>Broker MQTT não aceita conexões TLS</li>
+                            </ul>
+                            <p><strong>Solução:</strong></p>
+                            <div class="code-block" data-lang="bash">
+                                <code><span class="comment"># Verificar certificado</span>
+openssl s_client -connect mqtt.example.com:8883
+
+<span class="comment"># Testar conexão MQTT</span>
+mosquitto_sub -h mqtt.example.com -p 8883 \
+    --cafile ca.crt --cert client.crt --key client.key \
+    -t "test" -v
+
+<span class="comment"># Verificar logs do broker</span>
+docker compose logs mosquitto</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <div class="accordion-header-left">
+                                <i class="fas fa-exclamation-triangle" style="color: var(--warning)"></i>
+                                <span class="accordion-title">Dados inconsistentes ou zerados</span>
+                            </div>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Causas possíveis:</strong></p>
+                            <ul>
+                                <li>Modo float vs integer incorreto</li>
+                                <li>Fatores de escala (scale factors) incorretos</li>
+                                <li>Endereços de registradores errados</li>
+                                <li>Inversor em modo standby ou fault</li>
+                            </ul>
+                            <p><strong>Solução:</strong></p>
+                            <ul>
+                                <li>Verificar se o driver está correto (sunspec, fronius, growatt)</li>
+                                <li>Consultar manual Modbus do fabricante</li>
+                                <li>Usar <code>sunspec</code> driver para inversores certificados</li>
+                                <li>Verificar status do inversor: <code>status: "running"</code></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <div class="accordion-header-left">
+                                <i class="fas fa-exclamation-triangle" style="color: var(--warning)"></i>
+                                <span class="accordion-title">Gateway não inicia</span>
+                            </div>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Causas possíveis:</strong></p>
+                            <ul>
+                                <li>Arquivo de configuração YAML inválido</li>
+                                <li>Dependências Python faltando</li>
+                                <li>Porta já em uso</li>
+                                <li>Permissões de arquivo incorretas</li>
+                            </ul>
+                            <p><strong>Solução:</strong></p>
+                            <div class="code-block" data-lang="bash">
+                                <code><span class="comment"># Validar configuração</span>
+python3 -c "from pvsolar.core.config import load_config; load_config('config/gateway.yaml')"
+
+<span class="comment"># Verificar dependências</span>
+pip install -r requirements.txt
+
+<span class="comment"># Verificar porta</span>
+lsof -i :5000
+
+<span class="comment"># Verificar logs</span>
+docker compose logs pvsolar-gateway
+journalctl -u pvsolar -n 100</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <div class="accordion-header-left">
+                                <i class="fas fa-exclamation-triangle" style="color: var(--warning)"></i>
+                                <span class="accordion-title">pvbrowser não recebe dados</span>
+                            </div>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Causas possíveis:</strong></p>
+                            <ul>
+                                <li>Pocket socket desabilitado</li>
+                                <li>Porta 5050 bloqueada por firewall</li>
+                                <li>pvbrowser não conectado ao gateway</li>
+                            </ul>
+                            <p><strong>Solução:</strong></p>
+                            <div class="code-block" data-lang="bash">
+                                <code><span class="comment"># Verificar se a porta está aberta</span>
+netstat -tlnp | grep 5050
+
+<span class="comment"># Testar conexão</span>
+telnet localhost 5050
+
+<span class="comment"># Verificar configuração</span>
+grep -A5 "pvbrowser" config/gateway.yaml</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <div class="accordion-header-left">
+                                <i class="fas fa-exclamation-triangle" style="color: var(--warning)"></i>
+                                <span class="accordion-title">Armazenamento edge lotado</span>
+                            </div>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Causas possíveis:</strong></p>
+                            <ul>
+                                <li>Conexão com cloud/broker instável</li>
+                                <li>Buffer max_buffer_hours muito alto</li>
+                                <li>Sincronização automática falhando</li>
+                            </ul>
+                            <p><strong>Solução:</strong></p>
+                            <div class="code-block" data-lang="bash">
+                                <code><span class="comment"># Verificar tamanho do buffer</span>
+sqlite3 /var/lib/pvsolar/edge.db "SELECT COUNT(*) FROM telemetry WHERE synced=0;"
+
+<span class="comment"># Limpar registros antigos</span>
+sqlite3 /var/lib/pvsolar/edge.db "DELETE FROM telemetry WHERE synced=1 AND created_at < strftime('%s','now') - 259200;"
+
+<span class="comment"># Ajustar configuração</span>
+edge:
+  store_and_forward:
+    max_buffer_hours: 48  <span class="comment"># Reduzir de 72 para 48</span></code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAQ -->
+            <section id="faq" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-question-circle"></i></div>
+                    <div>
+                        <h2 class="section-title">Perguntas Frequentes</h2>
+                        <p class="section-subtitle">Dúvidas comuns dos usuários</p>
+                    </div>
+                </div>
+
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <div class="accordion-header-left">
+                                <i class="fas fa-question-circle" style="color: var(--info)"></i>
+                                <span class="accordion-title">Qual o custo do pvSolar Gateway?</span>
+                            </div>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>O core do pvSolar Gateway é <strong>gratuito e open source</strong> sob licença GPLv3. Funcionalidades premium como AWS IoT Core, Azure IoT Hub, relatórios avançados e suporte técnico 24/7 estão disponíveis sob licença comercial. Entre em contato para valores.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <div class="accordion-header-left">
+                                <i class="fas fa-question-circle" style="color: var(--info)"></i>
+                                <span class="accordion-title">Posso usar com inversores de outros fabricantes?</span>
+                            </div>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Sim! O driver <code>sunspec</code> suporta qualquer inversor certificado SunSpec (IEEE 1547-2018). Isso inclui a maioria dos fabricantes modernos como SolarEdge, GoodWe, Sungrow, entre outros. Para fabricantes específicos, podemos desenvolver drivers customizados.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <div class="accordion-header-left">
+                                <i class="fas fa-question-circle" style="color: var(--info)"></i>
+                                <span class="accordion-title">Quantos inversores posso monitorar?</span>
+                            </div>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>O gateway foi projetado para monitorar <strong>centenas de inversores</strong> simultaneamente. O limite real depende do hardware e intervalo de polling. Para 100 inversores com polling de 5 segundos, um servidor com 4GB de RAM é suficiente. Para instalações maiores, recomendamos múltiplos gateways com balanceamento de carga.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <div class="accordion-header-left">
+                                <i class="fas fa-question-circle" style="color: var(--info)"></i>
+                                <span class="accordion-title">O gateway funciona offline?</span>
+                            </div>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p><strong>Sim!</strong> O pvSolar Gateway foi projetado para operar em ambientes com conectividade intermitente. O sistema de store-and-forward armazena até 72 horas de dados localmente (SQLite) e sincroniza automaticamente quando a conexão é restabelecida.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <div class="accordion-header-left">
+                                <i class="fas fa-question-circle" style="color: var(--info)"></i>
+                                <span class="accordion-title">Preciso de conhecimento em programação?</span>
+                            </div>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Para uso básico, <strong>não</strong>. A configuração é feita via arquivo YAML e o gateway funciona com configurações padrão. Para personalizações avançadas, desenvolvimento de drivers ou integrações customizadas, conhecimento em Python é recomendado. Oferecemos treinamento e consultoria.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <div class="accordion-header-left">
+                                <i class="fas fa-question-circle" style="color: var(--info)"></i>
+                                <span class="accordion-title">Como obter suporte técnico?</span>
+                            </div>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <ul>
+                                <li><strong>Comunidade:</strong> GitHub Issues para bugs e dúvidas gerais</li>
+                                <li><strong>Premium:</strong> Suporte técnico 24/7 via email/chat para clientes comerciais</li>
+                                <li><strong>Consultoria:</strong> Implantação e personalização sob demanda</li>
+                                <li><strong>Treinamento:</strong> Cursos presenciais e online para equipes</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4><i class="fas fa-solar-panel"></i> pvSolar Gateway</h4>
+                <p>Gateway profissional de monitoramento solar com integração MQTT e edge computing.</p>
+                <p><i class="fas fa-code-branch"></i> Versão 1.0.0</p>
+            </div>
+            <div class="footer-section">
+                <h4>Links Úteis</h4>
+                <a href="https://github.com/your-org/pvsolar-gateway"><i class="fab fa-github"></i> GitHub</a>
+                <a href="https://docs.pvsolar.io"><i class="fas fa-book"></i> Documentação</a>
+                <a href="https://pvbrowser.de"><i class="fas fa-desktop"></i> pvbrowser</a>
+                <a href="https://sunspec.org"><i class="fas fa-solar-panel"></i> SunSpec Alliance</a>
+            </div>
+            <div class="footer-section">
+                <h4>Contato</h4>
+                <p><i class="fas fa-envelope"></i> dev@pvsolar.io</p>
+                <p><i class="fas fa-headset"></i> support@pvsolar.io</p>
+                <p><i class="fas fa-file-contract"></i> Licença: GPLv3 / Comercial</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 pvSolar. Todos os direitos reservados. Feito com <i class="fas fa-heart" style="color: var(--danger)"></i> para energia solar.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script>
+        // Accordion Toggle
+        function toggleAccordion(header) {
+            const item = header.parentElement;
+            const wasActive = item.classList.contains('active');
+            
+            // Close all items
+            document.querySelectorAll('.accordion-item').forEach(i => {
+                i.classList.remove('active');
+            });
+            
+            // Toggle clicked item
+            if (!wasActive) {
+                item.classList.add('active');
+            }
+        }
+
+        // Active Sidebar Link
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.sidebar-nav a');
+            
+            window.addEventListener('scroll', () => {
+                let current = '';
+                
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    
+                    if (pageYOffset >= sectionTop - 200) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Open first accordion item
+        document.querySelector('.accordion-item').classList.add('active');
+    </script>
+
+</body>
+</html>

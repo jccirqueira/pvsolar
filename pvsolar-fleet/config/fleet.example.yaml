@@ -1,0 +1,75 @@
+# pvSolar Fleet Configuration
+# Copy this file to fleet.yaml and customize
+
+# Gateway Service
+gateway:
+  url: "http://localhost:8000"
+  api_key: null
+  timeout: 30
+
+# Analytics Service
+analytics:
+  url: "http://localhost:8001"
+  api_key: null
+  timeout: 30
+
+# Alert Aggregator
+alerts:
+  enabled: true
+  max_alerts_per_site: 100
+  escalation_timeout: 300
+  auto_resolve_timeout: 3600
+
+# Comparison Engine
+comparison:
+  enabled: true
+  default_metric: "pr"
+  ranking_window: 30
+  peer_group_size: 5
+
+# API Settings
+api:
+  host: "0.0.0.0"
+  port: 8003
+  title: "pvSolar Fleet API"
+
+# Company
+company_name: "pvSolar Fleet"
+
+# Managed Sites
+sites:
+  - id: "site_1"
+    name: "Usina Solar SP"
+    gateway_url: "http://192.168.1.100:8000"
+    analytics_url: "http://192.168.1.100:8001"
+    capacity_kw: 500.0
+    num_inverters: 10
+    timezone: "America/Sao_Paulo"
+    latitude: -23.55
+    longitude: -46.63
+    region: "sudeste"
+
+  - id: "site_2"
+    name: "Usina Solar RJ"
+    gateway_url: "http://192.168.1.101:8000"
+    analytics_url: "http://192.168.1.101:8001"
+    capacity_kw: 300.0
+    num_inverters: 6
+    timezone: "America/Sao_Paulo"
+    latitude: -22.90
+    longitude: -43.17
+    region: "sudeste"
+
+  - id: "site_3"
+    name: "Usina Solar MG"
+    gateway_url: "http://192.168.1.102:8000"
+    analytics_url: "http://192.168.1.102:8001"
+    capacity_kw: 200.0
+    num_inverters: 4
+    timezone: "America/Sao_Paulo"
+    latitude: -19.92
+    longitude: -43.94
+    region: "sudeste"
+
+# Debug Mode
+debug: false

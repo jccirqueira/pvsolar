@@ -1,0 +1,25 @@
+# Grafana Datasource Configuration for pvSolar Gateway
+# =====================================================
+
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    jsonData:
+      version: Flux
+      organization: pvsolar
+      defaultBucket: pvsolar
+    secureJsonData:
+      token: ${INFLUXDB_TOKEN:-pvsolar-super-secret-token}
+    isDefault: true
+    editable: true
+
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://pvsolar-gateway:9090
+    isDefault: false
+    editable: true

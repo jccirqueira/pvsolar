@@ -1,0 +1,256 @@
+================================================================================
+ pvSolar Digital Twin v1.0.0
+ Simulação e Otimização de Usinas Solares
+================================================================================
+
+Autor: pvSolar Team
+Licença: GPLv3
+Data: Setembro 2026
+Plataforma: Windows / Linux / Docker
+
+================================================================================
+1. CONTEXTO E OBJETIVO
+================================================================================
+
+O pvSolar Digital Twin é o módulo de simulação digital do ecossistema pvSolar.
+Ele permite modelar matematicamente painéis solares, simular cenários What-If,
+predizer degradação e otimizar o desempenho do sistema.
+
+Objetivos:
+- Modelo matemático I-V dos painéis
+- Simulação de cenários What-If
+- Predição de degradação ao longo do tempo
+- Otimização de inclinação e número de painéis
+- Cálculo de ROI e payback
+- API REST para integração
+
+================================================================================
+2. STACK TECNOLÓGICO
+================================================================================
+
+- Python 3.10+ (servidor de simulação)
+- FastAPI (API REST)
+- NumPy (cálculos numéricos)
+- aiohttp (chamadas HTTP async)
+- Pydantic (configuração type-safe)
+- structlog (logging estruturado)
+- Docker / Docker Compose
+
+================================================================================
+3. ESTRUTURA DO PROJETO
+================================================================================
+
+pvsolar-twin/
+├── pyproject.toml              # Build config
+├── requirements.txt            # Dependências
+├── Resumo.txt                  # Este arquivo
+├── Manual.html                 # Manual profissional HTML
+├── src/
+│   ├── __init__.py
+│   ├── app.py                  # Aplicação principal
+│   ├── core/
+│   │   ├── __init__.py
+│   │   └── config.py           # 10 classes Pydantic + 4 enums
+│   ├── models/
+│   │   ├── __init__.py
+│   │   └── panel_model.py      # Modelo matemático I-V
+│   ├── degradation/
+│   │   ├── __init__.py
+│   │   └── degradation_engine.py # Predição de degradação
+│   ├── scenarios/
+│   │   ├── __init__.py
+│   │   └── scenario_engine.py  # Cenários What-If
+│   ├── optimizer/
+│   │   ├── __init__.py
+│   │   └── optimizer.py        # Otimização
+│   └── api/
+│       ├── __init__.py
+│       └── app.py              # API REST
+├── config/
+│   └── twin.example.yaml       # Config de exemplo
+├── docker/
+│   ├── Dockerfile
+│   └── docker-compose.yml
+└── tests/
+    ├── __init__.py
+    ├── test_config.py          # 27 testes
+    ├── test_panel_model.py     # 16 testes
+    ├── test_degradation.py     # 18 testes
+    ├── test_scenarios.py       # 18 testes
+    └── test_optimizer.py       # 11 testes
+
+================================================================================
+4. MÓDULOS
+================================================================================
+
+4.1 CONFIG.PY (10 classes Pydantic + 4 enums)
+----------------------------------------------
+- PanelType: MONO, POLY, THIN_FILM, BIFACIAL
+- DegradationModel: LINEAR, EXPONENTIAL, LOGARITHMIC, STEP
+- ScenarioType: WHAT_IF, SENSITIVITY, MONTE_CARLO, OPTIMIZATION
+- OptimizationTarget: ENERGY, COST, ROI, PAYBACK
+- PanelConfig: config do painel (I-V, NOCT, coef. temp.)
+- InverterConfig: config do inversor
+- PlantConfig: config da usina (posição, inclinação)
+- DegradationConfig: config de degradação
+- FinancialConfig: config financeira (CAPEX, OPEX, preço)
+- ScenarioConfig: config de cenário
+
+4.2 PANEL_MODEL.PY (Modelo I-V)
+--------------------------------
+- PanelModel: modelo matemático do painel
+  - calculate_cell_temperature: temperatura da célula
+  - calculate_thermal_voltage: tensão térmica
+  - calculate_photo_current: corrente fotogerada
+  - calculate_voc_temperature: Voc com temperatura
+  - calculate_diode_equation: equação do diodo
+  - calculate_iv_curve: curva I-V completa
+  - calculate_power: potência máxima
+  - calculate_energy_output: energia (Wh)
+  - calculate_efficiency: eficiência
+  - calculate_losses: perdas do sistema
+  - get_state: estado do painel
+
+4.3 DEGRADATION_ENGINE.PY (Predição)
+-------------------------------------
+- 4 modelos: linear, exponencial, logarítmico, step
+- Geração de forecast (0-25 anos)
+- Predição de potência/energia por ano
+- Cálculo de vida útil restante
+- Validação com medições reais
+- Cálculo de erro de predição
+
+4.4 SCENARIO_ENGINE.PY (What-If)
+---------------------------------
+- CRUD de cenários
+- Avaliação de cenários (energia/receita)
+- Comparação entre cenários
+- Tipos: WHAT_IF, SENSITIVITY, MONTE_CARLO
+- Fatores: irradiância, sujidade, disponibilidade, preço
+
+4.5 OPTIMIZER.PY (Otimização)
+-------------------------------
+- Otimização de inclinação (tilt)
+- Otimização de número de painéis
+- Cálculo de ROI, payback, NPV
+- Análise de sensibilidade
+- Restrições de orçamento
+
+================================================================================
+5. MODELO MATEMÁTICO I-V
+================================================================================
+
+Equação do diodo:
+  I = Iph - I0 * (exp(V / (n * Ns * Vt)) - 1)
+
+Onde:
+  Iph: corrente fotogerada
+  I0: corrente de saturação do diodo
+  V: tensão
+  n: fator de idealidade
+  Ns: número de células
+  Vt: tensão térmica (kT/q)
+
+================================================================================
+6. MODELOS DE DEGRADAÇÃO
+================================================================================
+
+Linear:
+  F(t) = 1 - (rate * t)
+
+Exponencial:
+  F(t) = exp(-rate * t)
+
+Logarítmico:
+  F(t) = 1 - rate * ln(t + 1)
+
+Step (degraus):
+  0-1 ano: 0%
+  1-5 anos: 2%
+  5-10 anos: 5%
+  10-15 anos: 10%
+  15-20 anos: 15%
+  20-25 anos: 20%
+
+================================================================================
+7. TESTES
+================================================================================
+
+Total: 90 testes — 90 passando (1.21s)
+
+test_config.py:       27 testes (enums, configs, load)
+test_panel_model.py:  16 testes (PanelModel, I-V)
+test_degradation.py:  18 testes (DegradationEngine)
+test_scenarios.py:    18 testes (ScenarioEngine)
+test_optimizer.py:    11 testes (Optimizer, ROI)
+
+================================================================================
+8. CONFIGURAÇÃO
+================================================================================
+
+Exemplo (config/twin.yaml):
+
+panel:
+  rated_power_w: 400.0
+  efficiency: 0.22
+  voc: 37.5
+  isc: 11.5
+
+plant:
+  num_panels: 200
+  tilt_angle: 25.0
+  latitude: -23.55
+
+degradation:
+  model: "linear"
+  annual_rate: 0.005
+
+financial:
+  capex_usd: 500000.0
+  energy_price_usd_kwh: 0.08
+
+Variáveis de ambiente:
+  PVTWIN_DEBUG
+  PANEL_RATED_POWER, PANEL_EFFICIENCY
+  PLANT_NUM_PANELS, PLANT_TILT_ANGLE
+  DEGRADATION_RATE
+  FINANCIAL_CAPEX, ENERGY_PRICE
+  API_HOST, API_PORT
+
+================================================================================
+9. DOCKER
+================================================================================
+
+Serviços:
+- pvsolar-twin: Python 3.11, porta 8006
+
+Comandos:
+  docker-compose up -d          # Iniciar
+  docker-compose logs -f        # Ver logs
+  docker-compose down           # Parar
+
+================================================================================
+10. INTEGRAÇÃO COM ECOSSISTEMA pvSolar
+================================================================================
+
+pvSolar Gateway (8000)     →  pvSolar Twin (dados reais)
+pvSolar Analytics (8001)   →  pvSolar Twin (ML insights)
+pvSolar Twin (8006)        →  Simulação/Otimização
+
+Fluxo:
+  Gateway coleta dados → Twin simula → Otimização → Recomendações
+
+================================================================================
+11. NOTAS TÉCNICAS
+================================================================================
+
+- datetime.now(timezone.utc), NÃO timedelta.utc
+- Imports absolutos: from src.core.config import X
+- structlog: usar event_type=, não event=
+- Pydantic: Field(default=...) para todos os campos
+- NumPy: para cálculos numéricos I-V
+- Equação do diodo simplificada
+
+================================================================================
+ FIM DO RESUMO
+================================================================================

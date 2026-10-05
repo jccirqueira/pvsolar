@@ -1,0 +1,90 @@
+# pvSolar Scheduler Configuration
+# Copy this file to scheduler.yaml and customize
+
+# Scheduler Settings
+max_concurrent_tasks: 5
+task_history_max: 1000
+check_interval_seconds: 10
+# Inicia o loop de execucao automaticamente ao subir o servico.
+# Com false, as tarefas so rodam apos POST /api/scheduler/start.
+auto_start: true
+
+# API
+api:
+  host: "0.0.0.0"
+  port: 8009
+  title: "pvSolar Scheduler API"
+
+# Database (PostgreSQL)
+# A persistência fica ativa quando `enabled: true` OU quando a variável de
+# ambiente PVSOLAR_DATABASE_URL estiver definida (ela tem prioridade).
+# Crie o banco uma vez com:  .\venv\Scripts\python.exe scripts\create_databases.py
+database:
+  enabled: true
+  url: "postgresql+asyncpg://postgres:pvsolar_dev@localhost:5432/pvsolar_scheduler"
+  echo: false
+  pool_size: 5
+  max_overflow: 10
+  pool_timeout: 30
+  create_tables: true
+  hydrate_on_startup: true
+
+# Pre-configured Tasks
+tasks:
+  - id: "data_sync"
+    name: "Data Synchronization"
+    task_type: "data_sync"
+    description: "Sync data from all pvSolar services"
+    enabled: true
+    priority: "normal"
+    schedule_type: "interval"
+    interval_seconds: 300
+    target_service: "gateway"
+    target_url: "http://localhost:8000/api/sync"
+    timeout_seconds: 120
+    max_retries: 3
+    tags: ["data", "production"]
+
+  - id: "report_daily"
+    name: "Daily Report Generation"
+    task_type: "report_generate"
+    description: "Generate daily performance report"
+    enabled: true
+    priority: "normal"
+    schedule_type: "daily"
+    time: "23:00"
+    target_service: "reports"
+    target_url: "http://localhost:8002/api/reports/daily"
+    timeout_seconds: 300
+    tags: ["reports", "daily"]
+
+  - id: "health_check"
+    name: "Service Health Check"
+    task_type: "health_check"
+    description: "Check health of all services"
+    enabled: true
+    priority: "high"
+    schedule_type: "interval"
+    interval_seconds: 60
+    target_url: "http://localhost:8000/health"
+    timeout_seconds: 30
+    tags: ["health", "monitoring"]
+
+  - id: "backup_nightly"
+    name: "Nightly Backup"
+    task_type: "backup_run"
+    description: "Run nightly backup of all data"
+    enabled: true
+    priority: "high"
+    schedule_type: "daily"
+    time: "02:00"
+    target_service: "backup"
+    target_url: "http://localhost:8008/api/backup"
+    timeout_seconds: 600
+    tags: ["backup", "nightly"]
+
+# Company
+company_name: "pvSolar Scheduler"
+
+# Debug Mode
+debug: false

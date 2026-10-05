@@ -1,0 +1,76 @@
+pvSolar Exporter
+Prometheus/Grafana Metrics Exporter
+=====================================
+
+OVERVIEW
+--------
+Metrics exporter for the pvSolar ecosystem. Scrapes data from all pvSolar
+services and exposes them in Prometheus format for Grafana dashboards.
+
+ARCHITECTURE
+------------
+src/
+  core/
+    config.py              - 4 Pydantic configuration classes
+    exporter.py            - PrometheusExporter (Gauge/Counter/Histogram/Summary)
+  collectors/
+    collectors.py          - 11 service collectors (Gateway, Analytics, SCADA, etc.)
+    scrape.py              - ScrapeManager (orchestrates collection)
+  api/
+    app.py                 - FastAPI endpoints (8 routes)
+  app.py                   - Main entry point
+
+TESTS
+-----
+tests/
+  test_config.py           - 11 tests (enums, configs, load, PVSOLAR_CONFIG)
+  test_exporter.py         - 17 tests (metrics, record, batch)
+  test_collectors.py       - 15 tests (all collectors, factory)
+  test_scrape.py           - 4 tests (ScrapeManager)
+  test_api.py              - 8 tests (API endpoints)
+  Total:                   55 tests, all passing
+
+METRICS EXPORTED
+----------------
+Gateway:      inverter_count, mqtt_connected, uptime_seconds, messages_received
+Analytics:    models_loaded, predictions_count, anomalies_detected, accuracy_score
+SCADA:        screens_active, widgets_rendered, active_users
+Reports:      reports_generated, pdf_count, excel_count
+Fleet:        total_sites, online_sites, offline_sites, total_capacity_mw
+Alert:        active_alerts, notifications_sent, rules_active
+Grid:         compliance_score, violations_count, voltage_pu, frequency_hz
+Twin:         simulations_running, total_simulations, accuracy_percent
+Auth:         active_users, total_tokens, failed_logins
+Backup:       total_backups, last_backup_status, total_size_bytes
+Scheduler:    total_tasks, running_tasks, failed_tasks, history_count
+
+DEPENDENCIES
+------------
+- fastapi
+- uvicorn[standard]
+- pydantic>=2.0
+- pyyaml
+- structlog
+- httpx
+- prometheus-client
+
+CONFIGURATION
+-------------
+Config resolution (highest priority first):
+  1. Explicit path argument (load_config(path))
+  2. PVSOLAR_CONFIG environment variable
+  3. config/exporter.yaml (or config/exporter.yml) in the working directory
+  4. Built-in defaults
+Docker variant: docker/config/exporter.yaml (scrape targets pointing to the
+compose service names), mounted by the root docker-compose.yml.
+
+PORT
+----
+8010
+
+GRAFANA INTEGRATION
+-------------------
+1. Configure Prometheus to scrape http://pvsolar-exporter:8010/metrics
+2. Add Prometheus data source in Grafana
+3. Import pvSolar dashboard or create custom panels
+4. Use pvsolar_* namespace for all metrics

@@ -1,0 +1,128 @@
+pvSolar Scheduler
+Task Scheduling for Solar Plants
+=================================
+
+OVERVIEW
+--------
+Centralized task scheduling system for the pvSolar ecosystem.
+Manages automated tasks like data sync, report generation, health checks,
+backups, and custom workflows with flexible scheduling and retry policies.
+
+ARCHITECTURE
+------------
+src/
+  core/
+    config.py              - 5 Pydantic configuration classes
+  tasks/
+    task.py                - Task, TaskRegistry, TaskResult
+  engine/
+    scheduler.py           - SchedulerEngine (cron, interval, daily/weekly/monthly)
+  db/
+    base.py                - Async engine/session factory (SQLAlchemy 2.0)
+    models.py              - ORM: tasks, task_results
+    service.py             - PersistenceService (startup, hydrate, write-through)
+  api/
+    app.py                 - FastAPI endpoints + lifespan (12 routes)
+  app.py                   - Main entry point
+scripts/
+  create_databases.py      - Cria o banco PostgreSQL (uma vez)
+  reset_database.py        - Dropa todas as tabelas (dev, exige --yes)
+
+DATABASE (PostgreSQL)
+---------------------
+Persistence is optional: with database.enabled=false the service runs purely
+in memory (original behaviour, used by unit tests).
+
+Setup:
+  1. Copy config/scheduler.example.yaml to config/scheduler.yaml and set
+     database.url (or export
+     PVSOLAR_DATABASE_URL=postgresql+asyncpg://user:senha@host:5432/pvsolar_scheduler)
+  2. .\venv\Scripts\python.exe scripts\create_databases.py
+  3. Start the service - schema is created automatically on startup
+
+On startup the service loads tasks and the execution history from PostgreSQL
+into memory (hydrate) and inserts rows for tasks declared only in the YAML
+file. Tasks and results created via the API are written through on every
+change, so tasks, their state (run_count, status, next_run) and the history
+survive restarts. The history is trimmed to task_history_max both in memory
+and in the database.
+
+Semantics: the database is the source of truth for tasks that have a row.
+Editing a task in the YAML file therefore only takes effect after the row is
+removed (delete it via the API, or run scripts/reset_database.py in dev).
+
+TESTS
+-----
+tests/
+  test_config.py           - 15 tests (enums, configs, load, env overrides, auto-descoberta)
+  test_tasks.py            - 16 tests (Task, Registry, CRUD)
+  test_scheduler.py        - 15 tests (engine, agendamento, execucao)
+  test_api.py              -  5 tests (auto_start, start/stop, execucao automatica)
+  test_persistence.py      - 16 tests (roundtrip, hidratacao, restart e2e)
+  Total:                   67 tests, all passing
+
+  test_persistence.py runs on SQLite by default (aiosqlite). To validate
+  against real PostgreSQL use the dedicated test database (the tests drop
+  and recreate the schema on every run - NEVER point them at production):
+    set PVSOLAR_TEST_DB_URL=postgresql+asyncpg://postgres:senha@localhost:5432/pvsolar_scheduler_test
+    .\venv\Scripts\python.exe -m pytest tests/ -q
+
+TASK TYPES
+----------
+- data_sync: Synchronize data between services
+- report_generate: Generate PDF/Excel reports
+- backup_run: Run backup operations
+- alert_check: Check and trigger alerts
+- analytics_run: Run ML analytics
+- health_check: Service health monitoring
+- notification_send: Send notifications
+- custom: User-defined tasks
+
+SCHEDULE TYPES
+--------------
+- once: Execute once at specified time
+- interval: Execute every N seconds
+- cron: Cron expression (e.g., "0 */6 * * *")
+- daily: Once per day at configured time
+- weekly: Once per week on configured day
+- monthly: Once per month on configured day
+
+FEATURES
+--------
+- Optional PostgreSQL persistence (async SQLAlchemy, survives restarts)
+- Task registry with CRUD operations
+- Custom task handlers (async functions)
+- Configurable retry policies (max retries, delay)
+- Task dependencies (depends_on)
+- Priority levels (low, normal, high, critical)
+- Execution history with configurable retention (memory + database)
+- Concurrent task execution limits
+- Tags for task grouping
+- REST API for management
+
+DEPENDENCIES
+------------
+- fastapi
+- uvicorn[standard]
+- pydantic>=2.0
+- pyyaml
+- structlog
+- httpx
+- croniter
+- sqlalchemy[asyncio]>=2.0.25
+- asyncpg
+- aiosqlite (testes da camada de persistência)
+
+PORT
+----
+8009
+
+PRODUCTION
+----------
+- Configure appropriate check intervals
+- Set realistic timeouts for long-running tasks
+- Use task dependencies for complex workflows
+- Monitor execution history for failures
+- Use tags to organize tasks by service
+- Enable database.enabled with a dedicated PostgreSQL user (least privilege)
+- Back up the pvsolar_scheduler database regularly

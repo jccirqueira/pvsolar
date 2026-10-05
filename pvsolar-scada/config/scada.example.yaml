@@ -1,0 +1,79 @@
+# pvSolar SCADA Configuration
+# Copy this file to scada.yaml and customize
+
+# MQTT Connection
+mqtt:
+  broker: "localhost"
+  port: 1883
+  username: null
+  password: null
+  client_id: "pvsolar-scada"
+  topics:
+    - "pvsolar/+/telemetry"
+    - "pvsolar/+/status"
+    - "pvsolar/+/alarms"
+  qos: 1
+  tls: false
+  ca_cert: null
+
+# pvBrowser Server
+pvbrowser:
+  host: "0.0.0.0"
+  port: 5000
+  max_clients: 10
+  update_interval: 1.0
+  title: "pvSolar SCADA"
+
+# Gateway Integration
+gateway:
+  url: "http://localhost:8000"
+  mqtt_bridge_port: 1884
+  api_key: null
+
+# Analytics Integration
+analytics:
+  url: "http://localhost:8001"
+  api_key: null
+
+# Alarm Settings
+alarms:
+  levels:
+    critical: "#FF0000"
+    warning: "#FFA500"
+    info: "#0000FF"
+    ok: "#00FF00"
+  max_alarms: 1000
+  sound_enabled: true
+  acknowledge_timeout: 300
+
+# Trend Settings
+trends:
+  max_points: 3600
+  update_rate: 1.0
+  time_ranges:
+    - "1h"
+    - "6h"
+    - "24h"
+    - "7d"
+    - "30d"
+
+# Plant Configuration
+plant:
+  name: "Minha Usina Solar"
+  capacity_kw: 100.0
+  num_inverters: 6
+  timezone: "America/Sao_Paulo"
+  latitude: -23.55
+  longitude: -46.63
+
+# Enabled Screens
+screens:
+  - "dashboard"
+  - "inverters"
+  - "weather"
+  - "alarms"
+  - "trends"
+  - "performance"
+
+# Debug Mode
+debug: false

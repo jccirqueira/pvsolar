@@ -1,0 +1,279 @@
+================================================================================
+ pvSolar SCADA v1.0.0
+ Dashboard HMI/SCADA para Monitoramento de Usinas Solares
+================================================================================
+
+Autor: pvSolar Team
+Licença: GPLv3
+Data: Setembro 2026
+Plataforma: Windows / Linux / Docker
+
+================================================================================
+1. CONTEXTO E OBJETIVO
+================================================================================
+
+O pvSolar SCADA é o componente de visualização e controle do ecossistema pvSolar.
+Ele se conecta ao pvSolar Gateway (coleta de dados) e pvSolar Analytics (ML)
+para fornecer uma interface HMI/SCADA completa para monitoramento em tempo real
+de usinas fotovoltaicas.
+
+Objetivos:
+- Dashboard principal com visão geral da usina
+- Monitoramento detalhado de inversores
+- Visualização de dados meteorológicos
+- Sistema de alarmes com acknowledge
+- Gráficos de trends históricos
+- Scoring de performance e benchmarking
+- Controle remoto de inversores
+
+================================================================================
+2. STACK TECNOLÓGICO
+================================================================================
+
+- Python 3.10+ (servidor SCADA)
+- TCP Socket Server (protocolo pvBrowser)
+- Pydantic (configuração type-safe)
+- structlog (logging estruturado)
+- aiohttp (chamadas HTTP async)
+- paho-mqtt (subscription MQTT)
+- Docker / Docker Compose
+- Mosquitto (broker MQTT)
+
+================================================================================
+3. ESTRUTURA DO PROJETO
+================================================================================
+
+pvsolar-scada/
+├── pyproject.toml              # Build config
+├── requirements.txt            # Dependências
+├── Resumo.txt                  # Este arquivo
+├── Manual.html                 # Manual profissional HTML
+├── src/
+│   ├── __init__.py
+│   ├── app.py                  # Aplicação principal
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── config.py           # 8 classes Pydantic
+│   │   ├── server.py           # Servidor TCP pvBrowser
+│   │   ├── screens.py          # ScreenManager + Widget
+│   │   └── data_manager.py     # MQTT, APIs, Alarmes
+│   └── screens/
+│       ├── __init__.py
+│       ├── factory.py          # Factory de telas
+│       ├── dashboard.py        # Tela principal
+│       ├── inverters.py        # Tela de inversores
+│       ├── weather.py          # Tela meteorológica
+│       ├── alarms.py           # Tela de alarmes
+│       ├── trends.py           # Tela de trends
+│       └── performance.py      # Tela de performance
+├── config/
+│   └── scada.example.yaml      # Config de exemplo
+├── docker/
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   └── mosquitto.conf
+└── tests/
+    ├── __init__.py
+    ├── test_config.py          # 11 testes
+    ├── test_screens.py         # 18 testes
+    ├── test_server.py          # 15 testes
+    ├── test_data_manager.py    # 22 testes
+    └── test_factory.py         # 11 testes
+
+================================================================================
+4. MÓDULOS CORE
+================================================================================
+
+4.1 CONFIG.PY (8 classes Pydantic)
+-----------------------------------
+- MQTTConfig: broker, port, TLS, topics, QoS
+- PVBrowserConfig: host, port, max_clients, update_interval
+- GatewayConfig: URL, API key
+- AnalyticsConfig: URL, API key
+- AlarmConfig: cores por nível, timeout, max alarms
+- TrendConfig: max pontos, rate, time ranges
+- PlantConfig: nome, capacidade, inversores, timezone, GPS
+- SCADAConfig: configuração principal (agrega todas)
+
+4.2 SERVER.PY (Servidor TCP pvBrowser)
+--------------------------------------
+- Multi-client (até 10 simultâneos)
+- Protocolo JSON sobre TCP
+- Heartbeat com timeout (30s)
+- Comandos registráveis (navigate, ack_alarm, set_power_limit, restart)
+- Broadcast de atualizações
+- Thread-safe com locks
+
+4.3 SCREENS.PY (Gerenciador de Telas)
+--------------------------------------
+- Widget: id, tipo, posição, tamanho, propriedades
+- 14 tipos de widget: GAUGE, CHART, LABEL, BUTTON, INDICATOR, TABLE,
+  IMAGE, LED, THERMOMETER, PROGRESS, GROUP, COMBOBOX, LINEEDIT,
+  CHECKBOX, COMPASS
+- Screen: container de widgets com groups
+- ScreenManager: navegação, histórico, dict/serialization
+
+4.4 DATA_MANAGER.PY (Gerenciador de Dados)
+-------------------------------------------
+- MQTT subscription (paho-mqtt)
+- Gateway API integration (aiohttp)
+- Analytics API integration (aiohttp)
+- TelemetryData: valores + qualidade por device
+- AlarmData: nível, mensagem, source, acknowledge
+- Callbacks para eventos (telemetry, alarm, alarm_ack)
+- Auto-limite de 1000 alarmes
+
+================================================================================
+5. TELAS SCADA (6 telas)
+================================================================================
+
+5.1 DASHBOARD (dashboard.py)
+-----------------------------
+- Plant Overview: nome, status LED, uptime, last update
+- Power Production: gauge potência, gauge energia diária, eficiência, CF
+- Weather: irradiância gauge, termômetro, vento, umidade, condição
+- Inverter Status: total ativos, potência total, eficiência, alarmes
+- Production Chart: linha potência vs irradiância (24h)
+
+5.2 INVERTERS (inverters.py)
+-----------------------------
+- Grid de até 6 inversores (3x2)
+- Cada inversor: status LED, potência, energia, eficiência, temperatura
+- Detalhes DC/AC: tensão, corrente, frequência
+- Detalhe do inversor selecionado: chart + tabela de status
+
+5.3 WEATHER (weather.py)
+-------------------------
+- Solar Resource: irradiância global gauge, difusa, direta, refletida
+- Ambient: termômetro, umidade gauge, vento gauge, rosa dos ventos
+- Module Temperature: chart temperatura módulo vs ambiente
+- Production vs Irradiance: chart dual axis
+
+5.4 ALARMS (alarms.py)
+-----------------------
+- Summary: contadores critical/warning/info/ack/unack
+- Controles: Acknowledge All, filtro, busca
+- Tabela ativa: tempo, nível, source, mensagem, status
+- Detalhes do alarme selecionado + botão Acknowledge
+- Histórico: chart de alarmes por hora (24h)
+
+5.5 TRENDS (trends.py)
+-----------------------
+- Controles: time range, refresh rate, pause, export CSV, screenshot
+- Power Trend: área com potência atual/forecast/capacity
+- Multi-parameter: multi-line (potência, irradiância, temp, eficiência)
+- Seleção de parâmetros via checkbox
+- Statistics: min, max, avg, total, std dev, capacity factor
+
+5.6 PERFORMANCE (performance.py)
+---------------------------------
+- Performance Score: gauge + grade (A+ a F) + rank + percentile
+- Components: PR, CEF, Availability, Efficiency (progress bars)
+- Trends: histórico 30d de todos os componentes
+- Benchmark: vs fleet avg, peer avg, historical, best (radar chart)
+- Insights: tabela de recomendações
+
+================================================================================
+6. API DE COMANDOS (TCP)
+================================================================================
+
+Comandos suportados pelo servidor:
+
+navigate        → Navega para uma tela
+  params: { screen: "dashboard" | "inverters" | ... }
+
+ack_alarm       → Acknowledge um alarme
+  params: { alarm_id: "alarm_1", user: "operator" }
+
+set_power_limit → Define limite de potência
+  params: { inverter_id: 1, limit_kw: 80.0 }
+
+restart_inverter → Reinicia um inversor
+  params: { inverter_id: 1 }
+
+================================================================================
+7. TESTES
+================================================================================
+
+Total: 77 testes — 77 passando (100%)
+
+test_config.py:        11 testes (MQTT, PVBrowser, Plant, SCADA, Load)
+test_screens.py:       18 testes (Widget, Screen, ScreenManager)
+test_server.py:        15 testes (ClientConnection, PVBrowserServer)
+test_data_manager.py:  22 testes (Telemetry, Alarm, DataManager)
+test_factory.py:       11 testes (ScreenFactory, criação de telas)
+
+================================================================================
+8. CONFIGURAÇÃO
+================================================================================
+
+Exemplo (config/scada.yaml):
+
+mqtt:
+  broker: "localhost"
+  port: 1883
+  topics:
+    - "pvsolar/+/telemetry"
+    - "pvsolar/+/status"
+    - "pvsolar/+/alarms"
+
+pvbrowser:
+  host: "0.0.0.0"
+  port: 5000
+  max_clients: 10
+  update_interval: 1.0
+
+plant:
+  name: "Minha Usina Solar"
+  capacity_kw: 100.0
+  num_inverters: 6
+  timezone: "America/Sao_Paulo"
+
+Variáveis de ambiente:
+  MQTT_BROKER, MQTT_PORT, MQTT_USERNAME, MQTT_PASSWORD
+  PVBROWSER_HOST, PVBROWSER_PORT
+  GATEWAY_URL, GATEWAY_API_KEY
+  ANALYTICS_URL, ANALYTICS_API_KEY
+  ALARM_MAX_ALARMS, ALARM_SOUND_ENABLED
+  PLANT_NAME, PLANT_CAPACITY_KW, PLANT_NUM_INVERTERS
+
+================================================================================
+9. DOCKER
+================================================================================
+
+Serviços:
+- pvsolar-scada: Python 3.11, porta 5000
+- mqtt-broker: Eclipse Mosquitto 2, porta 1883
+
+Comandos:
+  docker-compose up -d          # Iniciar stack
+  docker-compose logs -f        # Ver logs
+  docker-compose down           # Parar
+
+================================================================================
+10. INTEGRAÇÃO COM ECOSSISTEMA pvSolar
+================================================================================
+
+pvSolar Gateway (porta 1884)     →  pvsolar-scada (MQTT subscribe)
+pvSolar Analytics (porta 8001)   →  pvsolar-scada (API queries)
+pvBrowser Client (porta 5000)    ←  pvsolar-scada (TCP server)
+
+Fluxo de dados:
+  Inversor → Gateway (MQTT) → SCADA (display) → Operador (HMI)
+  Inversor → Gateway (MQTT) → Analytics (ML) → SCADA (insights)
+
+================================================================================
+11. NOTAS TÉCNICAS
+================================================================================
+
+- Usar datetime.now(timezone.utc), NÃO timedelta.utc
+- Imports absolutos: from src.core.config import X
+- structlog: usar event_type=, não event=
+- Pydantic: Field(default=...) para todos os campos
+- WidgetType enum: COMBOBOX, LINEEDIT, CHECKBOX, COMPASS incluídos
+- JSON protocol: {"type": MSG_xxx, ...} + "\n" delimiter
+- Thread-safe: locks em _clients e _screen_data
+
+================================================================================
+ FIM DO RESUMO
+================================================================================

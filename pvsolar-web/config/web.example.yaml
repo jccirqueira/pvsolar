@@ -1,0 +1,30 @@
+# pvSolar Web Configuration
+# Copy this file to web.yaml and customize
+
+# Service URLs
+services:
+  gateway: "http://localhost:8000"
+  analytics: "http://localhost:8001"
+  scada: "http://localhost:5000"
+  reports: "http://localhost:8002"
+  fleet: "http://localhost:8003"
+  alert: "http://localhost:8004"
+  grid: "http://localhost:8005"
+  twin: "http://localhost:8006"
+  auth: "http://localhost:8007"
+
+# Refresh intervals (ms)
+refresh:
+  dashboard: 30000
+  inverters: 10000
+  weather: 60000
+  alarms: 15000
+
+# Theme
+theme:
+  primary_color: "#0ea5e9"
+  dark_mode: false
+
+# Company
+company_name: "pvSolar"
+company_logo: "/logo.svg"

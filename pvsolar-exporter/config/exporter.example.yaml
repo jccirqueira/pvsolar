@@ -1,0 +1,126 @@
+# pvSolar Exporter Configuration
+# Copy this file to exporter.yaml and customize
+
+# API Settings
+api:
+  host: "0.0.0.0"
+  port: 8010
+  title: "pvSolar Exporter API"
+
+# Scrape Settings
+scrape_interval_seconds: 15
+scrape_timeout_seconds: 10
+metrics_path: "/metrics"
+namespace: "pvsolar"
+
+# Global Labels (applied to all metrics)
+global_labels:
+  environment: "production"
+  region: "brasil"
+
+# Collectors - pvSolar services to scrape
+collectors:
+  gateway:
+    enabled: true
+    url: "http://localhost:8000"
+    path: "/api/status"
+    interval_seconds: 15
+    timeout_seconds: 10
+    labels:
+      component: "data-collection"
+
+  analytics:
+    enabled: true
+    url: "http://localhost:8001"
+    path: "/api/status"
+    interval_seconds: 30
+    timeout_seconds: 10
+    labels:
+      component: "ml-analytics"
+
+  scada:
+    enabled: true
+    url: "http://localhost:5000"
+    path: "/api/status"
+    interval_seconds: 15
+    timeout_seconds: 10
+    labels:
+      component: "hmi-scada"
+
+  reports:
+    enabled: true
+    url: "http://localhost:8002"
+    path: "/api/status"
+    interval_seconds: 60
+    timeout_seconds: 15
+    labels:
+      component: "reporting"
+
+  fleet:
+    enabled: true
+    url: "http://localhost:8003"
+    path: "/api/status"
+    interval_seconds: 30
+    timeout_seconds: 10
+    labels:
+      component: "fleet-management"
+
+  alert:
+    enabled: true
+    url: "http://localhost:8004"
+    path: "/api/status"
+    interval_seconds: 15
+    timeout_seconds: 10
+    labels:
+      component: "alerting"
+
+  grid:
+    enabled: true
+    url: "http://localhost:8005"
+    path: "/api/status"
+    interval_seconds: 30
+    timeout_seconds: 10
+    labels:
+      component: "grid-compliance"
+
+  twin:
+    enabled: true
+    url: "http://localhost:8006"
+    path: "/api/status"
+    interval_seconds: 60
+    timeout_seconds: 15
+    labels:
+      component: "digital-twin"
+
+  auth:
+    enabled: true
+    url: "http://localhost:8007"
+    path: "/api/status"
+    interval_seconds: 60
+    timeout_seconds: 10
+    labels:
+      component: "authentication"
+
+  backup:
+    enabled: true
+    url: "http://localhost:8008"
+    path: "/api/status"
+    interval_seconds: 120
+    timeout_seconds: 30
+    labels:
+      component: "backup"
+
+  scheduler:
+    enabled: true
+    url: "http://localhost:8009"
+    path: "/api/status"
+    interval_seconds: 30
+    timeout_seconds: 10
+    labels:
+      component: "scheduling"
+
+# Company
+company_name: "pvSolar Exporter"
+
+# Debug Mode
+debug: false

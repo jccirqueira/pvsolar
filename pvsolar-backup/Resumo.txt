@@ -1,0 +1,100 @@
+pvSolar Backup
+Automated Backup & Restore for Solar Plants
+=============================================
+
+OVERVIEW
+--------
+Automated backup and restore system for the pvSolar ecosystem.
+Supports multiple storage backends (Local, S3, FTP, SMB, Azure, GCS),
+scheduled backups, compression, retention policies, and a REST API.
+
+ARCHITECTURE
+------------
+src/
+  core/
+    config.py              - 8 Pydantic configuration classes
+  backup/
+    engine.py              - Backup creation, compression, checksums
+  restore/
+    engine.py              - Backup restoration, archive inspection
+  scheduler/
+    scheduler.py           - Cron-based backup scheduling
+  storage/
+    backends.py            - 6 storage backends (Local/FTP/S3/SMB/Azure/GCS)
+  api/
+    app.py                 - FastAPI endpoints
+  app.py                   - Main entry point
+
+TESTS
+-----
+tests/
+  test_config.py           - 15 tests (enums, configs, load, PVSOLAR_CONFIG)
+  test_backup.py           - 11 tests (engine, records, CRUD)
+  test_restore.py          - 7 tests (restore, archive contents)
+  test_scheduler.py        - 11 tests (scheduling, cron, run_now, rollover 23h, clamp)
+  test_storage.py          - 11 tests (Local, factory)
+  Total:                   55 tests, all passing
+
+STORAGE BACKENDS
+----------------
+- Local: Filesystem backup to local directory
+- S3: Amazon S3 compatible storage
+- FTP: FTP/SFTP remote backup
+- SMB: Windows network share
+- Azure: Azure Blob Storage
+- GCS: Google Cloud Storage
+
+COMPRESSION
+-----------
+- none: No compression (raw copy)
+- gzip: GZip single file compression
+- zip: ZIP archive with deflate
+- tar: TAR archive (no compression)
+- tar.gz: TAR + GZip (default, best balance)
+
+SCHEDULE
+--------
+- hourly: Every hour at :00
+- daily: Once per day at configured time
+- weekly: Once per week on configured day
+- monthly: Once per month on configured day
+- custom: User-defined cron expression
+
+RETENTION
+---------
+- max_backups: Maximum number of backups (default: 30)
+- max_age_days: Maximum age in days (default: 90)
+- min_keep: Minimum backups to always keep (default: 5)
+
+DEPENDENCIES
+------------
+- fastapi
+- uvicorn[standard]
+- pydantic>=2.0
+- pyyaml
+- structlog
+- httpx
+- croniter
+- aiofiles
+
+CONFIGURATION
+-------------
+Config resolution (highest priority first):
+  1. Explicit path argument (load_config(path))
+  2. PVSOLAR_CONFIG environment variable
+  3. config/backup.yaml (or config/backup.yml) in the working directory
+  4. Built-in defaults
+Docker variant: docker/config/backup.yaml (internal service-name URLs),
+mounted by the root docker-compose.yml.
+
+PORT
+----
+8008
+
+PRODUCTION
+----------
+- Configure S3 or remote storage for offsite backups
+- Set appropriate retention policies
+- Enable notifications for failure alerts
+- Use encryption for sensitive data
+- Test restore procedures regularly

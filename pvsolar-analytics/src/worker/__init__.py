@@ -1,0 +1,1 @@
+"""pvSolar Analytics - Worker module."""

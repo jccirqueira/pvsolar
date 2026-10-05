@@ -1,0 +1,277 @@
+================================================================================
+ pvSolar Reports v1.0.0
+ Geração Automática de Relatórios para Usinas Solares
+================================================================================
+
+Autor: pvSolar Team
+Licença: GPLv3
+Data: Setembro 2026
+Plataforma: Windows / Linux / Docker
+
+================================================================================
+1. CONTEXTO E OBJETIVO
+================================================================================
+
+O pvSolar Reports é o módulo de geração automática de relatórios profissionais
+do ecossistema pvSolar. Ele consolida dados do Gateway, Analytics e SCADA em
+documentos PDF e Excel prontos para investidores, operadores e equipes de
+manutenção.
+
+Objetivos:
+- Relatórios diários/semanais/mensais automáticos
+- PDF profissional com branding da empresa
+- Excel com dados brutos e gráficos
+- Email automático de relatórios
+- Agendamento inteligente
+- API REST para consultas
+
+================================================================================
+2. STACK TECNOLÓGICO
+================================================================================
+
+- Python 3.10+ (servidor de relatórios)
+- ReportLab (geração de PDF)
+- OpenPyXL (geração de Excel)
+- Matplotlib (gráficos)
+- Jinja2 (templates)
+- APScheduler (agendamento)
+- FastAPI (API REST)
+- aiohttp (chamadas HTTP async)
+- Docker / Docker Compose
+
+================================================================================
+3. ESTRUTURA DO PROJETO
+================================================================================
+
+pvsolar-reports/
+├── pyproject.toml              # Build config
+├── requirements.txt            # Dependências
+├── Resumo.txt                  # Este arquivo
+├── Manual.html                 # Manual profissional HTML
+├── src/
+│   ├── __init__.py
+│   ├── app.py                  # Aplicação principal
+│   ├── api/
+│   │   ├── __init__.py
+│   │   └── app.py              # API HTTP (FastAPI) - entry uvicorn
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── config.py           # 9 classes Pydantic
+│   │   └── email_sender.py     # Envio de emails
+│   ├── collectors/
+│   │   ├── __init__.py
+│   │   └── data_collector.py   # Coleta de dados Gateway/Analytics
+│   ├── generators/
+│   │   ├── __init__.py
+│   │   ├── pdf_generator.py    # Geração de PDF
+│   │   └── excel_generator.py  # Geração de Excel
+│   └── scheduler/
+│       ├── __init__.py
+│       └── report_scheduler.py # Agendamento de relatórios
+├── config/
+│   └── reports.example.yaml    # Config de exemplo
+├── docker/
+│   ├── Dockerfile
+│   └── docker-compose.yml
+├── output/
+│   ├── pdf/                    # PDFs gerados
+│   └── excel/                  # Excels gerados
+└── tests/
+    ├── __init__.py
+    ├── test_config.py          # 19 testes
+    ├── test_collector.py       # 11 testes
+    ├── test_api.py             # 9 testes (API HTTP)
+    ├── test_pdf_generator.py   # 7 testes
+    ├── test_excel_generator.py # 7 testes
+    └── test_email.py           # 4 testes
+
+================================================================================
+4. MÓDULOS
+================================================================================
+
+4.1 CONFIG.PY (9 classes Pydantic)
+-----------------------------------
+- GatewayConfig: URL, API key, timeout
+- AnalyticsConfig: URL, API key, timeout
+- EmailConfig: SMTP, credenciais, destinatários
+- SchedulerConfig: horários de agendamento
+- OutputConfig: diretórios, retenção de arquivos
+- TemplateConfig: idioma, empresa, cores, logo
+- PlantConfig: nome, capacidade, inversores
+- APIConfig: host, porta
+- ReportsConfig: configuração principal
+
+4.2 DATA_COLLECTOR.PY (Coleta de Dados)
+----------------------------------------
+- DataCollector: coleta de dados async via HTTP
+- TelemetryData: dados de telemetria
+- AlarmData: alarmes
+- PerformanceData: scoring de performance
+- MaintenanceData: previsões de manutenção
+- collect_daily_data: dados consolidados do dia
+- collect_weekly_data: dados da semana
+- collect_monthly_data: dados do mês
+
+4.3 PDF_GENERATOR.PY (Geração de PDF)
+--------------------------------------
+- PDFReportGenerator: gera PDFs profissionais
+- Header/footer com logo e page numbers
+- Tabelas estilizadas com cores da empresa
+- KPI cards para resumo executivo
+- generate_daily_report: relatório diário
+- generate_weekly_report: relatório semanal
+- generate_monthly_report: relatório mensal
+- generate_maintenance_report: relatório de manutenção
+
+4.4 EXCEL_GENERATOR.PY (Geração de Excel)
+------------------------------------------
+- ExcelReportGenerator: gera workbooks Excel
+- Múltiplas planilhas (Summary, Inverters, Alarms)
+- Gráficos embutidos (BarChart, LineChart)
+- Formatação profissional com headers coloridos
+- generate_daily_report
+- generate_weekly_report
+- generate_monthly_report
+- generate_maintenance_report
+
+4.5 EMAIL_SENDER.PY (Envio de Emails)
+--------------------------------------
+- EmailSender: envia emails com anexos
+- HTML body formatado
+- Múltiplos anexos (PDF + Excel)
+- Async support
+- Fallback para erros
+
+4.6 REPORT_SCHEDULER.PY (Agendamento)
+--------------------------------------
+- ReportScheduler: agenda relatórios automáticos
+- APScheduler AsyncIO
+- Daily/weekly/monthly schedules
+- Pause/resume/remove jobs
+
+================================================================================
+5. TIPOS DE RELATÓRIO
+================================================================================
+
+5.1 RELATÓRIO DIÁRIO
+---------------------
+- Resumo executivo (KPIs)
+- Produção por inversor
+- Alarmes e eventos
+- Performance (PR, grade)
+- Previsão para amanhã
+
+5.2 RELATÓRIO SEMANAL
+----------------------
+- Comparação entre dias
+- Tendência de produção
+- Top problemas da semana
+
+5.3 RELATÓRIO MENSAL
+---------------------
+- KPIs consolidados
+- Produção diária detalhada
+- Análise de tendências
+
+5.4 RELATÓRIO DE MANUTENÇÃO
+----------------------------
+- Avaliação de risco
+- Ações urgentes
+- Previsões de componentes
+
+================================================================================
+6. TESTES
+================================================================================
+
+Total: 57 testes — 57 passando (100%)
+
+test_config.py:         19 testes (configs + enums + load + PVSOLAR_CONFIG)
+test_collector.py:      11 testes (Telemetry, Alarm, Performance, Collector)
+test_api.py:             9 testes (health, status, daily/weekly/monthly/maintenance)
+test_pdf_generator.py:   7 testes (criação, daily, weekly, monthly, maintenance)
+test_excel_generator.py: 7 testes (criação, daily, weekly, monthly, maintenance)
+test_email.py:           4 testes (criação, mensagem, disabled, no recipients)
+
+================================================================================
+7. CONFIGURAÇÃO
+================================================================================
+
+Exemplo (config/reports.yaml):
+
+gateway:
+  url: "http://localhost:8000"
+
+analytics:
+  url: "http://localhost:8001"
+
+email:
+  enabled: true
+  smtp_host: "smtp.gmail.com"
+  recipients:
+    - "admin@pvsolar.com"
+
+scheduler:
+  enabled: true
+  daily_time: "06:00"
+  weekly_day: 1
+  monthly_day: 1
+
+plant:
+  name: "Minha Usina Solar"
+  capacity_kw: 100.0
+
+Variáveis de ambiente:
+  GATEWAY_URL, GATEWAY_API_KEY
+  ANALYTICS_URL, ANALYTICS_API_KEY
+  EMAIL_ENABLED, EMAIL_SMTP_HOST, EMAIL_SMTP_USER, EMAIL_SMTP_PASSWORD
+  SCHEDULER_ENABLED, SCHEDULER_DAILY_TIME
+  TEMPLATE_COMPANY_NAME, TEMPLATE_PRIMARY_COLOR
+  PLANT_NAME, PLANT_CAPACITY_KW
+  API_HOST, API_PORT
+
+================================================================================
+8. DOCKER
+================================================================================
+
+Serviços:
+- pvsolar-reports: Python 3.11, porta 8002
+- Entry point: uvicorn src.api.app:app (API HTTP com /health e /api/reports/*)
+
+Compose:
+  Subir pelo compose da raiz do ecossistema (recomendado):
+    docker compose up -d reports
+  As variantes de config para Docker ficam em docker/config/reports.yaml
+  (URLs gateway/analytics com nomes de serviço da rede interna).
+
+Comandos (legado, compose do próprio projeto):
+  docker-compose up -d          # Iniciar
+  docker-compose logs -f        # Ver logs
+  docker-compose down           # Parar
+
+================================================================================
+9. INTEGRAÇÃO COM ECOSSISTEMA pvSolar
+================================================================================
+
+pvSolar Gateway (8000)     →  pvSolar Reports (coleta dados)
+pvSolar Analytics (8001)   →  pvSolar Reports (ML insights)
+pvSolar Reports (8002)     →  PDF/Excel/Email (relatórios)
+pvSolar Reports (8002)     →  API REST (consultas)
+
+Fluxo:
+  Dados → Gateway/Analytics → Reports → PDF/Excel → Email/Download
+
+================================================================================
+10. NOTAS TÉCNICAS
+================================================================================
+
+- ReportLab: SimpleDocTemplate para PDFs
+- OpenPyXL: Workbook com múltiplas planilhas
+- APScheduler: AsyncIOScheduler para async
+- aiohttp: ClientSession para HTTP
+- datetime.now(timezone.utc), NÃO timedelta.utc
+- Imports absolutos: from src.core.config import X
+- structlog: usar event_type=, não event=
+
+================================================================================
+ FIM DO RESUMO
+================================================================================

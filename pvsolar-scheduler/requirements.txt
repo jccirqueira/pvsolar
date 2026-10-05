@@ -1,0 +1,13 @@
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.0
+pyyaml>=6.0
+structlog>=23.2.0
+httpx>=0.25.0
+croniter>=1.4.0
+
+# Persistência (PostgreSQL)
+sqlalchemy[asyncio]>=2.0.25
+asyncpg>=0.29.0
+# aiosqlite: driver usado nos testes unitários da camada de persistência
+aiosqlite>=0.19.0

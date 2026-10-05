@@ -1,0 +1,76 @@
+# pvSolar Analytics Configuration
+# Configuracao real do ecossistema pvSolar (porta 8001).
+# Gerada a partir de analytics.example.yaml - ajuste para o seu ambiente.
+#
+# Em Docker use a variante docker/config/analytics.yaml (broker "mosquitto"),
+# montada pelo docker-compose.yml da raiz.
+
+mqtt:
+  broker: "localhost"
+  port: 1883
+  use_tls: false
+  tls_enabled: false
+  ca_cert: ""
+  client_cert: ""
+  client_key: ""
+  client_id: "pvsolar-analytics-001"
+  username: null
+  password: null
+  subscribe_topics:
+    - "pvsolar/+/telemetry/+"
+    - "pvsolar/+/status"
+    - "pvsolar/+/alert"
+  qos: 1
+  reconnect_delay: 5
+
+database:
+  # SELECT 1 de partida no startup (init_database e eager). Banco dedicado:
+  # crie-o localmente (CREATE DATABASE pvsolar_analytics;) - o initdb do
+  # Docker ja o cria automaticamente.
+  url: "postgresql+asyncpg://postgres:pvsolar_dev@localhost:5432/pvsolar_analytics"
+  pool_size: 10
+  echo: false
+
+redis:
+  url: "redis://localhost:6379/0"
+
+ml:
+  model_dir: "./ml_models"
+  anomaly:
+    contamination: 0.05
+    threshold: 0.8
+    retrain_interval_hours: 168
+  maintenance:
+    prediction_horizons: [7, 30, 90]
+    retrain_interval_hours: 168
+  forecast:
+    horizon_hours: 168
+    confidence_level: 0.95
+
+alerts:
+  enabled: true
+  telegram:
+    enabled: false
+    bot_token: ""
+    chat_id: ""
+  email:
+    enabled: false
+    smtp_host: ""
+    smtp_port: 587
+    username: ""
+    password: ""
+    from_addr: ""
+    to_addrs: []
+
+api:
+  host: "0.0.0.0"
+  port: 8001
+  cors_origins: ["*"]
+
+web:
+  enabled: true
+  dashboard_port: 8001
+
+worker:
+  enabled: true
+  concurrency: 4

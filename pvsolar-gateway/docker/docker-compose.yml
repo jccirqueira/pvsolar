@@ -1,0 +1,141 @@
+version: '3.8'
+
+# pvSolar Gateway - Docker Compose Configuration
+# ================================================
+# This configuration deploys the complete pvSolar stack including:
+# - pvSolar Gateway (main application)
+# - Eclipse Mosquitto (MQTT broker)
+# - InfluxDB (time-series database)
+# - Grafana (visualization)
+# - Telegraf (optional metrics collection)
+
+services:
+  # pvSolar Gateway
+  pvsolar-gateway:
+    image: pvsolar/gateway:latest
+    container_name: pvsolar-gateway
+    restart: unless-stopped
+    ports:
+      - "5000:5000"   # Web Dashboard
+      - "5050:5050"   # pvbrowser Socket
+      - "9090:9090"   # Prometheus Metrics
+    volumes:
+      - ./config:/app/config:ro
+      - pvsolar-data:/var/lib/pvsolar
+      - pvsolar-certs:/etc/pvsolar/certs:ro
+      - pvsolar-logs:/var/log/pvsolar
+    environment:
+      - TZ=America/Sao_Paulo
+      - PVSOLAR_CONFIG=/app/config/gateway.yaml
+      - PVSOLAR_LOG_LEVEL=INFO
+    depends_on:
+      mosquitto:
+        condition: service_healthy
+      influxdb:
+        condition: service_healthy
+    networks:
+      - pvsolar-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Eclipse Mosquitto MQTT Broker
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: pvsolar-mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"   # MQTT
+      - "8883:8883"   # MQTT over TLS
+      - "9001:9001"   # WebSocket
+    volumes:
+      - ./mosquitto/config:/mosquitto/config:ro
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+      - pvsolar-certs:/mosquitto/certs:ro
+    networks:
+      - pvsolar-network
+    healthcheck:
+      test: ["CMD", "mosquitto_sub", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # InfluxDB Time-Series Database
+  influxdb:
+    image: influxdb:2.7
+    container_name: pvsolar-influxdb
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+      - influxdb-config:/etc/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_PASSWORD:-pvsolar123}
+      - DOCKER_INFLUXDB_INIT_ORG=pvsolar
+      - DOCKER_INFLUXDB_INIT_BUCKET=pvsolar
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_TOKEN:-pvsolar-super-secret-token}
+    networks:
+      - pvsolar-network
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Grafana Visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: pvsolar-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-pvsolar123}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    networks:
+      - pvsolar-network
+
+  # Optional: Telegraf for additional metrics
+  telegraf:
+    image: telegraf:latest
+    container_name: pvsolar-telegraf
+    restart: unless-stopped
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    depends_on:
+      - influxdb
+    networks:
+      - pvsolar-network
+
+volumes:
+  pvsolar-data:
+    driver: local
+  pvsolar-certs:
+    driver: local
+  pvsolar-logs:
+    driver: local
+  influxdb-data:
+    driver: local
+  influxdb-config:
+    driver: local
+  grafana-data:
+    driver: local
+
+networks:
+  pvsolar-network:
+    driver: bridge

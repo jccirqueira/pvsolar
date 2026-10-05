@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  pvsolar-twin:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: pvsolar-twin
+    restart: unless-stopped
+    ports:
+      - "8006:8006"
+    volumes:
+      - ../config:/app/config:ro
+      - twin-data:/app/data
+    environment:
+      - PVTWIN_DEBUG=false
+      - API_PORT=8006
+    networks:
+      - pvsolar-net
+
+volumes:
+  twin-data:
+
+networks:
+  pvsolar-net:
+    driver: bridge

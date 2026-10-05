@@ -1,0 +1,696 @@
+================================================================================
+                    RESUMO COMPLETO DO PROJETO PVSOLAR GATEWAY
+================================================================================
+Versão do Documento: 1.0
+Data: 2026-09-16
+Autor: Opencode (IA Assistente)
+Status: PROJETO FUNCIONAL - 68/68 TESTES PASSANDO
+
+================================================================================
+1. CONTEXTO E OBJETIVO DO PROJETO
+================================================================================
+
+O projeto "pvSolar Gateway" é um gateway profissional de monitoramento de
+inversores solares com integração MQTT, computação de borda e suporte a
+múltiplos inversores. O objetivo é ser o mais profissional possível.
+
+Modelo de Negócio: Open Core
+- Core (GPLv3): Gratuito - drivers, MQTT, edge computing, dashboard
+- Premium (Comercial): AWS IoT, Azure IoT Hub, alertas avançados, suporte
+
+Preferência do Usuário: "A mais profissional possível" — sempre escolher a
+opção mais profissional quando há dúvidas de implementação.
+
+================================================================================
+2. STACK TECNOLÓGICO
+================================================================================
+
+Linguagem: Python 3.11.9 (testado)
+Build System: pyproject.toml (PEP 517/518) com setuptools
+Testes: pytest 9.1.1 + pytest-asyncio 1.4.0
+Platform: Windows 32-bit (pwsh shell)
+
+Dependências Principais:
+- pydantic>=2.0          — Validação de configuração
+- pymodbus>=3.0.0        — Comunicação Modbus TCP/RTU
+- paho-mqtt>=1.6.0       — Cliente MQTT
+- fastapi>=0.100.0       — API REST + Dashboard web
+- uvicorn>=0.23.0        — Servidor ASGI
+- structlog>=23.0        — Logging estruturado
+- prometheus-client>=0.17.0 — Métricas
+- aiosqlite>=0.19.0      — SQLite assíncrono (edge store)
+- cryptography>=41.0.0   — TLS 1.3 / mTLS
+- pyyaml>=6.0            — Configuração YAML
+- psutil>=5.9.0          — Monitoramento de sistema
+
+Dependências de Dev:
+- pytest>=7.4.0
+- pytest-asyncio>=0.21.0
+- pytest-cov>=4.1.0
+
+================================================================================
+3. ESTRUTURA DO PROJETO
+================================================================================
+
+pvsolar-gateway/
+├── .gitignore                    — Regras git (68 linhas)
+├── LICENSE                       — GPLv3
+├── README.md                     — Documentação principal (390 linhas)
+├── INSTALL.md                    — Guia de instalação (228 linhas)
+├── Manual.html                   — Manual profissional HTML (2067 linhas)
+├── pyproject.toml                — Config build moderno (92 linhas)
+├── requirements.txt              — Dependências pip (46 linhas)
+│
+├── config/
+│   └── gateway.example.yaml      — Exemplo completo de config (172 linhas)
+│
+├── docker/
+│   ├── docker-compose.yml        — Stack completo (141 linhas)
+│   ├── grafana/provisioning/
+│   │   └── datasources.yml       — Datasources Grafana
+│   └── mosquitto/config/
+│       ├── mosquitto.conf        — Config MQTT broker (47 linhas)
+│       └── acl.txt               — ACL de tópicos (32 linhas)
+│
+├── examples/
+│   └── pvbrowser_example.py      — Exemplo de uso (104 linhas)
+│
+├── src/                          — Código fonte principal
+│   ├── __init__.py               — Metadados do pacote
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── config.py             — Configuração Pydantic (261 linhas)
+│   │   ├── gateway.py            — Orquestrador principal (295 linhas)
+│   │   └── metrics.py            — Métricas Prometheus (262 linhas)
+│   ├── drivers/
+│   │   ├── __init__.py           — Re-exports: BaseInverterDriver, InverterData, create_driver
+│   │   ├── base.py               — Classe abstrata + factory (230 linhas)
+│   │   ├── sunspec/
+│   │   │   ├── __init__.py
+│   │   │   └── driver.py         — SunSpec IEEE 1547 (518 linhas)
+│   │   ├── fronius/
+│   │   │   ├── __init__.py
+│   │   │   └── driver.py         — Fronius GEN24/Tauro (499 linhas)
+│   │   ├── growatt/
+│   │   │   ├── __init__.py
+│   │   │   └── driver.py         — Growatt MIN/MOD/MIX (459 linhas)
+│   │   ├── sma/
+│   │   │   ├── __init__.py
+│   │   │   └── driver.py         — SMA dual-profile (535 linhas)
+│   │   └── huawei/
+│   │       ├── __init__.py
+│   │       └── driver.py         — Huawei SUN2000 (681 linhas)
+│   ├── mqtt/
+│   │   ├── __init__.py
+│   │   └── client.py             — MQTT TLS 1.3/mTLS (345 linhas)
+│   ├── edge/
+│   │   ├── __init__.py
+│   │   └── store.py              — SQLite store-and-forward (355 linhas)
+│   ├── pvbinder/
+│   │   ├── __init__.py
+│   │   └── bridge.py             — Bridge pvbrowser TCP (368 linhas)
+│   ├── web/
+│   │   ├── __init__.py
+│   │   └── app.py                — Dashboard FastAPI (192 linhas)
+│   ├── cloud/                    — Stubs para cloud (apenas __init__.py)
+│   │   ├── aws/
+│   │   ├── azure/
+│   │   └── mqtt-local/
+│   └── pvsolar/
+│       └── __init__.py           — Re-exports: SolarGateway, main
+│
+└── tests/                        — Suite de testes
+    ├── conftest.py               — Config pytest (adds src/ ao path)
+    ├── test_config.py            — 18 testes de configuração
+    ├── test_drivers.py           — 12 testes de drivers
+    ├── test_edge.py              — 8 testes de edge store
+    ├── test_huawei.py            — 9 testes do driver Huawei
+    ├── test_sma.py               — 7 testes do driver SMA
+    └── test_pvbinder.py          — 10 testes do pvbrowser bridge
+
+Total: 68 testes, todos passando.
+
+================================================================================
+4. MÓDULOS DETALHADOS
+================================================================================
+
+4.1 CORE/config.py (261 linhas)
+---------------------------------
+Sistema de configuração Pydantic validado via YAML.
+
+Classes:
+- GatewaySettings: name, location, timezone, instance_id
+- TLSConfig: enabled, ca_cert, client_cert, client_key, tls_version, verify
+- MQTTConfig: broker, port, use_tls, tls, client_id, username, password,
+              topics (publish/command/status/alert), qos, retain, heartbeat,
+              reconnect_delay
+- ModbusConnection: type (modbus_tcp|modbus_rtu|modbus_udp), host, port,
+                    unit_id, baudrate, parity, stopbits, timeout, retries
+- InverterConfig: id, name, driver (sunspec|fronius|growatt|sma|huawei|custom),
+                  connection, polling_interval, registers
+- CloudConfig: aws_iot, azure_iot_hub, mqtt_local
+- StoreAndForwardConfig: enabled, database, max_buffer_hours, sync_interval,
+                         max_records
+- PVBrowserConfig: enabled, socket_port, shared_memory, update_interval
+- WebConfig + WebAuthConfig: enabled, port, host, auth
+- AlertsConfig + TelegramConfig
+- LoggingConfig: level, file, max_size_mb, backup_count
+- MetricsConfig: enabled, port
+- GatewayConfig: modelo raiz com todos os sub-modelos
+
+Funções:
+- load_config(path: str) -> GatewayConfig — carrega e valida YAML
+- create_default_config() -> dict — gera config padrão
+
+4.2 CORE/gateway.py (295 linhas)
+----------------------------------
+Orquestrador principal baseado em asyncio.
+
+Classe SolarGateway:
+- __init__(config_path): carrega config, cria MetricsCollector
+- start(): inicializa MQTT, drivers, edge store, pvbinder, web dashboard
+- stop(): para todos os componentes graceful
+- _init_mqtt(): cria MQTTClient
+- _init_drivers(): cria drivers via create_driver()
+- _init_edge_store(): inicializa EdgeStore
+- _init_pvbinder(): inicializa PVBrowserBridge
+- _init_web_dashboard(): cria FastAPI app via create_app()
+- _run_mqtt(): loop MQTT com reconexão
+- _run_drivers(): loop de polling dos inversores
+- _run_edge_sync(): loop de sincronização edge->cloud
+- _run_pvbinder(): loop de publicação para pvbrowser
+
+Função main(): CLI entry point com Click
+
+4.3 CORE/metrics.py (262 linhas)
+----------------------------------
+Coletor de métricas Prometheus.
+
+Métricas definidas:
+- pvsolar_inverter_power_total (Gauge) — Potência AC total
+- pvsolar_inverter_energy_today (Gauge) — Energia diária
+- pvsolar_inverter_temperature (Gauge) — Temperatura
+- pvsolar_inverter_status (Gauge) — Status (0=off, 1=ok, 2=fault)
+- pvsolar_mqtt_messages_sent (Counter) — Mensagens MQTT enviadas
+- pvsolar_mqtt_messages_received (Counter) — Mensagens MQTT recebidas
+- pvsolar_mqtt_reconnects (Counter) — Reconexões MQTT
+- pvsolar_edge_records_stored (Counter) — Registros armazenados
+- pvsolar_edge_records_synced (Counter) — Registros sincronizados
+- pvsolar_driver_read_duration (Histogram) — Duração de leitura Modbus
+- pvsolar_driver_errors (Counter) — Erros de driver
+
+Métodos:
+- update_inverter_metrics(inverter_id, data)
+- update_mqtt_metrics(direction, count)
+- update_edge_metrics(event, count)
+- update_driver_metrics(driver_id, duration, success)
+- get_all_metrics() -> dict
+
+4.4 DRIVERS/base.py (230 linhas)
+----------------------------------
+Interface abstrata para todos os drivers.
+
+class InverterData (dataclass):
+- timestamp: datetime
+- status: dict (state, code, description)
+- ac: dict (power, voltage[], current[], frequency, power_factor)
+- dc: list[dict] (voltage, current, power por MPPT)
+- energy: dict (today, total, lifetime)
+- temperature: dict (heatsink, transformer, ambient)
+- efficiency: float
+- storage: dict (soc, power, voltage, current, temperature)
+- raw_registers: dict
+- to_dict() -> dict
+
+class BaseInverterDriver (ABC):
+- __init__(config: InverterConfig)
+- connect() -> bool
+- disconnect()
+- read_all() -> InverterData
+- read_register(address, count) -> list
+- write_register(address, value) -> bool
+- get_status() -> dict
+- get_stats() -> dict
+- _decode_float(registers, byte_order, word_order) -> float
+- _decode_uint32(registers) -> int
+- _decode_int16(value) -> int
+- _decode_ascii(registers, length) -> str
+
+def create_driver(config) -> BaseInverterDriver:
+- Factory que mapeia config.driver -> classe do driver
+- Suporta: sunspec, fronius, growatt, sma, huawei, custom
+
+4.5 DRIVERS/sunspec/driver.py (518 linhas)
+---------------------------------------------
+Driver genérico SunSpec Modbus IEEE 1547-2018.
+
+- Descobre chain de modelos SunSpec (Common, Inverter 101-113, MPPT 160, Storage 124)
+- Suporta modo integer (com scale factors) e float (IEEE 754)
+- Compatível com todos os inversores certificados SunSpec
+
+4.6 DRIVERS/fronius/driver.py (499 linhas)
+---------------------------------------------
+Driver Fronius Modbus TCP.
+
+- Auto-detecta GEN24 vs SnapINverter via registro
+- Descobre chain SunSpec
+- Lê modelos de inverter/MPPT/storage
+- Suporta modo float e integer
+- Decodifica strings/floats/uint32/uint64
+
+4.7 DRIVERS/growatt/driver.py (459 linhas)
+---------------------------------------------
+Driver Growatt Modbus TCP.
+
+- Auto-detecta versão do protocolo (2 vs 3.15)
+- Lê até 8 MPPTs
+- Dados de storage/hybrid (SOC, limites carga/descarga)
+- Suporte a agendamento time-of-use
+- IMPORTANTE: NÃO usa pymodbus.constants.Endian nem BinaryPayloadDecoder
+  (removidos por incompatibilidade com pymodbus>=3.15)
+
+4.8 DRIVERS/sma/driver.py (535 linhas)
+-----------------------------------------
+Driver SMA com dual-profile.
+
+- Perfil SMA: Unit ID 3, registros 30769+
+- Perfil SunSpec: Unit ID 126, modelo 101/103
+- Auto-detecta perfil ativo
+- Registros 32-bit Big Endian
+- Detecção de sentinela NaN (0x7FFFFFFF)
+- Escrita de active power limit
+
+4.9 DRIVERS/huawei/driver.py (681 linhas)
+---------------------------------------------
+Driver Huawei SUN2000 Modbus TCP (MAIOR driver).
+
+- Lê lados DC/AC, energia, temperatura, status
+- Suporte a bateria (hybrid), otimizadores
+- Escrita de active power limit e reactive power control
+- Decodificador completo de códigos de estado Huawei
+- Estados: standby, starting, running, fault, shutdown, communicating...
+- Suporta séries: SUN2000 L0/L1, M0/M1/M2/M3, MA, MB0
+- IMPORTANTE: NÃO usa imports relativos (from ..) — usa imports absolutos
+
+4.10 MQTT/client.py (345 linhas)
+-----------------------------------
+Cliente MQTT enterprise.
+
+- TLS 1.2/1.3 com mTLS (certificados X.509)
+- LWT (Last Will and Testament)
+- QoS 0/1/2
+- Subscribe por tópico
+- Publish: telemetry, status, alert
+- Reconexão com exponential backoff
+- Estatísticas de mensagens
+
+4.11 EDGE/store.py (355 linhas)
+----------------------------------
+SQLite store-and-forward.
+
+- In-memory SQLite para testes
+- store_reading(inverter_id, data) — armazena leitura
+- store_alert(inverter_id, alert_type, severity, message)
+- get_pending_readings(limit) → list
+- mark_synced(record_ids) — marca como sincronizado
+- sync_to_cloud(cloud_func) — sincroniza pendentes
+- cleanup_old_records() — remove registros antigos
+- get_stats() → dict (total_records, pending_sync, total_alerts)
+- Gerenciamento automático de tamanho do buffer
+
+4.12 PVBINDER/bridge.py (368 linhas)
+----------------------------------------
+Bridge para pvbrowser HMI.
+
+- Servidor TCP socket na porta configurada
+- Protocolo binário customizado (header + JSON)
+- Suporte a múltiplos clientes
+- PVBrowserBridge: normaliza dados dos inversores
+- PVBrowserDataConverter: utilitário para widgets
+  - to_value_widget(data, key) → {value, unit, quality}
+  - to_gauge_data(data, key, min, max) → {value, min, max, unit}
+  - to_trend_data(data, keys) → [{name, value, timestamp}]
+
+4.13 WEB/app.py (192 linhas)
+-------------------------------
+Dashboard FastAPI.
+
+- GET / — Dashboard HTML embutido com WebSocket real-time
+- GET /api/status — Status do gateway
+- GET /api/inverters — Lista de inversores
+- GET /api/inverters/{id} — Dados de um inversor
+- GET /api/metrics — Métricas Prometheus
+- GET /api/health — Health check
+- WS /ws — WebSocket para atualizações real-time
+
+================================================================================
+5. SISTEMA DE IMPORTS
+================================================================================
+
+CRÍTICO: Os imports foram migrados de relativos para absolutos.
+
+Antes (QUEBRADO):
+  from ..core.config import InverterConfig  # Relative beyond top-level
+  from ..base import BaseInverterDriver
+
+Depois (FUNCIONAL):
+  from core.config import InverterConfig    # Absoluto via sys.path = src/
+  from drivers.base import BaseInverterDriver
+
+Os testes adicionam src/ ao sys.path via conftest.py:
+  sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+Ou via package instalado (pip install -e .), onde o pacote é discoverable.
+
+Os __init__.py são NECESSÁRIOS para que find_packages() encontre todos os
+sub-pacotes. Sem eles, o pip install -e . não instala nada.
+
+Pacotes que precisam de __init__.py:
+- src/core/
+- src/mqtt/
+- src/edge/
+- src/drivers/
+- src/web/
+- src/cloud/
+- src/cloud/aws/
+- src/cloud/azure/
+- src/cloud/mqtt-local/
+
+================================================================================
+6. PROBLEMAS ENCONTRADOS E SOLUÇÕES
+================================================================================
+
+6.1 Imports relativos quebrados
+   Problema: Arquivos usavam `from ..core.config` mas testes importavam
+             via sys.path direto, causando ImportError
+   Solução: Migrar TODOS os imports para absolutos (`from core.config`)
+
+6.2 pymodbus.constants.Endian indisponível
+   Problema: `from pymodbus.constants import Endian` falha em pymodbus>=3.15
+   Solução: Remover import do growatt/driver.py (não era usado)
+
+6.3 Teste int32 com valor inválido
+   Problema: [0xFF, 0xFF] = 16711935 (positivo), não negativo
+   Solução: Usar [0xFFFF, 0xFFFF] = -1 para teste de negativo
+
+6.4 Teste edge store sem inicialização
+   Problema: get_stats() chamado sem initialize() → NoneType error
+   Solução: Tornar teste async e chamar initialize() antes
+
+6.5 Teste driver inválido
+   Problema: Pydantic valida antes do create_driver(), então
+             InverterConfig(driver="invalid") lança ValidationError
+   Solução: Usar pytest.raises(Exception) genérico
+
+6.6 pyproject.toml build backend
+   Problema: `setuptools.backends._legacy:_Backend` não existe
+   Solução: Usar `setuptools.build_meta`
+
+6.7 License classifier conflict
+   Problema: setuptools novo proíbe license classifiers com PEP 639
+   Solução: Remover classifier "License :: OSI Approved" do pyproject.toml
+
+6.8 Entry point quebrado
+   Problema: `pvsolar-config=pvsolar.core.config:main` — config.py não tem main()
+   Solução: Remover entry point inválido
+
+================================================================================
+7. TESTES
+================================================================================
+
+Comando: python -m pytest tests/ -v
+Resultado: 68/68 PASSED (0.69s)
+
+Distribuição por arquivo:
+- test_config.py:    18 testes (validação de config, TLS, MQTT, inverters, load)
+- test_drivers.py:   12 testes (InverterData, BaseDriver, create_driver factory)
+- test_edge.py:       8 testes (init, store, pending, sync, alert, stats)
+- test_huawei.py:     9 testes (decode, registers, state, structure)
+- test_sma.py:        7 testes (decode, status, ASCII, structure)
+- test_pvbinder.py:  10 testes (converter, bridge, normalize, pack)
+
+Fixtures:
+- conftest.py: adiciona src/ ao sys.path
+
+Testes async usam: @pytest.mark.asyncio com asyncio_mode=auto (pyproject.toml)
+
+================================================================================
+8. CONFIGURAÇÃO DE EXEMPLO (config/gateway.example.yaml)
+================================================================================
+
+Estrutura YAML completa com todos os módulos:
+
+gateway:
+  name: "pvsolar-site-001"
+  location: "São Paulo, BR"
+  timezone: "America/Sao_Paulo"
+
+mqtt:
+  broker: "broker.example.com"
+  port: 8883
+  use_tls: true
+  tls:
+    enabled: true
+    ca_cert: "/etc/pvsolar/certs/ca.pem"
+    client_cert: "/etc/pvsolar/certs/client.pem"
+    client_key: "/etc/pvsolar/certs/client.key"
+    tls_version: "1.3"
+  client_id: "pvsolar-gw-001"
+  username: "pvsolar"
+  password: "secure_password"
+  topics:
+    publish: "pvsolar/{site_id}/telemetry"
+    command: "pvsolar/{site_id}/command"
+    status: "pvsolar/{site_id}/status"
+    alert: "pvsolar/{site_id}/alert"
+  qos: 1
+  heartbeat_interval: 30
+
+inverters:
+  - id: "fronius-001"
+    name: "Fronius GEN24 6.0 Plus"
+    driver: "fronius"
+    connection:
+      type: "modbus_tcp"
+      host: "192.168.1.100"
+      port: 502
+      unit_id: 1
+    polling_interval: 5.0
+
+  - id: "sma-001"
+    name: "SMA Sunny Boy 5.0"
+    driver: "sma"
+    connection:
+      type: "modbus_tcp"
+      host: "192.168.1.101"
+      port: 502
+      unit_id: 3
+
+  - id: "growatt-001"
+    name: "Growatt MIN 5000TL-X"
+    driver: "growatt"
+    connection:
+      type: "modbus_tcp"
+      host: "192.168.1.102"
+      port: 502
+      unit_id: 1
+
+  - id: "huawei-001"
+    name: "Huawei SUN2000-5KTL"
+    driver: "huawei"
+    connection:
+      type: "modbus_tcp"
+      host: "192.168.1.103"
+      port: 502
+      unit_id: 1
+
+  - id: "sunspec-001"
+    name: "SunSpec Inverter"
+    driver: "sunspec"
+    connection:
+      type: "modbus_tcp"
+      host: "192.168.1.104"
+      port: 502
+      unit_id: 1
+
+cloud:
+  aws_iot:
+    enabled: false
+    endpoint: ""
+    cert_path: ""
+    key_path: ""
+    root_ca_path: ""
+    thing_name: ""
+  azure_iot_hub:
+    enabled: false
+    connection_string: ""
+    device_id: ""
+
+edge:
+  enabled: true
+  database: "/var/lib/pvsolar/edge.db"
+  max_buffer_hours: 72
+  sync_interval: 30
+  max_records: 10000
+
+pvbrowser:
+  enabled: true
+  socket_port: 5050
+  shared_memory: true
+  update_interval: 1.0
+
+web:
+  enabled: true
+  port: 5000
+  host: "0.0.0.0"
+  auth:
+    enabled: true
+    username: "admin"
+    password_hash: ""
+    jwt_secret: ""
+
+alerts:
+  enabled: false
+  channels:
+    telegram:
+      enabled: false
+      bot_token: ""
+      chat_id: ""
+
+logging:
+  level: "INFO"
+  file: "/var/log/pvsolar/gateway.log"
+  max_size_mb: 100
+  backup_count: 10
+
+metrics:
+  enabled: true
+  port: 9090
+
+================================================================================
+9. DOCKER STACK
+================================================================================
+
+docker-compose.yml inclui 5 serviços:
+
+1. pvsolar-gateway — Imagem customizada, depende de mosquitto
+2. mosquitto — MQTT broker com TLS, password auth, WebSocket
+3. influxdb — Banco de séries temporais (porta 8086)
+4. grafana — Dashboard visual (porta 3000)
+5. telegraf — Agente de coleta de métricas
+
+Portas:
+- Mosquitto: 8883 (TLS), 1883 (local), 9001 (WebSocket)
+- InfluxDB: 8086
+- Grafana: 3000
+- Telegraf: usa MQTT como input
+- Prometheus metrics: 9090
+
+================================================================================
+10. SEGURANÇA
+================================================================================
+
+- TLS 1.3 obrigatório para MQTT
+- mTLS com certificados X.509
+- ACL por tópico no Mosquitto
+- Senhas hashed (bcrypt) para web dashboard
+- JWT para autenticação da API
+- Verificação de certificado configurável
+- LWT para detecção de desconexão
+- Topic-level isolation por site
+
+================================================================================
+11. CÓDIGOS DE ESTADO DOS INVERSORES
+================================================================================
+
+SMA:
+- 0 = off, 100 = standby, 300 = starting, 600 = running
+- 800 = fault, 1300 = shutdown
+
+Huawei SUN2000:
+- 0x0000 = standby, 0x0100 = grid-connected
+- 0x0200 = running, 0x0201 = running (MPPT)
+- 0x0300 = fault, 0x0301 = shutdown
+- 0xA000 = standby (startup)
+- 0xA001 = communicating
+
+================================================================================
+12. O QUE NÃO ESTÁ IMPLEMENTADO (STUBS)
+================================================================================
+
+Os seguintes módulos existem apenas como __init__.py vazio:
+- src/cloud/aws/ — AWS IoT Core (precisa de boto3)
+- src/cloud/azure/ — Azure IoT Hub (precisa de azure-iot-device)
+- src/cloud/mqtt-local/ — Local MQTT broker
+- src/web/css/ — CSS do dashboard (HTML embutido no app.py)
+- src/web/js/ — JS do dashboard (HTML embutido no app.py)
+- docs/ — Diretório vazio para documentação futura
+
+================================================================================
+13. COMANDOS ÚTEIS
+================================================================================
+
+Instalar em modo dev:
+  cd pvsolar-gateway
+  pip install -e ".[dev]"
+
+Rodar testes:
+  python -m pytest tests/ -v
+
+Rodar o gateway:
+  pvsolar --config config/gateway.example.yaml
+  # ou
+  python -m src.core.gateway --config config/gateway.example.yaml
+
+Iniciar stack Docker:
+  cd docker
+  docker-compose up -d
+
+Verificar métricas:
+  curl http://localhost:9090/metrics
+
+Dashboard web:
+  http://localhost:5000
+
+API docs (Swagger):
+  http://localhost:5000/api/docs
+
+================================================================================
+14. PRÓXIMOS PASSOS SUGERIDOS
+================================================================================
+
+1. Implementar cloud/aws/ — cliente AWS IoT Core com boto3
+2. Implementar cloud/azure/ — cliente Azure IoT Hub
+3. Implementar cloud/mqtt-local/ — bridge para broker local
+4. Adicionar testes de integração com MQTT real (mosquitto)
+5. Adicionar testes de integração com Modbus (simulador)
+6. Criar CLI mais robusto com subcomandos (init, start, stop, status)
+7. Adicionar suporte a Modbus RTU via serial (RS485)
+8. Implementar alertas via Telegram/WhatsApp
+9. Criar package Docker multi-stage para produção
+10. Adicionar CI/CD (GitHub Actions)
+11. Adicionar type checking com mypy
+12. Adicionar linting com ruff
+13. Criar documentação Sphinx/MkDocs
+14. Implementar websockets para dados real-time no dashboard
+15. Adicionar export de dados para CSV/JSON
+
+================================================================================
+15. NOTAS TÉCNICAS IMPORTANTES
+================================================================================
+
+- NÃO usar `from ..` (imports relativos) — causam erro em testes
+- NÃO usar `pymodbus.constants.Endian` — indisponível em pymodbus>=3.15
+- NÃO usar `pymodbus.payload.BinaryPayloadDecoder` — indisponível em pymodbus>=3.15
+- Na pasta src/, os imports devem ser absolutos: `from core.config import X`
+- Tests inserem src/ no sys.path: `sys.path.insert(0, str(Path(...) / "src"))`
+- pyproject.toml usa setuptools.build_meta (NÃO setuptools.backends._legacy)
+- License no pyproject.toml deve ser SPDX expression ("GPL-3.0-only"), não classifier
+- asyncio_mode = "auto" no pyproject.toml permite testes async sem decorator
+- Windows não suporta bash syntax {a,b} — usar mkdir separados no PowerShell
+- O driver Huawei é o maior (681 linhas) e o mais complexo
+- O driver SMA usa dual-profile (Unit ID 3 + Unit ID 126) — único caso
+
+================================================================================
+FIM DO RESUMO
+================================================================================

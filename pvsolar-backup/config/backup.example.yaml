@@ -1,0 +1,74 @@
+# pvSolar Backup Configuration
+# Copy this file to backup.yaml and customize
+
+# Storage Configuration
+storage:
+  type: "local"                    # local, s3, ftp, smb, azure, gcs
+  local_path: "./backups"
+  # S3 Configuration
+  # s3_bucket: "pvsolar-backups"
+  # s3_region: "us-east-1"
+  # s3_access_key: ""
+  # s3_secret_key: ""
+  # s3_prefix: "backups/"
+  # FTP Configuration
+  # ftp_host: "ftp.example.com"
+  # ftp_port: 21
+  # ftp_user: "backup"
+  # ftp_password: ""
+  # ftp_path: "/backups"
+
+# Compression
+compression: "tar.gz"              # none, gzip, zip, tar, tar.gz
+
+# Retention Policy
+retention:
+  max_backups: 30                  # Maximum number of backups to keep
+  max_age_days: 90                 # Maximum age in days
+  min_keep: 5                      # Minimum backups to always keep
+
+# Schedule
+schedule:
+  enabled: true
+  frequency: "daily"               # hourly, daily, weekly, monthly, custom
+  time: "02:00"                    # HH:MM format
+  day_of_week: 0                   # 0=Monday (for weekly)
+  day_of_month: 1                  # (for monthly)
+  cron_expression: ""              # (for custom)
+
+# Data Sources
+data_sources:
+  gateway_url: "http://localhost:8000"
+  analytics_url: "http://localhost:8001"
+  scada_url: "http://localhost:5000"
+  reports_url: "http://localhost:8002"
+  fleet_url: "http://localhost:8003"
+  alert_url: "http://localhost:8004"
+  grid_url: "http://localhost:8005"
+  twin_url: "http://localhost:8006"
+  auth_url: "http://localhost:8007"
+  database_path: "data/"
+  config_path: "config/"
+
+# Notifications
+notification:
+  enabled: false
+  email_on_success: true
+  email_on_failure: true
+  webhook_url: ""
+
+# API
+api:
+  host: "0.0.0.0"
+  port: 8008
+  title: "pvSolar Backup API"
+
+# Logging
+logging:
+  level: "INFO"
+
+# Company
+company_name: "pvSolar Backup"
+
+# Debug Mode
+debug: false

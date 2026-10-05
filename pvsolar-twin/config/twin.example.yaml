@@ -1,0 +1,98 @@
+# pvSolar Digital Twin Configuration
+# Copy this file to twin.yaml and customize
+
+# Panel Configuration
+panel:
+  panel_type: "monocrystalline"
+  rated_power_w: 400.0
+  efficiency: 0.22
+  area_m2: 1.755
+  temp_coefficient: -0.004
+  noct: 45.0
+  voc: 37.5
+  isc: 11.5
+  vmp: 31.5
+  imp: 10.5
+
+# Inverter Configuration
+inverter:
+  rated_power_kw: 50.0
+  max_efficiency: 0.98
+  european_efficiency: 0.97
+  mppt_voltage_min: 200.0
+  mppt_voltage_max: 850.0
+
+# Plant Configuration
+plant:
+  num_panels: 200
+  num_inverters: 1
+  panels_per_inverter: 200
+  tilt_angle: 25.0
+  azimuth: 0.0
+  latitude: -23.55
+  longitude: -46.63
+  altitude: 760.0
+  ground_coverage_ratio: 0.4
+
+# Degradation Configuration
+degradation:
+  model: "linear"
+  annual_rate: 0.005
+  year_1_penalty: 0.02
+  temperature_factor: 1.0
+  humidity_factor: 1.0
+  dust_factor: 1.0
+  warranty_years: 25
+
+# Financial Configuration
+financial:
+  capex_usd: 500000.0
+  opex_annual_usd: 5000.0
+  energy_price_usd_kwh: 0.08
+  degradation_cost: 0.01
+  discount_rate: 0.08
+  inflation_rate: 0.03
+  project_life_years: 25
+
+# Scenarios
+scenarios:
+  - name: "optimistic"
+    type: "what_if"
+    irradiance_factor: 1.1
+    soiling_factor: 1.0
+    availability_factor: 0.99
+    power_price_factor: 1.05
+
+  - name: "pessimistic"
+    type: "what_if"
+    irradiance_factor: 0.85
+    soiling_factor: 0.95
+    availability_factor: 0.95
+    power_price_factor: 0.95
+
+  - name: "high_dust"
+    type: "what_if"
+    soiling_factor: 0.85
+    availability_factor: 0.97
+
+# Database
+database:
+  path: "data/twin.db"
+
+# API
+api:
+  host: "0.0.0.0"
+  port: 8006
+  title: "pvSolar Digital Twin API"
+
+# Logging
+logging:
+  level: "INFO"
+  format: "json"
+
+# Company
+company_name: "pvSolar Digital Twin"
+site_id: "site_1"
+
+# Debug Mode
+debug: false

@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  pvsolar-auth:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: pvsolar-auth
+    restart: unless-stopped
+    ports:
+      - "8007:8007"
+    volumes:
+      - ../config:/app/config:ro
+      - auth-data:/app/data
+    environment:
+      - PVAUTH_DEBUG=false
+      - API_PORT=8007
+      - JWT_SECRET_KEY=CHANGE-THIS-IN-PRODUCTION
+    networks:
+      - pvsolar-net
+
+volumes:
+  auth-data:
+
+networks:
+  pvsolar-net:
+    driver: bridge

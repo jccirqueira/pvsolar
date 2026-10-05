@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pvSolar Backup - Manual Profissional</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --primary-light: #a78bfa;
+            --secondary: #3b82f6;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --dark: #1f2937;
+            --darker: #111827;
+            --light: #f3f4f6;
+            --lighter: #f9fafb;
+            --gray: #6b7280;
+            --gray-light: #e5e7eb;
+            --gradient-backup: linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #3b82f6 100%);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: all 0.3s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background: var(--lighter); color: var(--dark); line-height: 1.7; }
+        .header { background: var(--gradient-backup); color: white; padding: 2rem 0; position: sticky; top: 0; z-index: 1000; box-shadow: var(--shadow-lg); }
+        .header-content { max-width: 1400px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; }
+        .logo { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon { width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+        .logo-text h1 { font-size: 1.5rem; font-weight: 700; }
+        .logo-text span { font-size: 0.85rem; opacity: 0.9; }
+        .header-nav { display: flex; gap: 1.5rem; }
+        .header-nav a { color: white; text-decoration: none; font-weight: 500; padding: 0.5rem 1rem; border-radius: var(--radius-sm); transition: var(--transition); display: flex; align-items: center; gap: 0.5rem; }
+        .header-nav a:hover { background: rgba(255,255,255,0.2); }
+        .hero { background: var(--gradient-backup); color: white; padding: 4rem 2rem; text-align: center; }
+        .hero h1 { font-size: 2.8rem; font-weight: 800; margin-bottom: 1rem; }
+        .hero p { font-size: 1.2rem; opacity: 0.95; max-width: 700px; margin: 0 auto 2rem; }
+        .hero-badges { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .badge { background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 3rem 2rem; display: grid; grid-template-columns: 280px 1fr; gap: 2rem; }
+        .sidebar { position: sticky; top: 100px; height: fit-content; background: white; border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); }
+        .sidebar-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--gray); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--gray-light); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav li { margin-bottom: 0.25rem; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--dark); text-decoration: none; border-radius: var(--radius-sm); transition: var(--transition); font-size: 0.95rem; }
+        .sidebar-nav a:hover { background: var(--light); color: var(--primary); }
+        .sidebar-nav i { width: 20px; text-align: center; }
+        .main-content { min-width: 0; }
+        .section { background: white; border-radius: var(--radius); padding: 2rem; margin-bottom: 2rem; box-shadow: var(--shadow); }
+        .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--gray-light); }
+        .section-icon { width: 50px; height: 50px; background: var(--gradient-backup); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3rem; }
+        .section-title { font-size: 1.5rem; font-weight: 700; }
+        .section-subtitle { font-size: 0.9rem; color: var(--gray); }
+        h2 { font-size: 1.8rem; font-weight: 700; margin: 2rem 0 1rem; }
+        h3 { font-size: 1.3rem; font-weight: 600; margin: 1.5rem 0 0.75rem; }
+        p { margin-bottom: 1rem; color: #374151; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
+        .feature-card { background: var(--lighter); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--gray-light); transition: var(--transition); }
+        .feature-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+        .feature-icon { width: 45px; height: 45px; background: var(--gradient-backup); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; margin-bottom: 1rem; }
+        .feature-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .feature-desc { font-size: 0.9rem; color: var(--gray); }
+        .code-block { background: #1F2937; border-radius: var(--radius); padding: 1.5rem; margin: 1rem 0; overflow-x: auto; position: relative; }
+        .code-block::before { content: attr(data-lang); position: absolute; top: 0; right: 0; background: var(--primary); color: white; padding: 0.25rem 0.75rem; font-size: 0.75rem; font-weight: 600; border-radius: 0 var(--radius) 0 var(--radius-sm); }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; color: #E5E7EB; line-height: 1.6; }
+        .alert { padding: 1rem 1.5rem; border-radius: var(--radius-sm); margin: 1rem 0; display: flex; align-items: flex-start; gap: 1rem; }
+        .alert-icon { font-size: 1.2rem; margin-top: 0.25rem; }
+        .alert-content { flex: 1; }
+        .alert-title { font-weight: 600; margin-bottom: 0.25rem; }
+        .alert-info { background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E40AF; }
+        .alert-success { background: #F0FDF4; border: 1px solid #BBF7D0; color: #166534; }
+        .alert-warning { background: #FFFBEB; border: 1px solid #FDE68A; color: #92400E; }
+        .table-wrapper { overflow-x: auto; margin: 1rem 0; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        th { background: var(--gradient-backup); color: white; padding: 0.75rem 1rem; text-align: left; font-weight: 600; }
+        td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-light); }
+        tr:hover { background: var(--lighter); }
+        .steps { counter-reset: step; margin: 1.5rem 0; }
+        .step { display: flex; gap: 1.5rem; margin-bottom: 1.5rem; padding: 1.5rem; background: var(--lighter); border-radius: var(--radius); border-left: 4px solid var(--primary); }
+        .step::before { counter-increment: step; content: counter(step); min-width: 35px; height: 35px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; }
+        .step-content { flex: 1; }
+        .step-title { font-weight: 600; margin-bottom: 0.5rem; font-size: 1.1rem; }
+        .footer { background: var(--darker); color: white; padding: 3rem 2rem; text-align: center; margin-top: 3rem; }
+        .footer-links { display: flex; gap: 2rem; justify-content: center; margin-bottom: 1.5rem; }
+        .footer-links a { color: var(--primary-light); text-decoration: none; }
+        .footer-links a:hover { color: white; }
+        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } .sidebar { position: static; } .hero h1 { font-size: 2rem; } }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <div class="logo-text">
+                    <h1>pvSolar Backup</h1>
+                    <span>v1.0.0 - Automated Backup & Restore</span>
+                </div>
+            </div>
+            <nav class="header-nav">
+                <a href="#introducao"><i class="fas fa-book"></i> Docs</a>
+                <a href="#instalacao"><i class="fas fa-download"></i> Instalar</a>
+                <a href="#configuracao"><i class="fas fa-cog"></i> Config</a>
+                <a href="#docker"><i class="fab fa-docker"></i> Docker</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1><i class="fas fa-cloud-upload-alt"></i> pvSolar Backup</h1>
+        <p>Sistema automatizado de backup e restore para o ecossistema pvSolar. Suporta multiplos backends, agendamento, compressao e politicas de retencao.</p>
+        <div class="hero-badges">
+            <div class="badge"><i class="fas fa-cloud"></i> 6 Backends</div>
+            <div class="badge"><i class="fas fa-clock"></i> Agendamento</div>
+            <div class="badge"><i class="fas fa-compress-alt"></i> Compressao</div>
+            <div class="badge"><i class="fas fa-history"></i> Retencao</div>
+            <div class="badge"><i class="fas fa-undo"></i> Restore</div>
+            <div class="badge"><i class="fab fa-docker"></i> Docker Ready</div>
+        </div>
+    </section>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-title">Sumario</div>
+            <ul class="sidebar-nav">
+                <li><a href="#introducao"><i class="fas fa-home"></i> Introducao</a></li>
+                <li><a href="#arquitetura"><i class="fas fa-project-diagram"></i> Arquitetura</a></li>
+                <li><a href="#backends"><i class="fas fa-cloud"></i> Backends</a></li>
+                <li><a href="#instalacao"><i class="fas fa-download"></i> Instalacao</a></li>
+                <li><a href="#configuracao"><i class="fas fa-cog"></i> Configuracao</a></li>
+                <li><a href="#api"><i class="fas fa-plug"></i> API</a></li>
+                <li><a href="#docker"><i class="fab fa-docker"></i> Docker</a></li>
+                <li><a href="#producao"><i class="fas fa-server"></i> Producao</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <section class="section" id="introducao">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-home"></i></div>
+                    <div>
+                        <div class="section-title">Introducao</div>
+                        <div class="section-subtitle">Visao geral do pvSolar Backup</div>
+                    </div>
+                </div>
+                <p>O <strong>pvSolar Backup</strong> e o sistema de backup automatizado do ecossistema pvSolar. Ele permite fazer backup de todos os dados, configuracoes e banco de dados dos servicos pvSolar com agendamento flexivel e politicas de retencao.</p>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-cloud"></i></div>
+                        <div class="feature-title">6 Backends</div>
+                        <div class="feature-desc">Local, S3, FTP, SMB, Azure Blob, Google Cloud Storage.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-clock"></i></div>
+                        <div class="feature-title">Agendamento</div>
+                        <div class="feature-desc">Hourly, daily, weekly, monthly ou cron customizado.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-compress-alt"></i></div>
+                        <div class="feature-title">Compressao</div>
+                        <div class="feature-desc">ZIP, GZip, TAR, TAR.GZ para economizar espaco.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-history"></i></div>
+                        <div class="feature-title">Retencao</div>
+                        <div class="feature-desc">Max backups, idade maxima, minimo garantido.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-undo"></i></div>
+                        <div class="feature-title">Restore</div>
+                        <div class="feature-desc">Restauracao completa com inspecao de conteudo.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-plug"></i></div>
+                        <div class="feature-title">API REST</div>
+                        <div class="feature-desc">API completa para integracao e automacao.</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="arquitetura">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-project-diagram"></i></div>
+                    <div>
+                        <div class="section-title">Arquitetura</div>
+                        <div class="section-subtitle">Diagrama do sistema</div>
+                    </div>
+                </div>
+                <div class="code-block" data-lang="Diagrama"><code>
+  ┌─────────────────────────────────────────┐
+  │           pvSolar Backup               │
+  │          (Porta 8008)                   │
+  └───────────┬─────────────────────────────┘
+              │
+   ┌──────────┼──────────────┐
+   │          │              │
+┌──┴───┐ ┌───┴────┐ ┌───────┴───────┐
+│Backup│ │Restore │ │  Scheduler    │
+│Engine│ │Engine  │ │  (Cron)       │
+└──┬───┘ └───┬────┘ └───────────────┘
+   │         │
+   └────┬────┘
+        │
+  ┌─────┴─────┐
+  │  Storage  │
+  │  Backends │
+  └─────┬─────┘
+        │
+  ┌─────┼─────┬─────┬─────┬─────┐
+  │Local│ S3  │ FTP │ SMB │Azure│
+  └─────┴─────┴─────┴─────┴─────┘
+                </code></div>
+            </section>
+
+            <section class="section" id="backends">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-cloud"></i></div>
+                    <div>
+                        <div class="section-title">Storage Backends</div>
+                        <div class="section-subtitle">6 backends suportados</div>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Backend</th><th>Descricao</th><th>Configuracao</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Local</strong></td><td>Diretorio local do sistema</td><td>local_path</td></tr>
+                            <tr><td><strong>S3</strong></td><td>Amazon S3 / MinIO / compatible</td><td>bucket, region, keys</td></tr>
+                            <tr><td><strong>FTP</strong></td><td>FTP/SFTP remoto</td><td>host, user, password</td></tr>
+                            <tr><td><strong>SMB</strong></td><td>Compartilhamento Windows</td><td>host, share, user</td></tr>
+                            <tr><td><strong>Azure</strong></td><td>Azure Blob Storage</td><td>connection, container</td></tr>
+                            <tr><td><strong>GCS</strong></td><td>Google Cloud Storage</td><td>bucket, credentials</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="section" id="instalacao">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-download"></i></div>
+                    <div>
+                        <div class="section-title">Instalacao</div>
+                        <div class="section-subtitle">Guia passo a passo</div>
+                    </div>
+                </div>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Clonar o repositorio</div>
+                            <div class="code-block" data-lang="bash"><code>git clone https://github.com/pvsolar/pvsolar-backup.git
+cd pvsolar-backup</code></div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Criar ambiente virtual</div>
+                            <div class="code-block" data-lang="bash"><code>python -m venv venv
+venv\Scripts\activate</code></div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Instalar dependencias</div>
+                            <div class="code-block" data-lang="bash"><code>pip install -r requirements.txt</code></div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Configurar</div>
+                            <div class="code-block" data-lang="bash"><code>cp config/backup.example.yaml config/backup.yaml
+# Editar config/backup.yaml
+# Precedencia: PVSOLAR_CONFIG=/caminho.yaml > config/backup.yaml > defaults</code></div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Executar testes</div>
+                            <div class="code-block" data-lang="bash"><code>python -m pytest tests/ -v</code></div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-content">
+                            <div class="step-title">Iniciar API</div>
+                            <div class="code-block" data-lang="bash"><code>uvicorn src.api.app:app --host 0.0.0.0 --port 8008</code></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="configuracao">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-cog"></i></div>
+                    <div>
+                        <div class="section-title">Configuracao</div>
+                        <div class="section-subtitle">Arquivo backup.yaml</div>
+                    </div>
+                </div>
+                <div class="code-block" data-lang="YAML"><code>storage:
+  type: "local"
+  local_path: "./backups"
+
+compression: "tar.gz"
+
+retention:
+  max_backups: 30
+  max_age_days: 90
+  min_keep: 5
+
+schedule:
+  enabled: true
+  frequency: "daily"
+  time: "02:00"
+
+data_sources:
+  database_path: "data/"
+  config_path: "config/"
+
+api:
+  port: 8008</code></div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Parametro</th><th>Padrao</th><th>Descricao</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>storage.type</code></td><td>local</td><td>Tipo de backend de armazenamento</td></tr>
+                            <tr><td><code>compression</code></td><td>tar.gz</td><td>Tipo de compressao</td></tr>
+                            <tr><td><code>retention.max_backups</code></td><td>30</td><td>Maximo de backups</td></tr>
+                            <tr><td><code>retention.max_age_days</code></td><td>90</td><td>Idade maxima em dias</td></tr>
+                            <tr><td><code>schedule.frequency</code></td><td>daily</td><td>Frequencia de agendamento</td></tr>
+                            <tr><td><code>schedule.time</code></td><td>02:00</td><td>Horario do backup</td></tr>
+                            <tr><td><code>api.port</code></td><td>8008</td><td>Porta da API</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="section" id="api">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-plug"></i></div>
+                    <div>
+                        <div class="section-title">API Endpoints</div>
+                        <div class="section-subtitle">Todas as rotas disponiveis</div>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Metodo</th><th>Endpoint</th><th>Descricao</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>GET</code></td><td><code>/health</code></td><td>Health check</td></tr>
+                            <tr><td><code>POST</code></td><td><code>/api/backup</code></td><td>Criar backup manual</td></tr>
+                            <tr><td><code>GET</code></td><td><code>/api/backups</code></td><td>Listar todos backups</td></tr>
+                            <tr><td><code>GET</code></td><td><code>/api/backups/{id}</code></td><td>Detalhes de um backup</td></tr>
+                            <tr><td><code>DELETE</code></td><td><code>/api/backups/{id}</code></td><td>Excluir backup</td></tr>
+                            <tr><td><code>POST</code></td><td><code>/api/restore</code></td><td>Restaurar backup</td></tr>
+                            <tr><td><code>GET</code></td><td><code>/api/restore/contents/{path}</code></td><td>Ver conteudo do archive</td></tr>
+                            <tr><td><code>GET</code></td><td><code>/api/schedule</code></td><td>Status do agendamento</td></tr>
+                            <tr><td><code>POST</code></td><td><code>/api/schedule/run</code></td><td>Executar backup agora</td></tr>
+                            <tr><td><code>GET</code></td><td><code>/api/statistics</code></td><td>Estatisticas gerais</td></tr>
+                            <tr><td><code>GET</code></td><td><code>/api/storage</code></td><td>Listar arquivos no storage</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="section" id="docker">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fab fa-docker"></i></div>
+                    <div>
+                        <div class="section-title">Docker</div>
+                        <div class="section-subtitle">Deploy containerizado</div>
+                    </div>
+                </div>
+                <div class="code-block" data-lang="bash"><code><span class="comment"># Recomendado: compose da raiz do ecossistema (docker-compose.yml)</span>
+docker compose up -d backup
+
+<span class="comment"># Variante de config com URLs internas: docker/config/backup.yaml</span>
+<span class="comment"># Legado: compose do proprio projeto</span>
+docker-compose up -d
+docker-compose logs -f pvsolar-backup
+docker-compose down</code></div>
+            </section>
+
+            <section class="section" id="producao">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-server"></i></div>
+                    <div>
+                        <div class="section-title">Producao</div>
+                        <div class="section-subtitle">Melhores praticas</div>
+                    </div>
+                </div>
+                <ul style="margin-left: 1.5rem; margin-bottom: 1rem; line-height: 2;">
+                    <li>Configure S3 ou storage remoto para backups offsite</li>
+                    <li>Defina politicas de retencao adequadas</li>
+                    <li>Ative notificacoes para falhas</li>
+                    <li>Use criptografia para dados sensiveis</li>
+                    <li>Teste procedimentos de restore regularmente</li>
+                    <li>Monitore espaco em disco</li>
+                    <li>Use HTTPS para a API em producao</li>
+                </ul>
+
+                <div class="alert alert-success">
+                    <div class="alert-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="alert-content">
+                        <div class="alert-title">Dica de Seguranca</div>
+                        Mantenha sempre pelo menos 1 backup em local diferente da planta (3-2-1 rule).
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#introducao">Introducao</a>
+            <a href="#backends">Backends</a>
+            <a href="#instalacao">Instalacao</a>
+            <a href="#configuracao">Configuracao</a>
+            <a href="#api">API</a>
+            <a href="#docker">Docker</a>
+        </div>
+        <p>pvSolar Backup v1.0.0 - GPLv3</p>
+        <p style="opacity: 0.7; margin-top: 0.5rem;">Sistema Automatizado de Backup & Restore</p>
+    </footer>
+</body>
+</html>

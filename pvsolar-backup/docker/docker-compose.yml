@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  pvsolar-backup:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: pvsolar-backup
+    restart: unless-stopped
+    ports:
+      - "8008:8008"
+    volumes:
+      - ../config:/app/config:ro
+      - backup-data:/app/backups
+      - pvolar-data:/app/data
+    environment:
+      - PVSOLAR_BACKUP_DEBUG=false
+      - API_PORT=8008
+    networks:
+      - pvsolar-net
+
+volumes:
+  backup-data:
+  pvolar-data:
+
+networks:
+  pvsolar-net:
+    driver: bridge

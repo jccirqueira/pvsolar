@@ -1,0 +1,78 @@
+# [Docker] Variante para o docker-compose.yml da raiz - rede interna do compose.
+# Gerada a partir do YAML de origem do projeto; nao edite URLs locais aqui.
+
+# pvSolar Reports Configuration
+# Copy this file to reports.yaml and customize
+
+# Gateway API
+gateway:
+  url: "http://gateway:8000"
+  api_key: null
+  timeout: 30
+
+# Analytics API
+analytics:
+  url: "http://analytics:8001"
+  api_key: null
+  timeout: 30
+
+# Email Settings
+email:
+  enabled: false
+  smtp_host: "smtp.gmail.com"
+  smtp_port: 587
+  smtp_user: null
+  smtp_password: null
+  use_tls: true
+  from_address: "reports@pvsolar.com"
+  recipients:
+    - "admin@pvsolar.com"
+
+# Scheduler Settings
+scheduler:
+  enabled: true
+  daily_time: "06:00"
+  weekly_day: 1
+  monthly_day: 1
+
+# Output Settings
+output:
+  base_dir: "output"
+  pdf_dir: "output/pdf"
+  excel_dir: "output/excel"
+  retention_days: 90
+
+# Template Settings
+template:
+  language: "pt_BR"
+  company_name: "pvSolar Energy"
+  company_logo: null
+  primary_color: "#10B981"
+  secondary_color: "#3B82F6"
+
+# Plant Settings
+plant:
+  name: "Minha Usina Solar"
+  capacity_kw: 100.0
+  num_inverters: 6
+  timezone: "America/Sao_Paulo"
+
+# API Settings
+api:
+  host: "0.0.0.0"
+  port: 8002
+  title: "pvSolar Reports API"
+
+# Default Formats
+formats:
+  - "pdf"
+  - "excel"
+
+# Enabled Report Types
+report_types:
+  - "daily"
+  - "weekly"
+  - "monthly"
+
+# Debug Mode
+debug: false

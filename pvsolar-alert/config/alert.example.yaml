@@ -1,0 +1,185 @@
+# pvSolar Alert Configuration
+# Copy this file to alert.yaml and customize
+
+# Email Channel
+email:
+  enabled: true
+  api_key: null
+  from_address: "alerts@pvsolar.com.br"
+  from_name: "pvSolar Alert"
+  timeout: 30
+
+# SMS Channel
+sms:
+  enabled: false
+  account_sid: null
+  auth_token: null
+  from_number: null
+  timeout: 30
+
+# Telegram Channel
+telegram:
+  enabled: false
+  bot_token: null
+  chat_id: null
+  timeout: 30
+
+# WhatsApp Channel
+whatsapp:
+  enabled: false
+  base_url: null
+  api_key: null
+  timeout: 30
+
+# Webhook Channel
+webhook:
+  enabled: false
+  webhook_url: null
+  timeout: 30
+
+# Recipients
+recipients:
+  - name: "Operador Principal"
+    email: "operador@pvsolar.com.br"
+    phone: "+5511999999999"
+    telegram_chat_id: null
+    channels:
+      - email
+      - sms
+    time_window: "always"
+
+  - name: "Gerente"
+    email: "gerente@pvsolar.com.br"
+    channels:
+      - email
+    time_window: "business_hours"
+
+  - name: "Suporte"
+    email: "suporte@pvsolar.com.br"
+    channels:
+      - email
+      - telegram
+    time_window: "always"
+
+# Escalation Rules
+escalation:
+  - level: "level_1"
+    wait_seconds: 300
+    contacts:
+      - name: "Operador"
+        email: "operador@pvsolar.com.br"
+        channels:
+          - email
+
+  - level: "level_2"
+    wait_seconds: 600
+    contacts:
+      - name: "Engenheiro"
+        email: "engenheiro@pvsolar.com.br"
+        phone: "+5511988888888"
+        channels:
+          - email
+          - sms
+
+  - level: "level_3"
+    wait_seconds: 900
+    contacts:
+      - name: "Gerente"
+        email: "gerente@pvsolar.com.br"
+        phone: "+5511977777777"
+        channels:
+          - email
+          - sms
+          - telegram
+
+  - level: "level_4"
+    wait_seconds: 1200
+    contacts:
+      - name: "Diretor"
+        email: "diretor@pvsolar.com.br"
+        phone: "+5511966666666"
+        channels:
+          - email
+          - sms
+          - telegram
+
+# Notification Limits
+notification:
+  max_per_hour: 50
+  max_per_day: 200
+  retry_attempts: 3
+  retry_delay_seconds: 60
+  batch_size: 10
+  batch_delay_seconds: 5
+
+# Alert Rules
+rules:
+  - id: "rule_inverter_overheat"
+    name: "Inversor Superaquecimento"
+    enabled: true
+    conditions:
+      - field: "temperature"
+        operator: "gt"
+        value: 80.0
+    severity: "high"
+    channels:
+      - email
+      - sms
+    recipients:
+      - "operador@pvsolar.com.br"
+    escalation_level: "level_2"
+    cooldown_seconds: 300
+
+  - id: "rule_low_energy"
+    name: "Energia Baixa"
+    enabled: true
+    conditions:
+      - field: "energy_ratio"
+        operator: "lt"
+        value: 0.7
+    severity: "medium"
+    channels:
+      - email
+    recipients:
+      - "operador@pvsolar.com.br"
+    escalation_level: "level_1"
+    cooldown_seconds: 600
+
+  - id: "rule_critical_fault"
+    name: "Falha Crítica"
+    enabled: true
+    conditions:
+      - field: "fault_code"
+        operator: "gt"
+        value: 100.0
+    severity: "critical"
+    channels:
+      - email
+      - sms
+      - telegram
+    recipients:
+      - "operador@pvsolar.com.br"
+      - "engenheiro@pvsolar.com.br"
+    escalation_level: "level_3"
+    cooldown_seconds: 0
+
+# Database
+database:
+  path: "data/alerts.db"
+
+# API
+api:
+  host: "0.0.0.0"
+  port: 8004
+  title: "pvSolar Alert API"
+
+# Logging
+logging:
+  level: "INFO"
+  format: "json"
+
+# Company
+company_name: "pvSolar Alert"
+
+# Debug Mode
+debug: false

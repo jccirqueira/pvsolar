@@ -1,0 +1,57 @@
+# ============================================================
+# pvSolar - Gitignore do ecossistema (monorepo)
+# ============================================================
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# --- Ambientes virtuais ---
+venv/
+.venv/
+env/
+
+# --- Node / Next.js ---
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+
+# --- Segredos e configuracao local ---
+# .env.example e versionado; o .env real nunca entra no repositorio
+.env
+.env.local
+.env.*.local
+
+# --- Artefatos de execucao ---
+output/
+reports-output/
+backup-data/
+backups/
+logs/
+*.log
+
+# --- Dados locais de banco ---
+*.sqlite3
+pgdata/
+
+# --- IDE / sistema ---
+.vscode/
+.idea/
+*.swp
+*~
+Thumbs.db
+Desktop.ini
+.DS_Store

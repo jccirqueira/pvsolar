@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # PostgreSQL + TimescaleDB
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: pvsolar-timescaledb
+    environment:
+      POSTGRES_DB: pvsolar_analytics
+      POSTGRES_USER: analytics
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - timescaledb_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U analytics"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: pvsolar-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Mosquitto MQTT Broker
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: pvsolar-mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./docker/mosquitto/config:/mosquitto/config
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+
+  # pvSolar Analytics API
+  analytics:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: pvsolar-analytics
+    environment:
+      DATABASE_URL: postgresql+asyncpg://analytics:password@timescaledb:5432/pvsolar_analytics
+      REDIS_URL: redis://redis:6379/0
+      MQTT_BROKER: mosquitto
+      MQTT_PORT: 1883
+    ports:
+      - "8000:8000"
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mosquitto:
+        condition: service_started
+
+  # Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: pvsolar-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+volumes:
+  timescaledb_data:
+  redis_data:
+  mosquitto_data:
+  mosquitto_log:
+  grafana_data:

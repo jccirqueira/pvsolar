@@ -1,0 +1,11 @@
+# Imagem Docker do pvSolar Web - mantem o contexto de build enxuto.
+node_modules
+.next
+npm-debug.log*
+.git
+.gitignore
+*.md
+docker/
+coverage
+jest.config.js
+tsconfig.tsbuildinfo

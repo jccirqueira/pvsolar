@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  pvsolar-web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: pvsolar-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_GATEWAY_URL=http://pvsolar-gateway:8000
+      - NEXT_PUBLIC_ANALYTICS_URL=http://pvsolar-analytics:8001
+      - NEXT_PUBLIC_SCADA_URL=http://pvsolar-scada:5000
+      - NEXT_PUBLIC_REPORTS_URL=http://pvsolar-reports:8002
+      - NEXT_PUBLIC_FLEET_URL=http://pvsolar-fleet:8003
+      - NEXT_PUBLIC_ALERT_URL=http://pvsolar-alert:8004
+      - NEXT_PUBLIC_GRID_URL=http://pvsolar-grid:8005
+      - NEXT_PUBLIC_TWIN_URL=http://pvsolar-twin:8006
+      - NEXT_PUBLIC_AUTH_URL=http://pvsolar-auth:8007
+    networks:
+      - pvsolar-net
+
+networks:
+  pvsolar-net:
+    driver: bridge

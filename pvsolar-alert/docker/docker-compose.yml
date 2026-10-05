@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  pvsolar-alert:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: pvsolar-alert
+    restart: unless-stopped
+    ports:
+      - "8004:8004"
+    volumes:
+      - ../config:/app/config:ro
+      - alert-data:/app/data
+    environment:
+      - PVALERT_DEBUG=false
+      - API_PORT=8004
+    networks:
+      - pvsolar-net
+
+volumes:
+  alert-data:
+
+networks:
+  pvsolar-net:
+    driver: bridge

@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pvSolar Analytics - Manual Profissional</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8B5CF6;
+            --primary-dark: #7C3AED;
+            --primary-light: #A78BFA;
+            --secondary: #3B82F6;
+            --accent: #F59E0B;
+            --danger: #EF4444;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --info: #3B82F6;
+            --dark: #1F2937;
+            --darker: #111827;
+            --light: #F3F4F6;
+            --lighter: #F9FAFB;
+            --gray: #6B7280;
+            --gray-light: #E5E7EB;
+            --gradient-ai: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%);
+            --gradient-energy: linear-gradient(135deg, #10B981 0%, #3B82F6 100%);
+            --gradient-anomaly: linear-gradient(135deg, #EF4444 0%, #F59E0B 100%);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--lighter);
+            color: var(--dark);
+            line-height: 1.7;
+        }
+
+        .header {
+            background: var(--gradient-ai);
+            color: white;
+            padding: 2rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.2);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-text h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; }
+        .logo-text span { font-size: 0.85rem; opacity: 0.9; }
+
+        .header-nav { display: flex; gap: 1.5rem; }
+        .header-nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .header-nav a:hover { background: rgba(255,255,255,0.2); }
+
+        .hero {
+            background: var(--gradient-ai);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+        .hero h1 { font-size: 2.8rem; font-weight: 800; margin-bottom: 1rem; letter-spacing: -1px; }
+        .hero p { font-size: 1.2rem; opacity: 0.95; max-width: 700px; margin: 0 auto 2rem; }
+
+        .hero-badges { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .badge {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--gray-light);
+        }
+
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav li { margin-bottom: 0.25rem; }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--dark);
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+        .sidebar-nav a:hover { background: var(--light); color: var(--primary); }
+        .sidebar-nav a.active { background: var(--primary); color: white; }
+        .sidebar-nav i { width: 20px; text-align: center; }
+
+        .main-content { min-width: 0; }
+
+        .section {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-light);
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-ai);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        .section-title { font-size: 1.5rem; font-weight: 700; color: var(--dark); }
+        .section-subtitle { font-size: 0.9rem; color: var(--gray); }
+
+        h2 { font-size: 1.8rem; font-weight: 700; color: var(--dark); margin: 2rem 0 1rem; }
+        h3 { font-size: 1.3rem; font-weight: 600; color: var(--dark); margin: 1.5rem 0 0.75rem; }
+        p { margin-bottom: 1rem; color: #374151; }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .feature-card {
+            background: var(--lighter);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid var(--gray-light);
+            transition: var(--transition);
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--gradient-ai);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark); }
+        .feature-desc { font-size: 0.9rem; color: var(--gray); }
+
+        .code-block {
+            background: #1F2937;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+        .code-block::before {
+            content: attr(data-lang);
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 0 var(--radius) 0 var(--radius-sm);
+        }
+        .code-block code {
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            color: #E5E7EB;
+            line-height: 1.6;
+        }
+        .code-block .comment { color: #6B7280; }
+        .code-block .string { color: #34D399; }
+        .code-block .keyword { color: #60A5FA; }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-sm);
+            margin: 1rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        .alert-icon { font-size: 1.2rem; margin-top: 0.25rem; }
+        .alert-content { flex: 1; }
+        .alert-title { font-weight: 600; margin-bottom: 0.25rem; }
+
+        .alert-info { background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E40AF; }
+        .alert-success { background: #F0FDF4; border: 1px solid #BBF7D0; color: #166534; }
+        .alert-warning { background: #FFFBEB; border: 1px solid #FDE68A; color: #92400E; }
+        .alert-danger { background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; }
+
+        .table-wrapper { overflow-x: auto; margin: 1rem 0; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        th { background: var(--gradient-ai); color: white; padding: 1rem; text-align: left; font-weight: 600; }
+        td { padding: 1rem; border-bottom: 1px solid var(--gray-light); }
+        tr:hover td { background: var(--lighter); }
+
+        .steps { counter-reset: step-counter; margin: 1.5rem 0; }
+        .step {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        .step:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 45px;
+            bottom: -15px;
+            width: 2px;
+            background: var(--gray-light);
+        }
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-ai);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .step-content {
+            flex: 1;
+            background: var(--lighter);
+            border-radius: var(--radius-sm);
+            padding: 1.25rem;
+        }
+        .step-title { font-weight: 600; color: var(--dark); margin-bottom: 0.5rem; }
+
+        .architecture {
+            background: var(--lighter);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+        .arch-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .arch-box {
+            background: white;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.5rem;
+            min-width: 140px;
+            transition: var(--transition);
+        }
+        .arch-box:hover { border-color: var(--primary); transform: scale(1.05); }
+        .arch-box i { font-size: 1.5rem; color: var(--primary); margin-bottom: 0.5rem; }
+        .arch-box-title { font-weight: 600; font-size: 0.9rem; color: var(--dark); }
+        .arch-box-desc { font-size: 0.75rem; color: var(--gray); }
+        .arch-arrow { font-size: 1.5rem; color: var(--primary); }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .status-success { background: #F0FDF4; color: #166534; }
+        .status-success .status-dot { background: #10B981; }
+
+        code:not(.code-block code) {
+            background: var(--light);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--primary-dark);
+            font-family: 'Fira Code', monospace;
+        }
+
+        ul, ol { margin: 1rem 0; padding-left: 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+
+        .footer {
+            background: var(--darker);
+            color: white;
+            padding: 3rem 2rem;
+            margin-top: 3rem;
+        }
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        .footer-section h4 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--primary-light); }
+        .footer-section p, .footer-section a { color: #9CA3AF; text-decoration: none; font-size: 0.9rem; display: block; margin-bottom: 0.5rem; }
+        .footer-section a:hover { color: var(--primary-light); }
+        .footer-bottom { max-width: 1400px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid #374151; text-align: center; color: #6B7280; font-size: 0.9rem; }
+
+        @media (max-width: 1024px) {
+            .container { grid-template-columns: 1fr; }
+            .sidebar { position: static; order: -1; }
+            .header-nav { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .hero-badges { flex-direction: column; align-items: center; }
+            .arch-flow { flex-direction: column; }
+            .arch-arrow { transform: rotate(90deg); }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .section { animation: fadeIn 0.5s ease; }
+
+        @media print {
+            .header, .sidebar, .footer { display: none; }
+            .container { grid-template-columns: 1fr; }
+            .section { break-inside: avoid; box-shadow: none; border: 1px solid var(--gray-light); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>pvSolar Analytics</h1>
+                    <span>v1.0.0 - Manual Profissional</span>
+                </div>
+            </div>
+            <nav class="header-nav">
+                <a href="#introducao"><i class="fas fa-book"></i> Manual</a>
+                <a href="#instalacao"><i class="fas fa-download"></i> Instalação</a>
+                <a href="#configuracao"><i class="fas fa-cog"></i> Configuração</a>
+                <a href="#api"><i class="fas fa-code"></i> API</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1><i class="fas fa-robot"></i> pvSolar Analytics</h1>
+        <p>Plataforma AI/ML de analytics para monitoramento de inversores solares com manutenção preditiva, detecção de anomalias e previsão de energia.</p>
+        <div class="hero-badges">
+            <span class="badge"><i class="fas fa-brain"></i> Isolation Forest + LSTM</span>
+            <span class="badge"><i class="fas fa-chart-line"></i> Performance Scoring</span>
+            <span class="badge"><i class="fas fa-exclamation-triangle"></i> Anomaly Detection</span>
+            <span class="badge"><i class="fas fa-tools"></i> Predictive Maintenance</span>
+            <span class="badge"><i class="fas fa-sun"></i> Energy Forecasting</span>
+        </div>
+    </section>
+
+    <!-- Main Container -->
+    <div class="container">
+        
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-title">Sumário</div>
+            <ul class="sidebar-nav">
+                <li><a href="#introducao" class="active"><i class="fas fa-home"></i> Introdução</a></li>
+                <li><a href="#arquitetura"><i class="fas fa-project-diagram"></i> Arquitetura</a></li>
+                <li><a href="#modulos-ml"><i class="fas fa-brain"></i> Módulos ML</a></li>
+                <li><a href="#instalacao"><i class="fas fa-download"></i> Instalação</a></li>
+                <li><a href="#configuracao"><i class="fas fa-cog"></i> Configuração</a></li>
+                <li><a href="#mqtt"><i class="fas fa-exchange-alt"></i> MQTT</a></li>
+                <li><a href="#api"><i class="fas fa-code"></i> API REST</a></li>
+                <li><a href="#docker"><i class="fab fa-docker"></i> Docker</a></li>
+                <li><a href="#algoritmos"><i class="fas fa-calculator"></i> Algoritmos</a></li>
+                <li><a href="#troubleshooting"><i class="fas fa-wrench"></i> Solução de Problemas</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Introdução -->
+            <section id="introducao" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-home"></i></div>
+                    <div>
+                        <h2 class="section-title">Introdução</h2>
+                        <p class="section-subtitle">Conhecendo o pvSolar Analytics</p>
+                    </div>
+                </div>
+
+                <p>O <strong>pvSolar Analytics</strong> é uma plataforma AI/ML completa para analytics de inversores solares. Consome dados do pvSolar Gateway via MQTT e aplica algoritmos de machine learning para fornecer insights acionáveis sobre a saúde, performance e manutenção dos inversores.</p>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <h3 class="feature-title">Anomaly Detection</h3>
+                        <p class="feature-desc">5 algoritmos: Isolation Forest, Z-Score, Rolling Mean, SPC, Threshold. Detecção multivariada e univariada em tempo real.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-tools"></i></div>
+                        <h3 class="feature-title">Predictive Maintenance</h3>
+                        <p class="feature-desc">Gradient Boosting para predição de falhas em 7, 30 e 90 dias. Feature engineering com ~50 features por inversor.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-sun"></i></div>
+                        <h3 class="feature-title">Energy Forecasting</h3>
+                        <p class="feature-desc">LSTM com PyTorch para previsão de energia. Previsão horária, diária e semanal com attention mechanism.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                        <h3 class="feature-title">Performance Scoring</h3>
+                        <p class="feature-desc">PR, CEF, disponibilidade e eficiência. Benchmarking entre inversores com ranking percentil.</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle alert-icon"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">Licenciamento Open Core</div>
+                        <p>O core do analytics é open source (GPLv3). Funcionalidades premium como LSTM avançado, multi-tenant e relatórios estão disponíveis sob licença comercial.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Arquitetura -->
+            <section id="arquitetura" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-project-diagram"></i></div>
+                    <div>
+                        <h2 class="section-title">Arquitetura do Sistema</h2>
+                        <p class="section-subtitle">Visão geral da arquitetura ML</p>
+                    </div>
+                </div>
+
+                <div class="architecture">
+                    <div class="arch-flow">
+                        <div class="arch-box">
+                            <i class="fas fa-solar-panel"></i>
+                            <div class="arch-box-title">Gateway</div>
+                            <div class="arch-box-desc">pvSolar Gateway</div>
+                        </div>
+                        <i class="fas fa-arrow-right arch-arrow"></i>
+                        <div class="arch-box">
+                            <i class="fas fa-exchange-alt"></i>
+                            <div class="arch-box-title">MQTT</div>
+                            <div class="arch-box-desc">Telemetria real-time</div>
+                        </div>
+                        <i class="fas fa-arrow-right arch-arrow"></i>
+                        <div class="arch-box">
+                            <i class="fas fa-brain"></i>
+                            <div class="arch-box-title">Analytics Engine</div>
+                            <div class="arch-box-desc">ML Pipeline</div>
+                        </div>
+                        <i class="fas fa-arrow-right arch-arrow"></i>
+                        <div class="arch-box">
+                            <i class="fas fa-database"></i>
+                            <div class="arch-box-title">TimescaleDB</div>
+                            <div class="arch-box-desc">Séries temporais</div>
+                        </div>
+                        <i class="fas fa-arrow-right arch-arrow"></i>
+                        <div class="arch-box">
+                            <i class="fas fa-chart-bar"></i>
+                            <div class="arch-box-title">API + Grafana</div>
+                            <div class="arch-box-desc">Visualização</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Fluxo de Dados</h3>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Coleta MQTT</div>
+                            <p>O consumer MQTT recebe telemetria dos inversores via pvSolar Gateway. Suporta múltiplos formatos de payload.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Armazenamento</div>
+                            <p>Dados são salvos no TimescaleDB (PostgreSQL + hypertables) para consultas eficientes de séries temporais.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Análise ML</div>
+                            <p>Pipeline de ML processa dados em tempo real: anomalias, manutenção, forecast e performance são calculados automaticamente.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">API REST</div>
+                            <p>FastAPI expõe 25+ endpoints para consulta dos resultados. Swagger docs disponíveis em /api/docs.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <div class="step-title">Visualização</div>
+                            <p>Grafana dashboards para monitoramento visual. Alertas automáticos para anomalies e maintenance predictions.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Módulos ML -->
+            <section id="modulos-ml" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-brain"></i></div>
+                    <div>
+                        <h2 class="section-title">Módulos de Machine Learning</h2>
+                        <p class="section-subtitle">5 módulos ML completos</p>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div>
+                        <h3><i class="fas fa-exclamation-triangle" style="color: var(--danger)"></i> Anomaly Detection</h3>
+                        <ul>
+                            <li><strong>Isolation Forest</strong> — Detecção multivariada sem supervisão</li>
+                            <li><strong>Z-Score</strong> — Detecção univariada baseada em desvio padrão</li>
+                            <li><strong>Rolling Mean</strong> — Detecção de mudanças súbitas na média móvel</li>
+                            <li><strong>SPC (X-bar)</strong> — Controle estatístico de processos</li>
+                            <li><strong>Threshold</strong> — Limites simples min/max configuráveis</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3><i class="fas fa-tools" style="color: var(--warning)"></i> Predictive Maintenance</h3>
+                        <ul>
+                            <li><strong>Gradient Boosting</strong> — Classificação binária (sklearn)</li>
+                            <li>3 horizontes: <strong>7d</strong>, <strong>30d</strong>, <strong>90d</strong></li>
+                            <li><strong>~50 features</strong> por inversor</li>
+                            <li>Risk levels: LOW → MEDIUM → HIGH → CRITICAL</li>
+                            <li>Recomendações automáticas baseadas no risco</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3><i class="fas fa-sun" style="color: var(--success)"></i> Energy Forecasting</h3>
+                        <ul>
+                            <li><strong>LSTM</strong> — PyTorch com attention mechanism</li>
+                            <li>Arquitetura: Input → LSTM 2 camadas → Attention → Output</li>
+                            <li><strong>Hidden: 64</strong>, Dropout: 0.2, Epochs: 100</li>
+                            <li>Fallback: <strong>SimpleForecaster</strong> (trend + seasonal)</li>
+                            <li>Horizontes: 1h, 24h, 7d</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3><i class="fas fa-chart-line" style="color: var(--info)"></i> Performance Scoring</h3>
+                        <ul>
+                            <li><strong>PR</strong> (Performance Ratio): 35% peso</li>
+                            <li><strong>CEF</strong> (Calendar Energy Factor): 25% peso</li>
+                            <li><strong>Availability</strong>: 25% peso</li>
+                            <li><strong>Efficiency</strong>: 15% peso</li>
+                            <li>Benchmarking percentil entre inversores</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Instalação -->
+            <section id="instalacao" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-download"></i></div>
+                    <div>
+                        <h2 class="section-title">Instalação</h2>
+                        <p class="section-subtitle">Guia completo de instalação</p>
+                    </div>
+                </div>
+
+                <h3><i class="fab fa-docker" style="color: #2496ED"></i> Instalação com Docker (Recomendado)</h3>
+
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle alert-icon"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">Recomendado para Produção</div>
+                        <p>Docker é a forma mais segura e fácil de implantar o pvSolar Analytics em produção.</p>
+                    </div>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Pré-requisitos</div>
+                            <p>Instale Docker Engine 20.10+ e Docker Compose 2.0+:</p>
+                            <div class="code-block" data-lang="bash">
+                                <code><span class="comment"># Ubuntu/Debian</span>
+sudo apt update
+sudo apt install docker.io docker-compose-plugin
+
+<span class="comment"># Verificar instalação</span>
+docker --version
+docker compose version</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Clonar Repositório</div>
+                            <div class="code-block" data-lang="bash">
+                                <code>git clone https://github.com/your-org/pvsolar-analytics.git
+cd pvsolar-analytics</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Configurar Analytics</div>
+                            <div class="code-block" data-lang="bash">
+                                <code><span class="comment"># Copiar configuração de exemplo</span>
+cp config/analytics.example.yaml config/analytics.yaml
+
+<span class="comment"># Editar configuração</span>
+nano config/analytics.yaml</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Iniciar Stack</div>
+                            <div class="code-block" data-lang="bash">
+                                <code><span class="comment"># Iniciar todos os serviços</span>
+docker compose up -d
+
+<span class="comment"># Verificar status</span>
+docker compose ps
+
+<span class="comment"># Acompanhar logs</span>
+docker compose logs -f pvsolar-analytics</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <div class="step-title">Verificar Instalação</div>
+                            <div class="code-block" data-lang="bash">
+                                <code><span class="comment"># API docs (Swagger)</span>
+http://localhost:8000/api/docs
+
+<span class="comment"># Grafana</span>
+http://localhost:3000
+
+<span class="comment"># Health check</span>
+curl http://localhost:8000/api/health</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3><i class="fab fa-linux" style="color: #333"></i> Instalação Manual</h3>
+
+                <div class="code-block" data-lang="bash">
+                    <code><span class="comment"># Instalar dependências do sistema</span>
+sudo apt update
+sudo apt install python3 python3-pip python3-venv postgresql redis
+
+<span class="comment"># Criar ambiente virtual</span>
+python3 -m venv venv
+source venv/bin/activate
+
+<span class="comment"># Instalar dependências</span>
+pip install -e ".[dev]"
+
+<span class="comment"># Instalar PyTorch (opcional, para LSTM)</span>
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+<span class="comment"># Configurar banco de dados</span>
+sudo -u postgres createdb pvsolar
+sudo -u postgres psql -c "CREATE USER analytics WITH PASSWORD 'password';"
+sudo -u postgres psql -c "GRANT ALL ON DATABASE pvsolar TO analytics;"
+
+<span class="comment"># Rodar migrations</span>
+python -m src.core.app --config config/analytics.yaml</code>
+                </div>
+            </section>
+
+            <!-- Configuração -->
+            <section id="configuracao" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-cog"></i></div>
+                    <div>
+                        <h2 class="section-title">Configuração</h2>
+                        <p class="section-subtitle">Arquivo de configuração analytics.yaml</p>
+                    </div>
+                </div>
+
+                <h3>Configuração MQTT</h3>
+                <div class="code-block" data-lang="yaml">
+                    <code><span class="keyword">mqtt</span>:
+  <span class="string">broker</span>: <span class="string">"localhost"</span>
+  <span class="string">port</span>: <span class="string">1883</span>
+  <span class="string">client_id</span>: <span class="string">"pvsolar-analytics"</span>
+  <span class="string">topics</span>:
+    <span class="string">telemetry</span>: <span class="string">"pvsolar/+/telemetry"</span>
+    <span class="string">status</span>: <span class="string">"pvsolar/+/status"</span>
+    <span class="string">alert</span>: <span class="string">"pvsolar/+/alert"</span>
+  <span class="string">qos</span>: <span class="string">1</span></code>
+                </div>
+
+                <h3>Configuração do Banco de Dados</h3>
+                <div class="code-block" data-lang="yaml">
+                    <code><span class="keyword">database</span>:
+  <span class="string">url</span>: <span class="string">"postgresql+asyncpg://analytics:password@localhost:5432/pvsolar"</span>
+  <span class="string">pool_size</span>: <span class="string">5</span>
+  <span class="string">echo</span>: <span class="string">false</span></code>
+                </div>
+
+                <h3>Configuração ML</h3>
+                <div class="code-block" data-lang="yaml">
+                    <code><span class="keyword">ml</span>:
+  <span class="string">model_dir</span>: <span class="string">"./ml_models"</span>
+  <span class="string">anomaly</span>:
+    <span class="string">contamination</span>: <span class="string">0.1</span>
+    <span class="string">threshold</span>: <span class="string">3.0</span>
+    <span class="string">methods</span>: [<span class="string">"isolation_forest"</span>, <span class="string">"zscore"</span>, <span class="string">"rolling_mean"</span>]
+  <span class="string">maintenance</span>:
+    <span class="string">forecast_horizon</span>: <span class="string">90</span>
+    <span class="string">retrain_interval</span>: <span class="string">7</span>
+  <span class="string">forecast</span>:
+    <span class="string">sequence_length</span>: <span class="string">24</span>
+    <span class="string">forecast_horizon</span>: <span class="string">24</span>
+    <span class="string">hidden_size</span>: <span class="string">64</span></code>
+                </div>
+
+                <h3>Configuração da API</h3>
+                <div class="code-block" data-lang="yaml">
+                    <code><span class="keyword">api</span>:
+  <span class="string">host</span>: <span class="string">"0.0.0.0"</span>
+  <span class="string">port</span>: <span class="string">8000</span>
+  <span class="string">cors_origins</span>: [<span class="string">"http://localhost:3001"</span>]</code>
+                </div>
+            </section>
+
+            <!-- MQTT -->
+            <section id="mqtt" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-exchange-alt"></i></div>
+                    <div>
+                        <h2 class="section-title">Configuração MQTT</h2>
+                        <p class="section-subtitle">Comunicação com pvSolar Gateway</p>
+                    </div>
+                </div>
+
+                <h3>Estrutura de Tópicos</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tópico</th>
+                                <th>Direção</th>
+                                <th>Descrição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>pvsolar/+/telemetry</code></td>
+                                <td><i class="fas fa-arrow-down" style="color: var(--info)"></i> Subscribe</td>
+                                <td>Dados de telemetria dos inversores</td>
+                            </tr>
+                            <tr>
+                                <td><code>pvsolar/+/status</code></td>
+                                <td><i class="fas fa-arrow-down" style="color: var(--info)"></i> Subscribe</td>
+                                <td>Status dos gateways</td>
+                            </tr>
+                            <tr>
+                                <td><code>pvsolar/+/alert</code></td>
+                                <td><i class="fas fa-arrow-down" style="color: var(--info)"></i> Subscribe</td>
+                                <td>Alertas dos gateways</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Formato da Telemetria</h3>
+                <div class="code-block" data-lang="json">
+                    <code>{
+  <span class="string">"inverter_id"</span>: <span class="string">"fronius-001"</span>,
+  <span class="string">"timestamp"</span>: <span class="string">"2026-09-17T12:00:00Z"</span>,
+  <span class="string">"ac_power"</span>: <span class="string">5000</span>,
+  <span class="string">"ac_voltage"</span>: <span class="string">220.5</span>,
+  <span class="string">"ac_current"</span>: <span class="string">22.7</span>,
+  <span class="string">"temperature"</span>: <span class="string">45.2</span>,
+  <span class="string">"efficiency"</span>: <span class="string">0.965</span>,
+  <span class="string">"daily_energy"</span>: <span class="string">25.5</span>,
+  <span class="string">"status"</span>: <span class="string">"running"</span>
+}</code>
+                </div>
+            </section>
+
+            <!-- API REST -->
+            <section id="api" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-code"></i></div>
+                    <div>
+                        <h2 class="section-title">API REST</h2>
+                        <p class="section-subtitle">25+ endpoints disponíveis</p>
+                    </div>
+                </div>
+
+                <h3>Anomaly Detection</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>Endpoint</th><th>Descrição</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>GET /api/anomalies/{id}</code></td><td>Lista anomalias do inversor</td></tr>
+                            <tr><td><code>GET /api/anomalies/stats</code></td><td>Estatísticas globais de anomalias</td></tr>
+                            <tr><td><code>GET /api/anomalies/detect</code></td><td>Detecção real-time (query params)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Predictive Maintenance</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>Endpoint</th><th>Descrição</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>GET /api/maintenance/{id}</code></td><td>Predição de manutenção</td></tr>
+                            <tr><td><code>GET /api/maintenance/{id}/predict</code></td><td>Predição real-time</td></tr>
+                            <tr><td><code>GET /api/maintenance/{id}/features</code></td><td>Features extraídas</td></tr>
+                            <tr><td><code>GET /api/maintenance/stats</code></td><td>Status do sistema</td></tr>
+                            <tr><td><code>GET /api/maintenance/models</code></td><td>Modelos salvos</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Energy Forecasting</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>Endpoint</th><th>Descrição</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>GET /api/forecast/{id}</code></td><td>Previsão histórica</td></tr>
+                            <tr><td><code>GET /api/forecast/{id}/predict</code></td><td>Previsão 24h real-time</td></tr>
+                            <tr><td><code>GET /api/forecast/{id}/features</code></td><td>Features temporais</td></tr>
+                            <tr><td><code>GET /api/forecast/stats</code></td><td>Status do sistema</td></tr>
+                            <tr><td><code>GET /api/forecast/models</code></td><td>Modelos salvos</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Performance Scoring</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>Endpoint</th><th>Descrição</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>GET /api/performance/{id}</code></td><td>Score atual</td></tr>
+                            <tr><td><code>GET /api/performance/{id}/benchmark</code></td><td>Benchmark com fleet</td></tr>
+                            <tr><td><code>GET /api/performance/{id}/history</code></td><td>Histórico de scores</td></tr>
+                            <tr><td><code>GET /api/performance/ranking</code></td><td>Ranking da frota</td></tr>
+                            <tr><td><code>GET /api/performance/fleet</code></td><td>Estatísticas da frota</td></tr>
+                            <tr><td><code>GET /api/performance/fleet/{group}</code></td><td>Estatísticas do grupo</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Exemplo de Requisição</h3>
+                <div class="code-block" data-lang="bash">
+                    <code><span class="comment"># Predição de manutenção</span>
+curl http://localhost:8000/api/maintenance/fronius-001/predict
+
+<span class="comment"># Previsão de energia</span>
+curl http://localhost:8000/api/forecast/fronius-001/predict
+
+<span class="comment"># Detecção de anomalias</span>
+curl "http://localhost:8000/api/anomalies/detect?ac_power=5000&temperature=45"
+
+<span class="comment"># Benchmark de performance</span>
+curl http://localhost:8000/api/performance/fronius-001/benchmark</code>
+                </div>
+            </section>
+
+            <!-- Docker -->
+            <section id="docker" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fab fa-docker"></i></div>
+                    <div>
+                        <h2 class="section-title">Docker Stack</h2>
+                        <p class="section-subtitle">Containerização completa</p>
+                    </div>
+                </div>
+
+                <h3>Serviços</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>Serviço</th><th>Porta</th><th>Descrição</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>timescaledb</strong></td><td>5432</td><td>PostgreSQL + TimescaleDB para séries temporais</td></tr>
+                            <tr><td><strong>redis</strong></td><td>6379</td><td>Cache e filas</td></tr>
+                            <tr><td><strong>mosquitto</strong></td><td>1883</td><td>MQTT broker</td></tr>
+                            <tr><td><strong>grafana</strong></td><td>3000</td><td>Dashboard visual</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Comandos Docker</h3>
+                <div class="code-block" data-lang="bash">
+                    <code><span class="comment"># Iniciar stack completa</span>
+docker compose up -d
+
+<span class="comment"># Verificar status</span>
+docker compose ps
+
+<span class="comment"># Logs em tempo real</span>
+docker compose logs -f
+
+<span class="comment"># Parar stack</span>
+docker compose down
+
+<span class="comment"># Rebuild após alterações</span>
+docker compose up -d --build</code>
+                </div>
+            </section>
+
+            <!-- Algoritmos -->
+            <section id="algoritmos" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-calculator"></i></div>
+                    <div>
+                        <h2 class="section-title">Algoritmos ML</h2>
+                        <p class="section-subtitle">Detalhes técnicos dos algoritmos</p>
+                    </div>
+                </div>
+
+                <h3>Anomaly Detection — Isolation Forest</h3>
+                <p>O Isolation Forest isola observações selecionando aleatoriamente um feature e um split value. Anomalias requerem menos splits para serem isoladas.</p>
+                <div class="code-block" data-lang="python">
+                    <code><span class="comment"># Parâmetros padrão</span>
+contamination = 0.1  <span class="comment"># 10% esperado como anomalias</span>
+n_estimators = 100
+max_samples = 256
+
+<span class="comment"># Features monitoradas</span>
+metrics = [<span class="string">"ac_power"</span>, <span class="string">"temperature"</span>, <span class="string">"efficiency"</span>, <span class="string">"ac_frequency"</span>]</code>
+                </div>
+
+                <h3>Predictive Maintenance — Gradient Boosting</h3>
+                <p>Gradient Boosting treina árvores sequencialmente, cada uma corrigindo os erros da anterior. Features de ~50 dimensões por inversor.</p>
+                <div class="code-block" data-lang="python">
+                    <code><span class="comment"># Parâmetros padrão</span>
+n_estimators = 100
+max_depth = 5
+learning_rate = 0.1
+subsample = 0.8
+
+<span class="comment"># Horizontes de predição</span>
+horizons = {
+    <span class="string">"7d"</span>:  probabilidade_curto_prazo,
+    <span class="string">"30d"</span>: probabilidade_medio_prazo,
+    <span class="string">"90d"</span>: probabilidade_longo_prazo,
+}
+
+<span class="comment"># Risk levels</span>
+risk = {
+    <span class="string">"LOW"</span>:     prob_30d < 0.15,
+    <span class="string">"MEDIUM"</span>:  0.15 <= prob_30d < 0.40,
+    <span class="string">"HIGH"</span>:    0.40 <= prob_30d < 0.70,
+    <span class="string">"CRITICAL"</span>: prob_30d >= 0.70,
+}</code>
+                </div>
+
+                <h3>Energy Forecasting — LSTM</h3>
+                <p>Long Short-Term Memory (LSTM) é uma Rede Neural Recorrente capaz de aprender dependências de longo prazo em séries temporais.</p>
+                <div class="code-block" data-lang="python">
+                    <code><span class="comment"># Arquitetura</span>
+Input (10 features) → Projection (64) → LSTM (2 camadas, 64 hidden)
+→ Attention → Output (forecast_horizon)
+
+<span class="comment"># Treinamento</span>
+optimizer = Adam(lr=0.001)
+loss = MSELoss()
+epochs = 100
+batch_size = 32</code>
+                </div>
+
+                <h3>Performance Scoring — Fórmulas</h3>
+                <div class="grid-2">
+                    <div class="code-block" data-lang="math">
+                        <code>PR = (E_real / E_teorica) × 100
+CEF = (E_real / E_esperada) × 100
+Availability = (t_running / t_total) × 100
+η = (P_AC / P_DC) × 100
+
+Score = 0.35×PR + 0.25×CEF + 0.25×Avail + 0.15×η</code>
+                    </div>
+                    <div>
+                        <h4>Grades</h4>
+                        <ul>
+                            <li><strong>A+</strong> — ≥ 95%</li>
+                            <li><strong>A</strong> — ≥ 90%</li>
+                            <li><strong>B+</strong> — ≥ 85%</li>
+                            <li><strong>B</strong> — ≥ 80%</li>
+                            <li><strong>C+</strong> — ≥ 75%</li>
+                            <li><strong>C</strong> — ≥ 70%</li>
+                            <li><strong>D</strong> — ≥ 60%</li>
+                            <li><strong>F</strong> — &lt; 60%</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Troubleshooting -->
+            <section id="troubleshooting" class="section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-wrench"></i></div>
+                    <div>
+                        <h2 class="section-title">Solução de Problemas</h2>
+                        <p class="section-subtitle">Problemas comuns e soluções</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle alert-icon"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">PyTorch não instalado</div>
+                        <p>Se LSTM não funcionar, o sistema usa automaticamente o SimpleForecaster (fallback estatístico). Para LSTM completo, instale: <code>pip install torch --index-url https://download.pytorch.org/whl/cpu</code></p>
+                    </div>
+                </div>
+
+                <div class="alert alert-danger">
+                    <i class="fas fa-times-circle alert-icon"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">Erro de import: structlog event parameter</div>
+                        <p>structlog conflita com parâmetro nomeado <code>event</code>. Use <code>event_type</code> em vez de <code>event</code> ao chamar logger.</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle alert-icon"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">datetime.now timezone</div>
+                        <p>Use sempre <code>datetime.now(timezone.utc)</code> em vez de <code>datetime.now(timedelta.utc)</code> —后者 é inválido.</p>
+                    </div>
+                </div>
+
+                <h3>Comandos de Debug</h3>
+                <div class="code-block" data-lang="bash">
+                    <code><span class="comment"># Rodar testes</span>
+python -m pytest tests/ -v
+
+<span class="comment"># Verificar imports</span>
+python -c "from src.ml.anomaly.detector import AnomalyDetector; print('OK')"
+
+<span class="comment"># Testar API</span>
+curl http://localhost:8000/api/health
+
+<span class="comment"># Verificar logs</span>
+docker compose logs -f pvsolar-analytics
+
+<span class="comment"># Listar modelos salvos</span>
+ls -la ./ml_models/</code>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4><i class="fas fa-brain"></i> pvSolar Analytics</h4>
+                <p>Plataforma AI/ML de analytics para inversores solares.</p>
+                <p>v1.0.0 - GPLv3</p>
+            </div>
+            <div class="footer-section">
+                <h4>Módulos</h4>
+                <a href="#modulos-ml">Anomaly Detection</a>
+                <a href="#modulos-ml">Predictive Maintenance</a>
+                <a href="#modulos-ml">Energy Forecasting</a>
+                <a href="#modulos-ml">Performance Scoring</a>
+            </div>
+            <div class="footer-section">
+                <h4>API</h4>
+                <a href="#api">Swagger Docs</a>
+                <a href="#api">REST Endpoints</a>
+                <a href="#mqtt">MQTT Consumer</a>
+            </div>
+            <div class="footer-section">
+                <h4>Recursos</h4>
+                <a href="#instalacao">Instalação</a>
+                <a href="#configuracao">Configuração</a>
+                <a href="#troubleshooting">Troubleshooting</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>pvSolar Analytics v1.0.0 &copy; 2026 - Licenciado sob GPLv3</p>
+        </div>
+    </footer>
+
+</body>
+</html>

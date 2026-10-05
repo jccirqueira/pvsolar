@@ -1,0 +1,104 @@
+# pvSolar Auth Configuration
+# Copy this file to auth.yaml and customize
+
+# JWT Configuration
+jwt:
+  secret_key: "CHANGE-THIS-TO-A-SECRET-KEY-IN-PRODUCTION"
+  algorithm: "HS256"
+  access_token_expire_minutes: 30
+  refresh_token_expire_days: 7
+  issuer: "pvsolar-auth"
+  audience: "pvsolar"
+
+# Password Configuration
+password:
+  min_length: 8
+  require_uppercase: true
+  require_lowercase: true
+  require_digit: true
+  require_special: true
+  max_age_days: 90
+  history_count: 5
+
+# Rate Limiting
+rate_limit:
+  login_attempts: 5
+  login_lockout_minutes: 15
+  api_requests_per_minute: 100
+  api_requests_per_hour: 1000
+
+# Session Configuration
+session:
+  max_sessions: 5
+  session_timeout_minutes: 60
+  absolute_timeout_minutes: 480
+
+# OAuth2 Configuration
+oauth:
+  enabled: false
+  client_id: ""
+  client_secret: ""
+  authorization_url: ""
+  token_url: ""
+  userinfo_url: ""
+  redirect_uri: ""
+  scopes:
+    - "openid"
+    - "profile"
+    - "email"
+
+# RBAC Configuration
+rbac:
+  default_role: "viewer"
+
+# Tenant Configuration
+tenant:
+  max_users: 100
+  max_api_keys: 10
+  features:
+    - "dashboard"
+    - "alerts"
+    - "reports"
+    - "analytics"
+
+# Database (PostgreSQL)
+# A persistência fica ativa quando `enabled: true` OU quando a variável de
+# ambiente PVSOLAR_DATABASE_URL estiver definida (ela tem prioridade).
+# Crie o banco uma vez com:  .\venv\Scripts\python.exe scripts\create_databases.py
+database:
+  enabled: true
+  url: "postgresql+asyncpg://postgres:pvsolar_dev@localhost:5432/pvsolar_auth"
+  echo: false
+  pool_size: 5
+  max_overflow: 10
+  pool_timeout: 30
+  create_tables: true
+  hydrate_on_startup: true
+
+# API
+api:
+  host: "0.0.0.0"
+  port: 8007
+  title: "pvSolar Auth API"
+
+# Seed User (criado automaticamente no primeiro startup)
+# Desative em produção e crie usuários via API
+seed:
+  enabled: true
+  username: "admin"
+  email: "admin@pvsolar.com"
+  password: "admin123"
+  full_name: "Administrador"
+  role: "admin"
+  tenant_id: "default"
+
+# Logging
+logging:
+  level: "INFO"
+  format: "json"
+
+# Company
+company_name: "pvSolar Auth"
+
+# Debug Mode
+debug: false

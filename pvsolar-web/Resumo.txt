@@ -1,0 +1,114 @@
+pvSolar Web
+Unified Dashboard for Solar Plant Management
+=============================================
+
+OVERVIEW
+--------
+Next.js 14 + TypeScript + Tailwind CSS frontend for the pvSolar ecosystem.
+Unified dashboard integrating all 9 pvSolar services (Gateway, Analytics,
+SCADA, Reports, Fleet, Alert, Grid, Digital Twin, Auth) into a single UI.
+
+TECH STACK
+----------
+- Next.js 14 (App Router)
+- TypeScript 5.3
+- Tailwind CSS 3.4
+- Recharts (charts)
+- React 18
+
+PAGES
+-----
+- /auth           - Login page with JWT authentication
+- /dashboard      - Real-time overview (power, energy, inverters, weather)
+- /inverters      - Inverter details (status, voltage, current, temperature)
+- /weather        - Meteorological data (irradiance, temp, humidity, wind)
+- /alarms         - Alarm management (severity filters, acknowledge)
+- /trends         - Time-series charts (power, irradiance, temperature)
+- /performance    - PR, availability, efficiency, CEF, losses
+- /fleet          - Multi-site management (sites, capacity, alerts)
+- /alerts         - Centralized alert management
+- /grid           - PRODIST compliance (voltage, THD, frequency, flicker)
+- /twin           - Digital twin simulation (scenarios, what-if)
+
+COMPONENTS
+----------
+src/
+  components/
+    layout/
+      Sidebar.tsx          - Navigation sidebar with icons
+      Header.tsx           - Top bar with user info and service status
+    ui/
+      StatusCard.tsx       - Metric card with icon and trend
+      Card.tsx             - Generic content card
+      Badge.tsx            - Status badge (success/warning/danger/info)
+      LoadingSpinner.tsx   - Loading indicator
+      EmptyState.tsx       - Empty state placeholder
+    charts/
+      PowerChart.tsx       - Line chart for power trends
+      EnergyChart.tsx      - Bar chart for energy comparison
+      DonutChart.tsx       - Pie/donut chart for distribution
+
+LIB
+---
+src/
+  lib/
+    config.ts              - Service URLs and settings
+    api.ts                 - API client for all services
+    data.ts                - Data fetching with mock fallbacks
+
+TESTS
+-----
+__tests__/
+  components/
+    ui.test.tsx            - 4 tests (UI components)
+    charts.test.tsx        - 6 tests (charts)
+  contexts/
+    theme.test.tsx         - 7 tests (light/dark theme)
+  lib/
+    config.test.ts         - 2 tests (config)
+    data.test.ts           - 4 tests (data fetching)
+  Total:                   23 tests, all passing (npm run test)
+
+INSTALLATION
+------------
+npm install
+npm run dev          # Development
+npm run build        # Production build
+npm run start        # Production server
+npm run test         # Run tests
+npm run lint         # Lint code
+npm run typecheck    # TypeScript check
+
+DOCKER
+------
+# Recomendado: compose da raiz do ecossistema (build multi-stage, standalone)
+docker compose up -d web
+
+# Entrypoint do container: node server.js (Next standalone), porta 3001
+# URLs NEXT_PUBLIC_* viram caminhos relativos (/auth, /gateway, ...) no build
+# Variante legado: cd docker && docker-compose up -d
+
+DEPENDENCIES
+------------
+- next ^14.0.0
+- react ^18.2.0
+- recharts ^2.10.0
+- tailwindcss ^3.4.0
+- clsx ^2.1.0
+- date-fns ^3.0.0
+
+PORT
+----
+3001
+
+ECOSYSTEM INTEGRATION
+---------------------
+pvSolar Gateway  (8000)  → Real-time data
+pvSolar Analytics(8001)  → ML predictions
+pvSolar SCADA    (5000)  → HMI screens
+pvSolar Reports  (8002)  → PDF/Excel
+pvSolar Fleet    (8003)  → Multi-site
+pvSolar Alert    (8004)  → Notifications
+pvSolar Grid     (8005)  → Compliance
+pvSolar Twin     (8006)  → Simulation
+pvSolar Auth     (8007)  → Authentication

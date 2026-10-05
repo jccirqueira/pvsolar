@@ -1,0 +1,518 @@
+================================================================================
+                RESUMO COMPLETO DO PROJETO PVSOLAR ANALYTICS
+================================================================================
+Versão do Documento: 1.0
+Data: 2026-09-17
+Autor: Opencode (IA Assistente)
+Status: PROJETO FUNCIONAL - 151/151 TESTES PASSANDO
+
+================================================================================
+1. CONTEXTO E OBJETIVO DO PROJETO
+================================================================================
+
+O projeto "pvSolar Analytics" é uma plataforma AI/ML de analytics para
+monitoramento de inversores solares. Consome dados do pvSolar Gateway via
+MQTT para fornecer manutenção preditiva, detecção de anomalias, previsão
+de energia e scoring de performance.
+
+Modelo de Negócio: Open Core
+- Core (GPLv3): Gratuito — analytics básico, anomalias, performance
+- Premium (Comercial): LSTM avançado, multi-tenant, relatórios, alertas
+
+Parceria com: pvSolar Gateway (coleta de dados)
+Stack: Python 3.11.9, FastAPI, SQLAlchemy, PyTorch, scikit-learn
+
+================================================================================
+2. STACK TECNOLÓGICO
+================================================================================
+
+Linguagem: Python 3.11.9 (testado)
+Build System: pyproject.toml (PEP 517/518) com setuptools
+Testes: pytest 9.1.1 + pytest-asyncio 1.4.0
+Platform: Windows 32-bit (pwsh shell)
+
+Dependências Principais:
+- pydantic>=2.0            — Validação de configuração
+- fastapi>=0.100.0         — API REST
+- uvicorn>=0.23.0          — Servidor ASGI
+- sqlalchemy>=2.0          — ORM async (PostgreSQL/TimescaleDB)
+- structlog>=23.0          — Logging estruturado
+- numpy>=1.24.0            — Computação numérica
+- scikit-learn>=1.3.0      — ML (Isolation Forest, Gradient Boosting)
+- torch>=2.0.0             — LSTM para previsão de energia
+- joblib>=1.3.0            — Serialização de modelos
+- paho-mqtt>=1.6.0         — Cliente MQTT
+- pyyaml>=6.0              — Configuração YAML
+- httpx>=0.24.0            — Testes async FastAPI
+
+Dependências de Dev:
+- pytest>=7.4.0
+- pytest-asyncio>=0.21.0
+- pytest-cov>=4.1.0
+
+================================================================================
+3. ESTRUTURA DO PROJETO
+================================================================================
+
+pvsolar-analytics/
+├── .gitignore                    — Regras git
+├── pyproject.toml                — Config build moderno
+├── requirements.txt              — Dependências pip
+├── Resumo.txt                    — Este arquivo
+│
+├── config/
+│   └── analytics.example.yaml    — Exemplo completo de config
+│
+├── docker/
+│   ├── docker-compose.yml        — Stack completo
+│   └── Dockerfile                — Container build
+│
+├── src/                          — Código fonte principal
+│   ├── __init__.py
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── config.py             — Configuração Pydantic (15 classes)
+│   │   ├── database.py           — Conexão async PostgreSQL
+│   │   └── app.py                — FastAPI factory + lifespan
+│   ├── mqtt/
+│   │   ├── __init__.py
+│   │   └── consumer.py           — MQTT consumer + parser
+│   ├── storage/
+│   │   ├── __init__.py
+│   │   ├── models.py             — 7 modelos SQLAlchemy
+│   │   └── timeseries.py         — 17 métodos CRUD
+│   ├── ml/
+│   │   ├── anomaly/
+│   │   │   ├── __init__.py
+│   │   │   ├── detector.py       — 5 detectores + AnomalyDetector
+│   │   │   └── models.py         — Storage/loading de modelos
+│   │   ├── maintenance/
+│   │   │   ├── __init__.py
+│   │   │   ├── features.py       — Feature engineering
+│   │   │   ├── predictor.py      — Gradient Boosting predictor
+│   │   │   └── models.py         — Storage/loading de modelos
+│   │   ├── forecast/
+│   │   │   ├── __init__.py
+│   │   │   ├── features.py       — Feature engineering temporal
+│   │   │   ├── model.py          — LSTM PyTorch + SimpleForecaster
+│   │   │   ├── predictor.py      — Forecast predictor
+│   │   │   └── models.py         — Storage/loading de modelos
+│   │   └── performance/
+│   │       ├── __init__.py
+│   │       ├── calculator.py     — PR, CEF, disponibilidade, eficiência
+│   │       └── benchmark.py      — Benchmarking entre inversores
+│   └── api/
+│       ├── __init__.py
+│       └── routes/
+│           ├── __init__.py
+│           ├── health.py         — Health check
+│           ├── inverters.py      — CRUD inversores
+│           ├── telemetry.py      — Telemetria
+│           ├── anomalies.py      — Anomalias + detecção real-time
+│           ├── maintenance.py    — Manutenção preditiva
+│           ├── forecast.py       — Previsão de energia
+│           ├── performance.py    — Performance scoring
+│           └── alerts.py         — Alertas
+│
+└── tests/                        — Suite de testes
+    ├── conftest.py               — Config pytest
+    ├── test_config.py            — 15 testes de configuração
+    ├── test_consumer.py          — 10 testes MQTT consumer
+    ├── test_models.py            — 10 testes modelos SQLAlchemy
+    ├── test_api.py               — 5 testes rotas API
+    ├── test_anomaly.py           — 28 testes detecção de anomalias
+    ├── test_maintenance.py       — 29 testes manutenção preditiva
+    ├── test_forecast.py          — 27 testes previsão de energia
+    └── test_performance.py       — 29 testes performance scoring
+
+Total: 151 testes, todos passando.
+
+================================================================================
+4. MÓDULOS DETALHADOS
+================================================================================
+
+4.1 CORE/config.py (15 classes Pydantic)
+------------------------------------------
+Sistema de configuração validado.
+
+Classes:
+- MQTTConfig: broker, port, tls, client_id, topics, qos
+- DatabaseConfig: url, pool_size, echo
+- RedisConfig: url, max_connections
+- MLConfig: model_dir, anomaly, maintenance, forecast
+- AnomalyConfig: contamination, threshold, methods
+- MaintenanceConfig: forecast_horizon, retrain_interval
+- ForecastConfig: sequence_length, forecast_horizon, hidden_size
+- AlertConfig: enabled, channels, severity_threshold
+- APIConfig: host, port, cors_origins, auth
+- AnalyticsConfig: modelo raiz com todos os sub-modelos
+
+4.2 CORE/database.py
+---------------------
+Conexão async com PostgreSQL/TimescaleDB.
+
+- init_database(url, pool_size, echo)
+- close_database()
+- check_database_health() -> bool
+- get_session() -> AsyncGenerator
+
+4.3 CORE/app.py (450 linhas)
+-----------------------------
+FastAPI factory com lifespan manager.
+
+Lifespan:
+- Inicializa database, store, anomaly detector
+- Inicializa maintenance predictor + feature extractor
+- Inicializa forecast predictor + feature extractor
+- Inicializa performance calculator + benchmark
+- Inicia MQTT consumer
+- Salva todos os modelos no shutdown
+
+Telemetry Handler:
+- Armazena telemetria no banco
+- Roda detecção de anomalias
+- Extrai features para manutenção preditiva
+- Extrai features para forecast
+- Calcula performance score a cada 24 amostras
+
+4.4 MQTT/consumer.py
+---------------------
+Consumer MQTT com parsing de mensagens.
+
+- MQTTConsumer: start, stop, on, stats
+- parse_telemetry_message(payload) -> dict
+- Suporta formatos: gateway, flat, nested_ac
+
+4.5 STORAGE/models.py (7 modelos SQLAlchemy)
+----------------------------------------------
+- Telemetry: timestamp, inverter_id, metrics JSON
+- Anomaly: inverter_id, metric, value, score, severity
+- MaintenancePrediction: inverter_id, probabilities, risk_level
+- EnergyForecast: inverter_id, hourly/daily/weekly forecasts
+- PerformanceScore: inverter_id, PR, CEF, availability, grade
+- Alert: inverter_id, alert_type, severity, message
+- Inverter: id, name, model, status, config
+
+4.6 STORAGE/timeseries.py (17 métodos CRUD)
+---------------------------------------------
+TimeSeriesStore com métodos:
+- upsert_inverter, get_inverters, get_inverter
+- store_telemetry, get_telemetry
+- store_anomaly, get_anomalies, get_anomaly_stats
+- store_maintenance_prediction, get_maintenance_prediction
+- store_energy_forecast, get_energy_forecasts
+- store_performance_score, get_performance_score
+- store_alert, get_alerts
+
+4.7 ML/ANOMALY/detector.py (5 detectores)
+-------------------------------------------
+Detecção de anomalias em tempo real.
+
+1. IsolationForestDetector — Multivariado (sklearn)
+2. ZScoreDetector — Univariado baseado em desvio padrão
+3. RollingMeanDetector — Detecção de mudanças súbitas
+4. SPCDetector — Statistical Process Control (gráfico X-bar)
+5. ThresholdDetector — Limites simples min/max
+
+AnomalyDetector combina todos os detectores.
+Resultado: AnomalyResult com severity (low/warning/error/critical)
+
+4.8 ML/MAINTENANCE/predictor.py
+---------------------------------
+Predição de manutenção com Gradient Boosting.
+
+Feature Extraction (MaintenanceFeatureExtractor):
+- Statistical: mean, std, min, max, skewness, kurtosis
+- Trend: slope, acceleration, momentum
+- Stability: CV, within_1std, sign_changes
+- Cross-metric: power-temp corr, power-eff corr
+- Operational: uptime %, fault %, fault_code_changes
+
+Prediction (MaintenancePredictor):
+- 3 horizontes: 7d, 30d, 90d
+- Risk levels: LOW, MEDIUM, HIGH, CRITICAL
+- Recomendações automáticas baseadas no risco
+- Feature importance para explicabilidade
+
+4.9 ML/FORECAST/predictor.py
+------------------------------
+Previsão de energia com LSTM.
+
+Feature Extraction (ForecastFeatureExtractor):
+- Temporal: hour_sin/cos, day_of_week, month, is_weekend
+- Rolling: 3h, 6h, 12h, 24h windows
+- Lag: 1, 2, 3, 6, 12, 24 hours
+- Trend: slope, acceleration, momentum
+- Weather proxy: irradiance, temp correlation
+- Calendar: holiday, season
+
+Model (LSTMEnergyModel):
+- Input projection → LSTM 2 camadas → Attention → Output
+- Hidden: 64, Dropout: 0.2
+- Training: 100 epochs, Adam, MSE loss
+
+Fallback (SimpleForecaster):
+- Trend + seasonal decomposition
+- Sem dependência de PyTorch
+
+4.10 ML/PERFORMANCE/calculator.py
+-----------------------------------
+Cálculo de performance de inversores.
+
+Métricas (pesos):
+- Performance Ratio (PR): 35%
+  PR = (Energia Real / Energia Teórica) × 100
+- Calendar Energy Factor (CEF): 25%
+  CEF = (Energia Real / Energia Esperada) × 100
+- Availability: 25%
+  Availability = (Tempo Rodando / Tempo Total) × 100
+- Efficiency: 15%
+  η = (AC Power / DC Power) × 100
+
+Grades: A+ (≥95), A (≥90), B+ (≥85), B (≥80), C+ (≥75), C (≥70), D (≥60), F
+
+4.11 ML/PERFORMANCE/benchmark.py
+----------------------------------
+Benchmarking entre inversores.
+
+- Fleet Percentile — Ranking percentil no conjunto total
+- vs Fleet Average — Diferença % da média da frota
+- vs Peer Average — Diferença % do grupo de pares
+- vs Historical — Comparação com histórico do inversor
+
+Peer Groups: agrupamento por modelo, capacidade, região.
+
+================================================================================
+5. API REST (25 endpoints)
+================================================================================
+
+Health:
+- GET /api/health — Health check
+
+Inverters:
+- GET /api/inverters — Lista inversores
+- GET /api/inverters/{id} — Detalhes do inversor
+
+Telemetry:
+- GET /api/telemetry/{id} — Telemetria histórica
+
+Anomalies:
+- GET /api/anomalies/{id} — Lista anomalias
+- GET /api/anomalies/stats — Estatísticas
+- GET /api/anomalies/detect — Detecção real-time
+
+Maintenance:
+- GET /api/maintenance/{id} — Predição manutenção
+- GET /api/maintenance/{id}/predict — Predição real-time
+- GET /api/maintenance/{id}/features — Features extraídas
+- GET /api/maintenance/stats — Status do sistema
+- GET /api/maintenance/models — Modelos salvos
+
+Forecast:
+- GET /api/forecast/{id} — Previsão histórica
+- GET /api/forecast/{id}/predict — Previsão 24h real-time
+- GET /api/forecast/{id}/features — Features temporais
+- GET /api/forecast/stats — Status do sistema
+- GET /api/forecast/models — Modelos salvos
+
+Performance:
+- GET /api/performance/{id} — Score atual
+- GET /api/performance/{id}/benchmark — Benchmark
+- GET /api/performance/{id}/history — Histórico
+- GET /api/performance/ranking — Ranking da frota
+- GET /api/performance/fleet — Estatísticas da frota
+- GET /api/performance/fleet/{peer_group} — Estatísticas do grupo
+- GET /api/performance/stats — Status do sistema
+
+Alerts:
+- GET /api/alerts — Lista alertas
+
+================================================================================
+6. TESTES
+================================================================================
+
+Comando: python -m pytest tests/ -v
+Resultado: 151/151 PASSED (47.71s)
+
+Distribuição por arquivo:
+- test_config.py:        15 testes (validação de config)
+- test_consumer.py:      10 testes (MQTT consumer + parser)
+- test_models.py:        10 testes (modelos SQLAlchemy)
+- test_api.py:            5 testes (rotas API)
+- test_anomaly.py:       28 testes (5 detectores + combined)
+- test_maintenance.py:   29 testes (features + predictor)
+- test_forecast.py:      27 testes (features + LSTM + simple)
+- test_performance.py:   29 testes (calculator + benchmark)
+
+================================================================================
+7. CONFIGURAÇÃO DE EXEMPLO (config/analytics.example.yaml)
+================================================================================
+
+mqtt:
+  broker: "localhost"
+  port: 1883
+  client_id: "pvsolar-analytics"
+  topics:
+    telemetry: "pvsolar/+/telemetry"
+    status: "pvsolar/+/status"
+    alert: "pvsolar/+/alert"
+
+database:
+  url: "postgresql+asyncpg://analytics:password@localhost:5432/pvsolar"
+  pool_size: 5
+
+redis:
+  url: "redis://localhost:6379/0"
+
+ml:
+  model_dir: "./ml_models"
+  anomaly:
+    contamination: 0.1
+    threshold: 3.0
+    methods: ["isolation_forest", "zscore", "rolling_mean", "threshold"]
+  maintenance:
+    forecast_horizon: 90
+    retrain_interval: 7
+  forecast:
+    sequence_length: 24
+    forecast_horizon: 24
+    hidden_size: 64
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  cors_origins: ["http://localhost:3001"]
+
+alerts:
+  enabled: true
+  channels:
+    email:
+      enabled: false
+      smtp_host: ""
+      smtp_port: 587
+
+================================================================================
+8. DOCKER STACK
+================================================================================
+
+docker-compose.yml inclui 4 serviços:
+
+1. timescaledb — PostgreSQL + TimescaleDB (porta 5432)
+2. redis — Cache (porta 6379)
+3. mosquitto — MQTT broker (porta 1883)
+4. grafana — Dashboard visual (porta 3000)
+
+Portas:
+- TimescaleDB: 5432
+- Redis: 6379
+- Mosquitto: 1883
+- Grafana: 3000
+- API Analytics: 8000
+
+================================================================================
+9. ALGORITMOS ML
+================================================================================
+
+Detecção de Anomalias:
+- Isolation Forest: detecção multivariada sem supervisão
+- Z-Score: detecção univariada (threshold: 3.0)
+- Rolling Mean: janela móvel com threshold adaptativo
+- SPC (X-bar): controle estatístico de processos
+- Threshold: limites fixos min/max configuráveis
+
+Manutenção Preditiva:
+- Gradient Boosting (sklearn): classificação binária
+- 3 horizontes: 7d (curto), 30d (médio), 90d (longo)
+- Features: 4 categorias, ~50 features por inversor
+- Risk levels: LOW → MEDIUM → HIGH → CRITICAL
+
+Previsão de Energia:
+- LSTM (PyTorch): sequence-to-sequence
+- Arquitetura: Input → LSTM 2 camadas → Attention → Output
+- Hidden: 64, Dropout: 0.2, Epochs: 100
+- Fallback: SimpleForecaster (trend + seasonal)
+- Horizontes: 1h, 24h, 7d
+
+Performance Scoring:
+- PR (Performance Ratio): energia real vs teórica
+- CEF (Calendar Energy Factor): energia real vs esperada
+- Availability: tempo de operação vs tempo total
+- Efficiency: conversão DC→AC
+- Score ponderado: 35% PR + 25% CEF + 25% Avail + 15% Eff
+- Grades: A+ a F
+
+================================================================================
+10. PROBLEMAS ENCONTRADOS E SOLUÇÕES
+================================================================================
+
+10.1 structlog event parameter conflict
+    Problema: structlog conflita com parâmetro nomeado `event`
+    Solução: Usar `event_type` em vez de `event`
+
+10.2 SQLAlchemy Column defaults
+    Problema: Defaults não setam em objetos Python até commit
+    Solução: Setar valores padrão explicitamente no __init__
+
+10.3 API test mocking
+    Problema: FastAPI TestClient precisa de mock para store
+    Solução: Usar fixtures com mock para cada rota
+
+10.4 datetime.now(timedelta.utc)
+    Problema: `datetime.now(timedelta.utc)` é inválido
+    Solução: Usar `datetime.now(timezone.utc)`
+
+10.5 PyTorch not installed
+    Problema: LSTMEnergyModel falha sem PyTorch
+    Solução: SimpleForecaster como fallback estatístico
+
+10.6 LSTM batch dimension
+    Problema: Modelo espera 3D (batch, seq, features), recebe 2D
+    Solução: Adicionar batch dimension em _prepare_input
+
+10.7 Forecast feature type
+    Problema: features.get() retorna None em vez de array
+    Solução: Usar np.asarray() com dtype=float
+
+================================================================================
+11. COMANDOS ÚTEIS
+================================================================================
+
+Instalar em modo dev:
+  cd pvsolar-analytics
+  pip install -e ".[dev]"
+
+Instalar PyTorch (CPU):
+  pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+Rodar testes:
+  python -m pytest tests/ -v
+
+Rodar a API:
+  python -m src.core.app --config config/analytics.example.yaml
+
+Iniciar stack Docker:
+  cd docker
+  docker-compose up -d
+
+API docs (Swagger):
+  http://localhost:8000/api/docs
+
+Grafana:
+  http://localhost:3000
+
+================================================================================
+12. NOTAS TÉCNICAS IMPORTANTES
+================================================================================
+
+- Imports devem ser absolutos: `from ml.anomaly.detector import X`
+- datetime.now(timezone.utc) NÃO datetime.now(timedelta.utc)
+- structlog: evitar parâmetro `event` (usar `event_type`)
+- PyTorch: instalar separadamente (não está em requirements.txt)
+- SimpleForecaster funciona sem PyTorch (fallback automático)
+- Modelos são salvos em ./ml_models/ via joblib + JSON
+- Performance score é calculado a cada 24 amostras
+- Anomalias com severity ERROR/CRITICAL geram alertas automáticos
+
+================================================================================
+FIM DO RESUMO
+================================================================================

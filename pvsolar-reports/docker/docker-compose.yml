@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  pvsolar-reports:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: pvsolar-reports
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+    volumes:
+      - ../config:/app/config:ro
+      - reports-output:/app/output
+    environment:
+      - PVREPORTS_DEBUG=false
+      - GATEWAY_URL=http://pvsolar-gateway:8000
+      - ANALYTICS_URL=http://pvsolar-analytics:8001
+      - API_PORT=8002
+    networks:
+      - pvsolar-net
+
+volumes:
+  reports-output:
+
+networks:
+  pvsolar-net:
+    driver: bridge
