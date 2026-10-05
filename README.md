@@ -1,5 +1,8 @@
 # Ecossistema pvSolar
 
+[![CI](https://github.com/jccirqueira/pvsolar/actions/workflows/ci.yml/badge.svg)](https://github.com/jccirqueira/pvsolar/actions/workflows/ci.yml)
+[![Licença GPLv3](https://img.shields.io/badge/licen%C3%A7a-GPLv3-blue.svg)](LICENSE)
+
 Suíte completa de monitoramento, SCADA e analytics para usinas solares — 13
 projetos interligados, com API REST, autenticação multi-tenant, agendamento,
 relatórios PDF/Excel, alertas multi-canal, gêmeo digital e deploy
