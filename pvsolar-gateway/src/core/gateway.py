@@ -201,7 +201,8 @@ class SolarGateway:
                         )
 
                     # Update metrics
-                    self.metrics.update_inverter(driver.config.id, data)
+                    if data:
+                        self.metrics.update_inverter(driver.config.id, data)
 
                     # Send to pvbrowser
                     if self.pvbinder and data:

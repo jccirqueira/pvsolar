@@ -131,10 +131,11 @@ jobs:
       - name: "Smoke E2E: estado dos containers + probes HTTP"
         shell: bash
         run: |
-          echo "== docker compose ps =="
-          docker compose ps
+          echo "== docker compose ps --all =="
+          docker compose ps --all
           unhealthy="$(docker compose ps --status unhealthy -q)"
           exited="$(docker compose ps --status exited -q)"
+          restarting="$(docker compose ps --status restarting -q)"
           if [ -n "${unhealthy}" ]; then
             echo "::error::Containers unhealthy: ${unhealthy}"
             exit 1
@@ -143,16 +144,33 @@ jobs:
             echo "::error::Containers exitados: ${exited}"
             exit 1
           fi
-          echo "== probes HTTP =="
+          if [ -n "${restarting}" ]; then
+            echo "::error::Containers em restart loop: ${restarting}"
+            exit 1
+          fi
+          echo "== probes HTTP (caddy primeiro: porta de entrada) =="
+          curl -sf --retry 5 --retry-delay 3 --retry-all-errors http://localhost:80 >/dev/null
+          echo "caddy :80 -> web OK"
           curl -sf --retry 5 --retry-delay 3 --retry-all-errors http://localhost:8000/api/health >/dev/null
           echo "gateway :8000 /api/health OK"
           curl -sf --retry 5 --retry-delay 3 --retry-all-errors http://localhost:3001 >/dev/null
           echo "web :3001 OK"
-          curl -sf --retry 5 --retry-delay 3 --retry-all-errors http://localhost:80 >/dev/null
-          echo "caddy :80 -> web OK"
       - name: "Smoke E2E: logs (diagnostico em caso de falha)"
         if: failure()
-        run: docker compose logs --tail 120
+        shell: bash
+        run: |
+          echo "::group::docker compose ps --all"
+          docker compose ps --all
+          echo "::endgroup::"
+          echo "::group::docker compose logs --tail 300"
+          docker compose logs --tail 300
+          echo "::endgroup::"
+          echo "::group::logs COMPLETOS do caddy (sem tail: preserva o 1o erro)"
+          docker logs pvsolar-caddy 2>&1 || true
+          echo "::endgroup::"
+          echo "::group::estado do caddy"
+          docker inspect pvsolar-caddy --format '{{json .State}}' || true
+          echo "::endgroup::"
       - name: Derrubar a stack
         if: always()
         run: docker compose down -v

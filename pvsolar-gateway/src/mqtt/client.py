@@ -139,6 +139,17 @@ class MQTTClient:
 
             logger.info("mqtt.disconnected")
 
+    async def loop(self) -> None:
+        """Tick do ciclo do gateway (chamado por SolarGateway._run_mqtt).
+
+        O paho ja bombeia a rede em thread (connect inicia loop_start);
+        aqui apenas aguardamos o proximo ciclo para o laco do gateway
+        nao fazer busy-loop. Sem este metodo o gateway falhava com
+        ``AttributeError: 'MQTTClient' object has no attribute 'loop'``
+        a cada iteracao - bug encontrado pelo smoke E2E da CI.
+        """
+        await asyncio.sleep(1.0)
+
     async def publish_telemetry(self, inverter_id: str, data: dict[str, Any]):
         """Publish inverter telemetry data."""
         topic = self.config.topics['publish'].replace(
