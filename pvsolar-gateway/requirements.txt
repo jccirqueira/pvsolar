@@ -6,14 +6,14 @@ click>=8.0
 
 # Modbus
 pymodbus>=3.0.0
-umodbus>=1.0.0
+umodbus>=1.0.4
 
 # MQTT
 paho-mqtt>=1.6.0
 certifi>=2023.0
 
 # Edge/Database
-sqlalchemy>=2.0.0
+sqlalchemy>=2.0.54
 aiosqlite>=0.19.0
 
 # Web Dashboard
@@ -24,8 +24,8 @@ python-multipart>=0.0.6
 
 # Security
 cryptography>=41.0.0
-bcrypt>=4.0.0
-pyjwt>=2.8.0
+bcrypt>=5.0.0
+pyjwt>=2.15.1
 
 # Cloud (Premium)
 # boto3>=1.28.0          # AWS IoT Core

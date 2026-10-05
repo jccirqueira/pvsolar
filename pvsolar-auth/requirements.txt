@@ -19,5 +19,5 @@ aiosqlite>=0.19.0
 # Testes
 pytest>=7.4.0
 pytest-asyncio>=0.21.0
-httpx2>=2.0.0
+httpx2>=2.13.1
 pytest-cov>=4.1.0
