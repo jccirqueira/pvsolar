@@ -163,6 +163,9 @@ class WebConfig(BaseModel):
     enabled: bool = Field(default=True)
     port: int = Field(default=5000)
     host: str = Field(default="0.0.0.0")
+    # Origens CORS permitidas (o frontend roda em outra porta, ex.:
+    # pvsolar-web em localhost:3001 chamando a API em localhost:8000).
+    cors_origins: list[str] = Field(default_factory=lambda: ["*"])
     auth: WebAuthConfig = Field(default_factory=WebAuthConfig)
 
 

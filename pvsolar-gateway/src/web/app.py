@@ -7,6 +7,7 @@ Provides REST API and real-time dashboard for monitoring solar inverters.
 
 import structlog
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 
 logger = structlog.get_logger(__name__)
@@ -30,6 +31,16 @@ def create_app(config, drivers: list, metrics) -> FastAPI:
         version="1.0.0",
         docs_url="/api/docs",
         redoc_url="/api/redoc",
+    )
+
+    # CORS - mesmo padrao das demais APIs do ecossistema (analytics/auth):
+    # permite o pvsolar-web (localhost:3001) chamar esta API (localhost:8000).
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=config.web.cors_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
     app.state.config = config

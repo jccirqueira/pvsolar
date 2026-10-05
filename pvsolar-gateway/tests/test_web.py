@@ -168,3 +168,57 @@ class TestDashboardHelper:
         assert "ws://" in html
         assert "loadInverters" in html
         assert "inverters" in html
+
+
+class TestCORS:
+    """pvsolar-web (localhost:3001) chama esta API (localhost:8000)."""
+
+    def setup_method(self):
+        self.app = create_app(make_config(), [FakeDriver()], FakeMetrics())
+        self.client = TestClient(self.app)
+
+    def test_config_default_permite_todo_origin(self):
+        # padrao da casa (igual analytics/auth): cors_origins = ["*"]
+        assert make_config().web.cors_origins == ["*"]
+
+    def test_preflight_do_frontend_autorizado(self):
+        resp = self.client.options(
+            "/api/status",
+            headers={
+                "Origin": "http://localhost:3001",
+                "Access-Control-Request-Method": "GET",
+            },
+        )
+        assert resp.status_code == 200
+        assert (
+            resp.headers["access-control-allow-origin"]
+            == "http://localhost:3001"
+        )
+        assert "GET" in resp.headers["access-control-allow-methods"]
+
+    def test_resposta_simples_carrega_header_cors(self):
+        resp = self.client.get(
+            "/api/status",
+            headers={"Origin": "http://localhost:3001"},
+        )
+        assert resp.status_code == 200
+        assert (
+            resp.headers["access-control-allow-origin"]
+            == "http://localhost:3001"
+        )
+
+    def test_origins_restritos_sao_respeitados(self):
+        cfg = make_config()
+        cfg.web.cors_origins = ["http://exemplo.local"]
+        client = TestClient(create_app(cfg, [], FakeMetrics()))
+        resp = client.options(
+            "/api/status",
+            headers={
+                "Origin": "http://localhost:3001",
+                "Access-Control-Request-Method": "GET",
+            },
+        )
+        # origem fora da lista nao e autorizada (sem header ou 400)
+        assert resp.headers.get("access-control-allow-origin") != (
+            "http://localhost:3001"
+        )
