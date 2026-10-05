@@ -798,3 +798,29 @@ class TestFroniusDriver:
         # Int16 com sinal
         assert driver._decode_int16(100) == 100
         assert driver._decode_int16(65486) == -50
+
+    async def test_read_all_falha_inesperada_retorna_none(self, monkeypatch):
+        # guard do read_all: excecao fora dos sub-leitores (aqui em
+        # _reset_errors) conta erro e devolve None
+        def handler(method, address, count, slave):
+            if address == 40002:
+                return FakeResponse(common_model_regs())
+            if address == 40076:
+                return FakeResponse(inverter_int_regs())
+            return FakeResponse(error=True)
+
+        models = {
+            1: {"address": 40000, "length": 72},
+            103: {"address": 40074, "length": 50},
+        }
+        driver = make_driver(models=models, handler=handler)
+
+        def falha():
+            raise RuntimeError("falha simulada")
+
+        monkeypatch.setattr(driver, "_reset_errors", falha)
+
+        data = await driver.read_all()
+
+        assert data is None
+        assert driver._error_count == 1

@@ -543,6 +543,33 @@ class TestHuaweiOptimizers:
         assert "optimizer_count" not in data.custom
 
 
+class TestHuaweiGuardsDeExcecao:
+    """Guards dos leitores: excecao do cliente Modbus e engolida e logada."""
+
+    async def test_read_battery_excecao_engolida(self):
+        def handler(method, address, count, slave):
+            raise RuntimeError("cliente offline")
+
+        driver = make_driver(handler)
+        data = InverterData()
+
+        await driver._read_battery(data)
+
+        # a falha nao propaga e storage nao e montado pela metade
+        assert "storage" not in data.custom
+
+    async def test_read_optimizers_excecao_engolida(self):
+        def handler(method, address, count, slave):
+            raise RuntimeError("cliente offline")
+
+        driver = make_driver(handler)
+        data = InverterData()
+
+        await driver._read_optimizers(data)
+
+        assert "optimizer_count" not in data.custom
+
+
 class TestHuaweiConnection:
     """Tests for HuaweiDriver connection and Modbus operations."""
 

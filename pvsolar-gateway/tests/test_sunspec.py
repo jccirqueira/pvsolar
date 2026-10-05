@@ -662,3 +662,87 @@ class TestSunSpecDriver:
         # Int16 com sinal
         assert driver._decode_int16(100) == 100
         assert driver._decode_int16(65535) == -1
+
+
+class TestSunSpecGuardsDeExcecao:
+    """Guards dos sub-leitores: excecao do cliente Modbus e engolida e logada."""
+
+    async def test_read_common_model_excecao_engolida(self):
+        def handler(method, address, count, slave):
+            if address == 40002:
+                raise RuntimeError("timeout modbus")
+            return FakeResponse(error=True)
+
+        driver = make_driver(
+            models={1: {"address": 40000, "length": 72}},
+            handler=handler
+        )
+        data = InverterData()
+
+        await driver._read_common_model(data)
+
+        # a excecao nao propaga e os campos ficam intactos
+        assert data.manufacturer == ""
+        assert data.model == ""
+
+    async def test_read_inverter_model_sem_modelo_retorna_sem_leitura(self):
+        # nenhum modelo 101-113 na cadeia: sai antes de tocar no cliente
+        driver = make_driver(
+            models={1: {"address": 40000, "length": 72}},
+            handler=lambda method, address, count, slave: FakeResponse(
+                common_model_regs()
+            )
+        )
+        data = InverterData()
+
+        await driver._read_inverter_model(data)
+
+        assert data.ac_power == 0.0
+        assert driver._client.calls == []
+
+    async def test_read_inverter_model_excecao_engolida(self):
+        def handler(method, address, count, slave):
+            if address == 40076:
+                raise RuntimeError("timeout modbus")
+            return FakeResponse(error=True)
+
+        driver = make_driver(
+            models={103: {"address": 40074, "length": 50}},
+            handler=handler
+        )
+        data = InverterData()
+
+        await driver._read_inverter_model(data)
+
+        assert data.ac_power == 0.0
+        assert data.status == "unknown"
+
+    async def test_read_mppt_model_excecao_engolida(self):
+        def handler(method, address, count, slave):
+            raise RuntimeError("timeout modbus")
+
+        driver = make_driver(
+            models={160: {"address": 40000, "length": 13}},
+            handler=handler
+        )
+        data = InverterData()
+        data.dc_inputs = [{"voltage": 100.0}]
+
+        await driver._read_mppt_model(data)
+
+        # a falha no cliente preserva o estado anterior de dc_inputs
+        assert data.dc_inputs == [{"voltage": 100.0}]
+
+    async def test_read_storage_model_excecao_engolida(self):
+        def handler(method, address, count, slave):
+            raise RuntimeError("timeout modbus")
+
+        driver = make_driver(
+            models={124: {"address": 40000, "length": 8}},
+            handler=handler
+        )
+        data = InverterData()
+
+        await driver._read_storage_model(data)
+
+        assert "storage" not in data.custom
