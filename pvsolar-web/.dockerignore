@@ -1,11 +1,29 @@
-# Imagem Docker do pvSolar Web - mantem o contexto de build enxuto.
+# Contexto de build da imagem web (docker/Dockerfile)
+# Exclui o que nao deve entrar na imagem nem no upload do contexto.
 node_modules
 .next
+out
+coverage
 npm-debug.log*
+*.tsbuildinfo
+
+# Fontes de teste e qualidade (nao necessarias para `next build`)
+tests
+jest.config.js
+tsconfig.tsbuildinfo
+
+# Ambiente local (vars de producao entram via build args)
+.env
+.env.local
+.env.*.local
+
+# Artefatos e sistema
+output
+logs
+*.log
 .git
 .gitignore
 *.md
 docker/
-coverage
-jest.config.js
-tsconfig.tsbuildinfo
+Dockerfile
+.dockerignore

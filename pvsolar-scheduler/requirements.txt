@@ -11,3 +11,7 @@ sqlalchemy[asyncio]>=2.0.25
 asyncpg>=0.29.0
 # aiosqlite: driver usado nos testes unitários da camada de persistência
 aiosqlite>=0.19.0
+
+# Testes
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
