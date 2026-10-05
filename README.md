@@ -8,7 +8,7 @@ projetos interligados, com API REST, autenticação multi-tenant, agendamento,
 relatórios PDF/Excel, alertas multi-canal, gêmeo digital e deploy
 containerizado pronto para VPS com HTTPS automático.
 
-**Qualidade:** 1477 testes automatizados (12 suítes pytest + jest), cobertura de
+**Qualidade:** 1479 testes automatizados (12 suítes pytest + jest), cobertura de
 código com piso por projeto (gate na CI; pvsolar-gateway com **100%**), lint
 contínuo (ruff + ESLint na CI e
 pre-commit local), validadores estruturais de compose/documentação, CI com
@@ -73,9 +73,9 @@ uvicorn src.api.app:app --host 0.0.0.0 --port 8007
 
 | Stack | Comando | Total |
 |---|---|---|
-| 12 projetos Python | `python -m pytest tests/ -q` (em cada projeto) | 1427 |
+| 12 projetos Python | `python -m pytest tests/ -q` (em cada projeto) | 1429 |
 | pvsolar-web | `npm test` | 50 |
-| **Total** | | **1477** |
+| **Total** | | **1479** |
 
 A CI roda tudo com cobertura: `pytest --cov=src` falha abaixo do piso do
 `.coveragerc` de cada projeto (ratchet — nunca regredir, meta ≥80%) e o jest

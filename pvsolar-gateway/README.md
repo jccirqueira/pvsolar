@@ -322,7 +322,7 @@ O gateway expõe métricas via Prometheus:
 ## 🧪 Testes
 
 ```bash
-# Suíte completa (407 testes) com cobertura
+# Suíte completa (409 testes) com cobertura
 python -m pytest tests/ -q --cov=src --cov-report=term
 ```
 

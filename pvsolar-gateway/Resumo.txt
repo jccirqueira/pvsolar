@@ -4,7 +4,7 @@
 Versão do Documento: 1.0
 Data: 2026-09-16
 Autor: Opencode (IA Assistente)
-Status: PROJETO FUNCIONAL - 407/407 TESTES PASSANDO - COBERTURA 100%
+Status: PROJETO FUNCIONAL - 409/409 TESTES PASSANDO - COBERTURA 100%
 
 ================================================================================
 1. CONTEXTO E OBJETIVO DO PROJETO
@@ -138,9 +138,9 @@ pvsolar-gateway/
     ├── test_pvbinder.py          — 25 testes do pvbrowser bridge
     ├── test_sma.py               — 45 testes do driver SMA
     ├── test_sunspec.py           — 39 testes do driver SunSpec
-    └── test_web.py               — 17 testes da API web (REST, WS, OpenAPI, CORS)
+    └── test_web.py               — 19 testes da API web (REST, WS, CORS, realtime)
 
-Total: 407 testes, todos passando. Cobertura: 100% (2247/2247 linhas,
+Total: 409 testes, todos passando. Cobertura: 100% (2247/2247 linhas,
 piso .coveragerc = 98).
 
 ================================================================================
@@ -453,7 +453,7 @@ Pacotes que precisam de __init__.py:
 ================================================================================
 
 Comando: python -m pytest tests/ -v
-Resultado: 407/407 PASSED (8.1s)
+Resultado: 409/409 PASSED (8.8s)
 Cobertura: 100% (2247/2247 linhas) - piso .coveragerc = 98 (ratchet -2pp)
 
 Distribuição por arquivo:
@@ -470,7 +470,7 @@ Distribuição por arquivo:
 - test_pvbinder.py:  25 testes (converter, bridge, loops, stop/start, estado)
 - test_sma.py:       45 testes (decode, status, ASCII, get_status, structure)
 - test_sunspec.py:   39 testes (modelos, MPPT, storage, read_all, status)
-- test_web.py:       17 testes (dashboard HTML, REST, WebSocket, OpenAPI, CORS)
+- test_web.py:       19 testes (dashboard HTML, REST, WebSocket, OpenAPI, CORS, WS lib)
 
 Fixtures:
 - conftest.py: adiciona src/ ao sys.path

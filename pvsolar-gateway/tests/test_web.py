@@ -2,6 +2,7 @@
 Unit tests for pvSolar Gateway web dashboard (FastAPI).
 """
 
+import importlib.util
 import sys
 from pathlib import Path
 
@@ -168,6 +169,18 @@ class TestDashboardHelper:
         assert "ws://" in html
         assert "loadInverters" in html
         assert "inverters" in html
+
+
+class TestRealtimeWS:
+    """Tempo real do dashboard: uvicorn precisa da lib `websockets`
+    para dar upgrade no /ws - sem ela a rota vira 404 silencioso."""
+
+    def test_biblioteca_websockets_disponivel(self):
+        assert importlib.util.find_spec("websockets") is not None
+
+    def test_dashboard_e_rota_ws_apontam_para_o_mesmo_caminho(self):
+        html = _dashboard_html()
+        assert 'new WebSocket(`ws://${location.host}/ws`)' in html
 
 
 class TestCORS:
