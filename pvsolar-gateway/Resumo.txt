@@ -62,15 +62,19 @@ pvsolar-gateway/
 ├── requirements.txt              — Dependências pip (46 linhas)
 │
 ├── config/
+│   ├── gateway.yaml               — Config local (dev, credenciais MQTT)
 │   └── gateway.example.yaml      — Exemplo completo de config (172 linhas)
 │
 ├── docker/
-│   ├── docker-compose.yml        — Stack completo (141 linhas)
-│   ├── grafana/provisioning/
-│   │   └── datasources.yml       — Datasources Grafana
-│   └── mosquitto/config/
-│       ├── mosquitto.conf        — Config MQTT broker (47 linhas)
-│       └── acl.txt               — ACL de tópicos (32 linhas)
+│   ├── docker-compose.yml        — Stack dev: gateway + mosquitto + influx + grafana + telegraf
+│   ├── grafana/provisioning/datasources/
+│   │   └── datasources.yml       — Datasources Grafana (token via ${INFLUXDB_TOKEN})
+│   ├── mosquitto/config/
+│   │   ├── mosquitto.conf        — Broker MQTT: 1883 autenticado + 9001 WebSocket
+│   │   ├── password.txt          — Senhas (mosquitto_passwd: pvsolar/pvsolar_dev)
+│   │   └── acl.txt               — ACL de tópicos (32 linhas)
+│   └── telegraf/
+│       └── telegraf.conf         — Pipeline MQTT -> InfluxDB (validado: telegraf --test)
 │
 ├── examples/
 │   └── pvbrowser_example.py      — Exemplo de uso (104 linhas)
@@ -609,25 +613,29 @@ metrics:
 docker-compose.yml inclui 5 serviços:
 
 1. pvsolar-gateway — Imagem customizada, depende de mosquitto
-2. mosquitto — MQTT broker com TLS, password auth, WebSocket
+2. mosquitto — MQTT broker com autenticação (1883) e WebSocket (9001)
 3. influxdb — Banco de séries temporais (porta 8086)
 4. grafana — Dashboard visual (porta 3000)
-5. telegraf — Agente de coleta de métricas
+5. telegraf — Coleta MQTT e grava no InfluxDB (pipeline -> Grafana)
 
 Portas:
-- Mosquitto: 8883 (TLS), 1883 (local), 9001 (WebSocket)
+- Mosquitto: 1883 (autenticado), 9001 (WebSocket)
 - InfluxDB: 8086
 - Grafana: 3000
 - Telegraf: usa MQTT como input
 - Prometheus metrics: 9090
 
+Credenciais MQTT do dev stack: pvsolar / pvsolar_dev (password.txt,
+as mesmas que envia config/gateway.yaml; anônimo é recusado).
+
 ================================================================================
 10. SEGURANÇA
 ================================================================================
 
-- TLS 1.3 obrigatório para MQTT
-- mTLS com certificados X.509
-- ACL por tópico no Mosquitto
+- TLS 1.2/1.3 suportado e configurável no cliente MQTT (cloud)
+- mTLS opcional com certificados X.509 (campos tls no config)
+- Autenticação por senha no broker local (allow_anonymous false)
+- ACL por tópico no Mosquitto (acl.txt)
 - Senhas hashed (bcrypt) para web dashboard
 - JWT para autenticação da API
 - Verificação de certificado configurável

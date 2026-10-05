@@ -112,6 +112,10 @@ jobs:
       - uses: actions/checkout@v7
       - name: Validar sintaxe do compose
         run: docker compose config -q
+      - name: Validar sintaxe dos composes dev (gateway e scada)
+        run: |
+          docker compose -f pvsolar-gateway/docker/docker-compose.yml config -q
+          docker compose -f pvsolar-scada/docker/docker-compose.yml config -q
       - name: Validar Caddyfile (caddy validate)
         run: |
           # Mesmo default do compose (http://localhost = HTTP puro na 80);

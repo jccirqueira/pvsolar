@@ -1,5 +1,3 @@
-version: '3.8'
-
 # pvSolar Gateway - Docker Compose Configuration
 # ================================================
 # This configuration deploys the complete pvSolar stack including:
@@ -48,18 +46,16 @@ services:
     container_name: pvsolar-mosquitto
     restart: unless-stopped
     ports:
-      - "1883:1883"   # MQTT
-      - "8883:8883"   # MQTT over TLS
+      - "1883:1883"   # MQTT (autenticado: pvsolar / pvsolar_dev)
       - "9001:9001"   # WebSocket
     volumes:
       - ./mosquitto/config:/mosquitto/config:ro
       - ./mosquitto/data:/mosquitto/data
       - ./mosquitto/log:/mosquitto/log
-      - pvsolar-certs:/mosquitto/certs:ro
     networks:
       - pvsolar-network
     healthcheck:
-      test: ["CMD", "mosquitto_sub", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3"]
+      test: ["CMD", "mosquitto_sub", "-h", "localhost", "-u", "pvsolar", "-P", "pvsolar_dev", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -104,21 +100,27 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-pvsolar123}
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_SERVER_ROOT_URL=http://localhost:3000
+      - INFLUXDB_TOKEN=${INFLUXDB_TOKEN:-pvsolar-super-secret-token}
     depends_on:
       influxdb:
         condition: service_healthy
     networks:
       - pvsolar-network
 
-  # Optional: Telegraf for additional metrics
+  # Optional: Telegraf for additional metrics (MQTT -> InfluxDB)
   telegraf:
     image: telegraf:latest
     container_name: pvsolar-telegraf
     restart: unless-stopped
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    environment:
+      - MOSQUITTO_URL=${MOSQUITTO_URL:-tcp://mosquitto:1883}
+      - INFLUX_URL=${INFLUX_URL:-http://influxdb:8086}
+      - INFLUXDB_TOKEN=${INFLUXDB_TOKEN:-pvsolar-super-secret-token}
     depends_on:
       - influxdb
+      - mosquitto
     networks:
       - pvsolar-network
 
