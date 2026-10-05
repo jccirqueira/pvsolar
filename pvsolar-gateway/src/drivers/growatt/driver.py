@@ -48,8 +48,11 @@ class GrowattDriver(BaseInverterDriver):
     REG_BATTERY_VOLTAGE = 105
     REG_BATTERY_CURRENT = 106
     REG_BATTERY_POWER = (107, 108)
-    REG_BATTERY_CHARGE_LIMIT = (951, 952)
-    REG_BATTERY_DISCHARGE_LIMIT = (953, 954)
+    # Enderecos iniciais dos blocos de limite (4 registradores a partir
+    # de REG_BATTERY_CHARGE_LIMIT: carga H/L em 951-952, descarga H/L
+    # em 953-954). Antes era uma tupla passada como address do Modbus.
+    REG_BATTERY_CHARGE_LIMIT = 951
+    REG_BATTERY_DISCHARGE_LIMIT = 953
 
     def __init__(self, config: InverterConfig):
         super().__init__(config)
@@ -272,9 +275,11 @@ class GrowattDriver(BaseInverterDriver):
 
     async def _read_holding_registers(self, data: InverterData):
         """Read Growatt holding registers."""
+        # 0..88: serial em 23-27 e firmware em 88 (count=30 deixava o
+        # acesso ao registrador 88 estourar IndexError e anular read_all)
         result = await self._client.read_holding_registers(
             address=0,
-            count=30,
+            count=89,
             slave=self.config.connection.unit_id
         )
 
@@ -286,7 +291,8 @@ class GrowattDriver(BaseInverterDriver):
         data.serial_number = self._decode_ascii(serial_regs)
 
         # Firmware version
-        data.firmware_version = f"{result.registers[88] >> 8}.{result.registers[88] & 0xFF}"
+        if len(result.registers) > 88:
+            data.firmware_version = f"{result.registers[88] >> 8}.{result.registers[88] & 0xFF}"
 
     async def _read_storage_data(self, data: InverterData):
         """Read storage/hybrid specific data."""

@@ -8,7 +8,7 @@ projetos interligados, com API REST, autenticação multi-tenant, agendamento,
 relatórios PDF/Excel, alertas multi-canal, gêmeo digital e deploy
 containerizado pronto para VPS com HTTPS automático.
 
-**Qualidade:** 1226 testes automatizados (12 suítes pytest + jest), cobertura de
+**Qualidade:** 1428 testes automatizados (12 suítes pytest + jest), cobertura de
 código com piso por projeto (gate na CI), lint contínuo (ruff + ESLint na CI e
 pre-commit local), validadores estruturais de compose/documentação, CI com
 build real das 13 imagens Docker + **smoke-test E2E** (stack completa sobe no
@@ -71,9 +71,9 @@ uvicorn src.api.app:app --host 0.0.0.0 --port 8007
 
 | Stack | Comando | Total |
 |---|---|---|
-| 12 projetos Python | `python -m pytest tests/ -q` (em cada projeto) | 1176 |
+| 12 projetos Python | `python -m pytest tests/ -q` (em cada projeto) | 1378 |
 | pvsolar-web | `npm test` | 50 |
-| **Total** | | **1226** |
+| **Total** | | **1428** |
 
 A CI roda tudo com cobertura: `pytest --cov=src` falha abaixo do piso do
 `.coveragerc` de cada projeto (ratchet — nunca regredir, meta ≥80%) e o jest
@@ -149,8 +149,11 @@ profissional com API, configuração e troubleshooting).
 2. **pytest** — matriz com os 12 projetos Python (Windows runner, ambiente
    validado);
 3. **jest** — pvsolar-web (Node 20);
-4. **Docker build** — `docker compose config` + build das 14 imagens
-   (validação real dos Dockerfiles).
+4. **Lint** — ruff (monorepo) + ESLint (web);
+5. **Docker build + smoke E2E** — `docker compose config` + `caddy validate`
+   + build das 13 imagens (validação real dos Dockerfiles) + stack completa
+   no ar (`up --wait`) com probes HTTP; em falha, dumps de logs e de estado
+   dos containers.
 
 ---
 

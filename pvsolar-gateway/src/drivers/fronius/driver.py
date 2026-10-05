@@ -41,6 +41,10 @@ class FroniusDriver(BaseInverterDriver):
         self._unit_id: int = config.connection.unit_id
         self._float_mode: bool = False
         self._has_storage: bool = False
+        # Descoberta da cadeia SunSpec; dict vazio quando a leitura
+        # inicial falha (sem isto, o logger do _discover_models e o
+        # read_all estouravam AttributeError).
+        self._models: dict[int, dict] = {}
 
     async def connect(self):
         """Establish connection to Fronius inverter."""
@@ -140,7 +144,6 @@ class FroniusDriver(BaseInverterDriver):
                     break
 
                 # Store model
-                self._models = getattr(self, '_models', {})
                 self._models[model_id] = {
                     'address': address,
                     'length': model_length
@@ -173,6 +176,14 @@ class FroniusDriver(BaseInverterDriver):
             data.inverter_name = self.config.name
             data.manufacturer = "Fronius"
             data.custom['device_generation'] = self._device_generation
+
+            # Sem modelo de inverter (101-113) descoberto: nada a ler
+            # -> None (em vez de InverterData zerada, que publicaria 0s)
+            if not any(mid in self._models for mid in (103, 113, 102, 112, 101, 111)):
+                self._handle_error(
+                    ValueError("nenhum modelo SunSpec de inverter descoberto")
+                )
+                return None
 
             # Read Common Model (ID 1)
             if 1 in self._models:
@@ -363,8 +374,10 @@ class FroniusDriver(BaseInverterDriver):
         data.operating_state = state_reg
         data.status = state_map.get(state_reg, 'unknown')
 
-        # Temperature
-        if len(result.registers) > 37:
+        # Temperature: apenas no modo inteiro. No modo float o
+        # registrador 37 pertence a energia total ([34:38]) - ler
+        # como temperatura produzia valor ficticio (ex.: 1500.0 C).
+        if not is_float and len(result.registers) > 37:
             data.temperature = self._decode_int16(result.registers[37]) * 0.1
 
     async def _read_mppt_model(self, data: InverterData):

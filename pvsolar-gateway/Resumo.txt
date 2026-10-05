@@ -4,7 +4,7 @@
 Versão do Documento: 1.0
 Data: 2026-09-16
 Autor: Opencode (IA Assistente)
-Status: PROJETO FUNCIONAL - 156/156 TESTES PASSANDO
+Status: PROJETO FUNCIONAL - 358/358 TESTES PASSANDO
 
 ================================================================================
 1. CONTEXTO E OBJETIVO DO PROJETO
@@ -124,15 +124,18 @@ pvsolar-gateway/
     ├── test_config.py            — 22 testes de configuração
     ├── test_drivers.py           — 12 testes de drivers
     ├── test_edge.py              — 8 testes de edge store
+    ├── test_fronius.py           — 39 testes do driver Fronius
     ├── test_gateway.py           — 26 testes do orquestrador core
-    ├── test_huawei.py            — 9 testes do driver Huawei
+    ├── test_growatt.py           — 39 testes do driver Growatt
+    ├── test_huawei.py            — 61 testes do driver Huawei
     ├── test_metrics.py           — 15 testes do coletor Prometheus
     ├── test_mqtt.py              — 34 testes do cliente MQTT
     ├── test_pvbinder.py          — 10 testes do pvbrowser bridge
-    ├── test_sma.py               — 7 testes do driver SMA
+    ├── test_sma.py               — 45 testes do driver SMA
+    ├── test_sunspec.py           — 34 testes do driver SunSpec
     └── test_web.py               — 13 testes da API web (REST + WebSocket)
 
-Total: 156 testes, todos passando.
+Total: 358 testes, todos passando.
 
 ================================================================================
 4. MÓDULOS DETALHADOS
@@ -418,23 +421,47 @@ Pacotes que precisam de __init__.py:
    Problema: `pvsolar-config=pvsolar.core.config:main` — config.py não tem main()
    Solução: Remover entry point inválido
 
+6.9 Growatt: read_all() sempre retornava None
+   Problema: _read_holding_registers pedia count=30 mas lia registers[88]
+             (IndexError anulava a leitura inteira); _read_storage_data
+             passava a tupla REG_BATTERY_CHARGE_LIMIT como address do Modbus
+   Solução: count=89 (bloco 0..88) + guard de firmware; endereco 951
+
+6.10 Fronius: AttributeError na descoberta + temperatura fictícia
+    Problema: __init__ não inicializava _models (AttributeError no logger
+              da cadeia quando a primeira leitura falhava); no modo float o
+              registrador 37 (energia total [34:38]) também era lido como
+              temperatura (ex.: 1500.0 C)
+    Solução: _models = {} no init; temperatura só no modo inteiro;
+             read_all() devolve None + erro quando não há modelo de inverter
+
+6.11 SunSpec: MPPT sempre vazio + temperatura fictícia
+    Problema: _read_mppt_model chamava self._decode_uint16 inexistente
+              (exceção engolida -> dc_inputs sempre []); mesma sobreposição
+              de temperatura no modo float
+    Solução: decoder _decode_uint16; temperatura só no modo inteiro;
+             guard de "sem modelo de inverter" (None + erro reportado)
+
 ================================================================================
 7. TESTES
 ================================================================================
 
 Comando: python -m pytest tests/ -v
-Resultado: 156/156 PASSED (5.48s)
+Resultado: 358/358 PASSED (7.8s)
 
 Distribuição por arquivo:
 - test_config.py:    22 testes (validação de config, TLS, MQTT, inverters, load)
 - test_drivers.py:   12 testes (InverterData, BaseDriver, create_driver factory)
 - test_edge.py:       8 testes (init, store, pending, sync, alert, stats)
+- test_fronius.py:   39 testes (connect, discover, float/int, read_all, status)
 - test_gateway.py:   26 testes (init, start/stop, componentes, loops, main)
-- test_huawei.py:     9 testes (decode, registers, state, structure)
+- test_growatt.py:   39 testes (input/holding, storage, read_all, status)
+- test_huawei.py:    61 testes (decode, registers, state, get_status, structure)
 - test_metrics.py:   15 testes (coletor Prometheus: init, update, helpers)
 - test_mqtt.py:      34 testes (connect/TLS, publish, subscribe, callbacks)
 - test_pvbinder.py:  10 testes (converter, bridge, normalize, pack)
-- test_sma.py:        7 testes (decode, status, ASCII, structure)
+- test_sma.py:       45 testes (decode, status, ASCII, get_status, structure)
+- test_sunspec.py:   34 testes (modelos, MPPT, storage, read_all, status)
 - test_web.py:       13 testes (dashboard HTML, REST, WebSocket, OpenAPI)
 
 Fixtures:

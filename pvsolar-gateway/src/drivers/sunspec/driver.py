@@ -28,6 +28,12 @@ class SunSpecModels:
     INVERTER_THREE_PHASE_FLOAT = 113
     MPPT = 160
     STORAGE = 124
+    # Qualquer modelo de inverter (inteiro ou float)
+    INVERTER_IDS = (
+        INVERTER_SINGLE_PHASE, INVERTER_SPLIT_PHASE, INVERTER_THREE_PHASE,
+        INVERTER_SINGLE_PHASE_FLOAT, INVERTER_SPLIT_PHASE_FLOAT,
+        INVERTER_THREE_PHASE_FLOAT,
+    )
 
 
 class SunSpecDriver(BaseInverterDriver):
@@ -150,6 +156,14 @@ class SunSpecDriver(BaseInverterDriver):
             data = InverterData()
             data.inverter_id = self.config.id
             data.inverter_name = self.config.name
+
+            # Sem modelo de inverter (101-113) descoberto: nada a ler
+            # -> None (em vez de InverterData zerada, que publicaria 0s)
+            if not any(mid in self._models for mid in SunSpecModels.INVERTER_IDS):
+                self._handle_error(
+                    ValueError("nenhum modelo SunSpec de inverter descoberto")
+                )
+                return None
 
             # Read Common Model (ID 1)
             await self._read_common_model(data)
@@ -368,8 +382,10 @@ class SunSpecDriver(BaseInverterDriver):
             data.operating_state = operating_state
             data.status = state_map.get(operating_state, 'unknown')
 
-            # Temperature (if available)
-            if len(result.registers) > 37:
+            # Temperature: apenas no modo inteiro - no float o
+            # registrador 37 pertence a energia total ([34:38]) e
+            # ler causaria valor ficticio (ex.: 1500.0 C).
+            if not is_float and len(result.registers) > 37:
                 data.temperature = self._decode_int16(result.registers[37]) * 0.1
 
         except Exception as e:
@@ -505,6 +521,10 @@ class SunSpecDriver(BaseInverterDriver):
         if len(registers) < 4:
             return 0
         return (registers[0] << 48) | (registers[1] << 32) | (registers[2] << 16) | registers[3]
+
+    def _decode_uint16(self, register: int) -> int:
+        """Decode unsigned int16 from register."""
+        return register & 0xFFFF
 
     def _decode_int16(self, register: int) -> int:
         """Decode signed int16 from register."""
